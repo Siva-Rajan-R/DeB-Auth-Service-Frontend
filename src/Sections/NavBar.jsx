@@ -55,9 +55,19 @@ export const NavBar = () => {
         }
     }
 
+    const getSecrets=async()=>{
+          const res=await call({method:'GET',path:'/user/secrets'})
+          console.log("users :",res)
+          if(res){
+            console.warn("usersbro : ",res);
+          }
+          return res
+      }
+
 
   // Intersection observer for nav highlight
   useEffect(() => {
+    getSecrets()
     console.log("your username from cookie : ",Cookies.get('user_name'));
 
     if (Cookies.get('user_name')!=null && Cookies.get('user_profile')){
