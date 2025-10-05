@@ -87,7 +87,7 @@ export const DialogContents={
 
 
 export const featuresCardDatas=[
-    {'title':'Multiple Sign-In Options','desc':'OTP, Google, Facebook, GitHub — users can sign in their way.','imageUrl':'public/assets/social_links.png','lottieUrl':null},
+    {'title':'Multiple Sign-In Options','desc':'OTP, Google, Facebook, GitHub — users can sign in their way.','imageUrl':'/social_links.png','lottieUrl':null},
     {'title':'Secure JWT Delivery','desc':'Client secret swap → JWT issued with full profile info.','imageUrl':null,'lottieUrl':Security},
     {'title':'Multiple API Keys & Configs','desc':'Create different API keys with custom login options — OTP, Google, Facebook, GitHub','imageUrl':null,'lottieUrl':Keys},
     {'title':'OAuth-Like Simplicity','desc':'Works just like OAuth — login, redirect, code exchange, and user info. Simple and secure.','imageUrl':null,'lottieUrl':Oauth}
