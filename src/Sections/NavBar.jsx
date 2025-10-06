@@ -41,7 +41,7 @@ export const NavBar = () => {
       const res=await call({method:'GET',path:'/user/auth',withCred:false})
       if (res){
         Cookies.set('isInitiated',true)
-        // window.location.href=res.login_url
+        window.location.href=res.login_url
       }
       setLoading(false)
     }
