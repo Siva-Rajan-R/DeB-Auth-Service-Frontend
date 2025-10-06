@@ -47,7 +47,7 @@ export const NavBar = () => {
     }
   
     const logout = async ()=>{
-        const res=await call({method:'delete',path:'/user/logout'})
+        const res=await call({method:'delete',path:'/user/logout',withCred:true})
         if (res){
           Cookies.remove('user_name')
           Cookies.remove('user_profile')

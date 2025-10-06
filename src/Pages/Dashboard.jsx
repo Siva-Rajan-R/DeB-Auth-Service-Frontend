@@ -15,7 +15,7 @@ export const DashboardPage = () => {
   const { isSecretsAdded }=useContext(AuthContext)
 
   const getSecrets=async()=>{
-      const res=await call({method:'GET',path:'/user/secrets'})
+      const res=await call({method:'GET',path:'/user/secrets',withCred:true})
       console.log("users :",res)
       var secretsComponent=[];
       if(res){
