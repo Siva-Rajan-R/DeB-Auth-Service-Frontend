@@ -43,7 +43,7 @@ export const DashboardPage = () => {
   useEffect(()=>{
     getSecrets()
     if (!Cookies.get('user_name')){
-      window.location.href='/'
+      // window.location.href='/'
       console.warn("Your Token expierd , Please Sign-in")
     }
   },[isSecretsAdded])
