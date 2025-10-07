@@ -32,7 +32,9 @@ export const useNetworkCalls = () => {
         Cookies.remove('user_name')
         Cookies.remove('user_profile')
         if (location.pathname!='/'){
-          window.location.href='/'
+          // window.location.href='/'
+          console.warn("You  need to go back to home page and sigin in again");
+          
         }
         setIsLoggedIn(false);
       }
