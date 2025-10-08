@@ -26,11 +26,16 @@ export const NavBar = () => {
 
   const userName=params.get('name')
   const userProfile=params.get('profile')
+  const accessToken=params.get('access_token')
+  const refreshToken=params.get('refresh_token')
+
   console.log('is cookie initiated',Cookies.get('isInitiated'),params.size);
   
-  if (userName!=null && userProfile!=null && Cookies.get('isInitiated')=='true'){
+  if (userName!=null && userProfile!=null && accessToken!=null && refreshToken!=null && Cookies.get('isInitiated')=='true'){
     Cookies.set('user_name',userName)
     Cookies.set('user_profile',userProfile)
+    Cookies.set('access_token',accessToken)
+    Cookies.set('refresh_token',refreshToken)
     Cookies.remove('isInitiated')
   }
 
@@ -47,12 +52,16 @@ export const NavBar = () => {
     }
   
     const logout = async ()=>{
-        const res=await call({method:'delete',path:'/user/logout',withCred:true})
-        if (res){
-          Cookies.remove('user_name')
-          Cookies.remove('user_profile')
-          setIsLoggedIn(false)
-        }
+        // const res=await call({method:'delete',path:'/user/logout',withCred:true})
+        // if (res){
+          
+          
+        // }
+        Cookies.remove('user_name')
+        Cookies.remove('user_profile')
+        Cookies.remove('access_token')
+        Cookies.remove('refresh_token')
+        setIsLoggedIn(false)
     }
 
 
@@ -60,7 +69,7 @@ export const NavBar = () => {
   useEffect(() => {
     console.log("your username from cookie : ",Cookies.get('user_name'));
 
-    if (Cookies.get('user_name')!=null && Cookies.get('user_profile')){
+    if (Cookies.get('user_name')!=null && Cookies.get('user_profile') && Cookies.get('access_token')!=null && Cookies.get('refresh_token')){
       setIsLoggedIn(true)
     }
 
