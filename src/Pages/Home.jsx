@@ -7,7 +7,7 @@ import { KnowusPage } from './Knowus'
 export const HomePage = () => {
   return (
     <>
-    <div className='mx-12 pb-20'>
+    <div className='mx-12 max-sm:mx-3 pb-20'>
         <NavBar></NavBar> 
         <Hero></Hero> 
         <FeaturesPage></FeaturesPage>

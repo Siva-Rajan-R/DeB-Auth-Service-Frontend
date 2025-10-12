@@ -17,6 +17,7 @@ body{
   background-color: black;
   margin: 0;
   padding: 5px;
+  
 }
 
 .scrollbar-hide::-webkit-scrollbar {

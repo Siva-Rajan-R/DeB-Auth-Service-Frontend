@@ -114,14 +114,14 @@ export const NavBar = () => {
     <div className="w-full">
       <div className="flex justify-between items-center m-3 pb-3 w-full" id="home">
         {/* Title */}
-        <div>
-          <h1 className="text-3xl bg-linear-to-r from-cyan-100 via-cyan-200 to-cyan-300 bg-clip-text text-transparent font-bold">
+        <div className=''>
+          <h1 className="text-3xl bg-linear-to-r from-cyan-100 via-cyan-200 to-cyan-300 bg-clip-text text-transparent font-bold max-sm:text-2xl">
             DeB-Auth-System
           </h1>
         </div>
 
         {/* for navigation */}
-            <div className='bg-transparent shadow shadow-cyan-400 w-100 h-15 rounded-2xl flex items-center justify-evenly'>
+            <div className='bg-transparent shadow shadow-cyan-400 w-100 h-15 rounded-2xl flex items-center justify-evenly max-sm:hidden max-lg:hidden'>
                 {
                     navigationTexts.map((nav,index)=>{
                         return <a key={index} href={`#${nav.href}`} className={`font-semibold ${curNavName==nav.navName && 'border-b-3'} border-cyan-500 cursor-pointer text-[18px]`} onClick={(event)=>handleNavClick(event, nav.navName)}>{nav.navName}</a>
@@ -130,7 +130,7 @@ export const NavBar = () => {
             </div>
 
         {/* Right side buttons */}
-        <div className=" w-100 h-15 rounded-2xl flex justify-evenly items-center">
+        <div className=" w-100 h-15 rounded-2xl flex justify-evenly items-center max-sm:w-auto max-lg:w-fit max-sm:mx-5">
           {isLoggedIn ? (
             <>
               {/* Profile */}
@@ -185,12 +185,13 @@ export const NavBar = () => {
                 btnName={'Get Started'}
                 btnClassName={'text-[18px] font-semibold'}
                 onclickFunc={() => { window.open('/auth-docs', '_blank') }}
+                btnDivClassName={"max-sm:hidden max-lg:hidden"}
               />
             </>
           ) : (
             <>
-              <IceBlueButton btnName={isLoading ? <Lottie animationData={Loading} className='w-20'/>:'Sign-In'} btnClassName={'text-[18px] font-semibold'} onclickFunc={()=>login()}/>
-              <IceBlueButton btnName={'Get Started'} btnClassName={'text-[18px] font-semibold'} onclickFunc={() => { window.open('/auth-docs', '_blank') }} />
+              <IceBlueButton btnName={isLoading ? <Lottie animationData={Loading} className='w-20'/>:'Sign-In'} btnClassName={'text-[18px] max-sm:text-sm max-lg:text-sm font-semibold'} btnDivClassName={"max-sm:p-3"} onclickFunc={()=>login()}/>
+              <IceBlueButton btnName={'Get Started'} btnDivClassName={"max-sm:hidden max-lg:hidden"} btnClassName={'text-[18px] font-semibold'} onclickFunc={() => { window.open('/auth-docs', '_blank') }} />
             </>
           )}
         </div>
