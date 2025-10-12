@@ -15,24 +15,29 @@ export const DashBoardNavBar = () => {
 
   return (
     <div
-      className={`w-full sticky top-0 transition-all duration-300 ${
-        scrolled ? 'backdrop-blur-md bg-white/20 shadow-md rounded-2xl' : 'bg-transparent'
+      className={`w-full transition-all duration-300 sticky top-0 z-50 ${
+        scrolled ? 'backdrop-blur-md bg-white/20 shadow-md rounded-b-2xl' : 'bg-transparent'
       }`}
     >
-      <div className="flex justify-between items-center m-3 pb-3 w-full">
+      <div className="flex justify-between items-center p-3 sm:p-4 w-full">
         {/* for title */}
-        <div className='flex justify-center items-center gap-x-5'>
-          <MdOutlineKeyboardBackspace size={40} color='cyan' cursor={'pointer'} onClick={()=>{window.location.href="/"}}/>
-          <h1 className="text-3xl bg-gradient-to-r from-cyan-100 via-cyan-200 to-cyan-300 bg-clip-text text-transparent font-bold">
+        <div className='flex justify-center items-center gap-x-3 sm:gap-x-5'>
+          <MdOutlineKeyboardBackspace 
+            size={32} 
+            className='sm:w-10 sm:h-10 text-cyan-400 cursor-pointer hover:text-cyan-300 transition-colors' 
+            onClick={()=>{window.location.href="/"}}
+          />
+          <h1 className="text-xl sm:text-2xl md:text-3xl bg-gradient-to-r from-cyan-100 via-cyan-200 to-cyan-300 bg-clip-text text-transparent font-bold">
             DeB-Auth-Dashboard
           </h1>
         </div>
 
         {/* for signin and other buttons */}
-        <div className="bg-transparent w-100 h-15 rounded-2xl flex justify-evenly items-center">
+        <div className="bg-transparent">
           <IceBlueButton
             btnName={'Docs'}
-            btnClassName={'text-[18px] font-semibold'}
+            btnClassName={'text-sm sm:text-base md:text-[18px] font-semibold px-5 max-sm:px-0'}
+            btnDivClassName={'px-3 sm:px-4 py-2 rounded-lg sm:rounded-xl'}
             onclickFunc={() => {
               window.open('/auth-docs', '_blank')
             }}

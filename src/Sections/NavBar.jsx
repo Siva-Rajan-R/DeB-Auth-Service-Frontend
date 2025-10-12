@@ -52,11 +52,8 @@ export const NavBar = () => {
     }
   
     const logout = async ()=>{
-        // const res=await call({method:'delete',path:'/user/logout',withCred:true})
-        // if (res){
-          
-          
-        // }
+        console.log("Inside Logout");
+      
         Cookies.remove('user_name')
         Cookies.remove('user_profile')
         Cookies.remove('access_token')
@@ -157,7 +154,7 @@ export const NavBar = () => {
 
                 {/* Dropdown */}
                 {showProfileCard && (
-                  <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-cyan-300 p-4 z-50">
+                  <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-cyan-300 p-4 z-1000">
                     <p className="text-gray-700 font-semibold mb-3">
                       👋 Hi, <span className="text-cyan-500">{Cookies.get('user_name')}</span>
                     </p>
