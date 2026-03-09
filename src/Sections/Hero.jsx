@@ -20,7 +20,7 @@ export const Hero = () => {
         
         <div className='w-240 text-center z-[90] max-sm:w-80'>
             <h1 className='text-[70px] max-sm:text-4xl max-lg:text-5xl max-sm:mb-2 max-lg:mb-2 bg-linear-to-r from-cyan-100 via-cyan-200 to-cyan-300 bg-clip-text text-transparent font-bold'>
-                Build Secure User Authentication in Minutes, Not Months
+                Authentication API for Developers
             </h1>
             <h1 className='text-[80px] max-sm:text-2xl max-lg:text-3xl max-sm:mb-2 max-lg:mb-2 bg-linear-to-r from-cyan-100 via-cyan-200 to-cyan-300 bg-clip-text text-transparent font-bold'>
                 The No-Fluff Auth API for Developers Who Ship Fast
