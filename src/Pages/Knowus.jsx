@@ -12,21 +12,21 @@ export const KnowusPage = () => {
       <div className="w-full mt-12 rounded-2xl flex flex-row max-sm:flex-col max-lg:flex-col max-sm:gap-10 max-lg:gap-10">
         
         {/* Section 1 */}
-        <div className="ml-10 max-sm:ml-0 max-lg:ml-0 w-full border-l-2 border-r-2 border-purple-400 rounded-xl px-3">
-          <h1 className="text-2xl max-sm:text-xl font-bold text-purple-300">Why Choose Us</h1>
+        <div className="ml-10 max-sm:ml-0 max-lg:
+        .1.1.1..  .1. 1.. font-bold text-purple-300"><h1>Why Choose DeB-Auth-Service?</h1>
           <div className="ml-5 mt-5 max-sm:ml-3">
             <ul className="list-disc list-inside space-y-2 text-lg">
               <li>
-                <span className="font-bold max-sm:font-semibold text-purple-100">Zero Fluff, Maximum Security</span> → One-time login URLs ensure every session starts fresh and safe.
+                <span className="font-bold max-sm:font-semibold text-purple-100">Zero-Trust Security Architecture:</span> Our single-use login URLs ensure that every authentication session starts with a fresh, cryptographically unique handshake to prevent session hijacking.
               </li>
               <li>
-                <span className="font-bold max-sm:font-semibold text-purple-100">Speed That Matches Your Workflow</span> → Grab an API key, and you’re ready to roll. No long setup.
+                <span className="font-bold max-sm:font-semibold text-purple-100">Rapid API Integration</span> Eliminate complex setups. Generate a secure API Key and deploy production-ready authentication in under five minutes.
               </li>
               <li>
-                <span className="font-bold max-sm:font-semibold text-purple-100">Built for Modern Apps</span> → Supports both OTP and social logins out of the box.
+                <span className="font-bold max-sm:font-semibold text-purple-100">Universal Auth Support</span> Out-of-the-box compatibility for Passwordless OTP, Google OAuth2, GitHub, and Facebook social logins.
               </li>
               <li>
-                <span className="font-bold max-sm:font-semibold text-purple-100">JWT-Powered Trust</span> → Every successful exchange ends with a JWT carrying verified user info.
+                <span className="font-bold max-sm:font-semibold text-purple-100">Cryptographically Verified JWTs</span> Every successful authentication exchange concludes with a signed JSON Web Token (JWT), providing trusted user metadata for your application.
               </li>
             </ul>
           </div>
@@ -34,20 +34,20 @@ export const KnowusPage = () => {
 
         {/* Section 2 */}
         <div className="ml-10 max-sm:ml-0 max-lg:ml-0 w-full border-l-2 border-r-2 border-purple-400 rounded-xl px-3">
-          <h1 className="text-2xl max-sm:text-xl font-bold text-purple-300">What Makes Us Different from Others</h1>
+          <h1 className="text-2xl max-sm:text-xl font-bold text-purple-300">What Makes Us Different?</h1>
           <div className="ml-5 mt-5 max-sm:ml-3">
             <ul className="list-disc list-inside space-y-2 text-lg">
               <li>
-                <span className="font-bold max-sm:font-semibold text-purple-100">One-Time Login Flow</span> → Unlike others, every login link is valid only once. No chance of replay attacks.
+                <span className="font-bold max-sm:font-semibold text-purple-100">Replay Attack Protection</span> Unlike standard persistent login forms, our One-Time Login Flow invalidates links immediately after use, neutralizing replay attack vectors
               </li>
               <li>
-                <span className="font-bold max-sm:font-semibold text-purple-100">Multiple API Keys with Custom Configs</span> → Tailor login methods (OTP, Google, Facebook, GitHub) per key.
+                <span className="font-bold max-sm:font-semibold text-purple-100">Granular API Configuration</span> Manage multiple API Keys with custom security configurations—tailor specific login methods (OTP vs. Social) per environment or project.
               </li>
               <li>
-                <span className="font-bold max-sm:font-semibold text-purple-100">OAuth-Like but Cleaner</span> → Familiar flow (login → redirect → code exchange → JWT), without the heavy baggage.
+                <span className="font-bold max-sm:font-semibold text-purple-100">Lightweight OAuth2 Implementation</span>Experience a familiar Authorization Code Grant flow (Login → Redirect → Code Exchange → JWT) without the heavy infrastructure baggage.
               </li>
               <li>
-                <span className="font-bold max-sm:font-semibold text-purple-100">Made for Devs Who Ship Fast</span> → Minimal learning curve, maximum output.
+                <span className="font-bold max-sm:font-semibold text-purple-100">Developer-First (DX) Focused</span> Built for developers who ship fast. Minimal learning curve with clean API endpoints and OIDC-compliant responses.
               </li>
             </ul>
           </div>

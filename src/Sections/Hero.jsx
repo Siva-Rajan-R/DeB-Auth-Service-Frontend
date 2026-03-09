@@ -20,19 +20,19 @@ export const Hero = () => {
         
         <div className='w-240 text-center z-[90] max-sm:w-80'>
             <h1 className='text-[70px] max-sm:text-4xl max-lg:text-5xl max-sm:mb-2 max-lg:mb-2 bg-linear-to-r from-cyan-100 via-cyan-200 to-cyan-300 bg-clip-text text-transparent font-bold'>
-                Lock, Load, Login
+                Build Secure User Authentication in Minutes, Not Months
             </h1>
             <h1 className='text-[80px] max-sm:text-2xl max-lg:text-3xl max-sm:mb-2 max-lg:mb-2 bg-linear-to-r from-cyan-100 via-cyan-200 to-cyan-300 bg-clip-text text-transparent font-bold'>
-                Auth That Plays Hard
+                The No-Fluff Auth API for Developers Who Ship Fast
             </h1>
             <h1 className='text-cyan-100 font-semibold max-sm:text-[12px] max-lg:text-[15px] max-sm:px-0 max-lg:px-40'>
-                “Drop your API Key → grab a one-time login URL → users sign in their way (OTP or social) → code hits your redirect → swap it with your client secret → JWT drops with full user profile info. No fluff. No weak flows. Just fast, clean, savage authentication — made for devs who play hard and ship faster”
+                “Stop building custom login flows from scratch <strong>DeB-Auth-System</strong> developer-first authentication API that handles everything from <strong> OTP logins</strong> to  <strong>social authentication (OAuth)</strong> . Drop in your API key, grab a JWT, and get back to building your core product.”
             </h1>
         </div>
 
         <div className='flex w-150 justify-evenly mt-10 z-[90]'>
             <IceBlueButton btnName={"Grab API Key"} btnClassName={'text-[15px] font-semibold'} btnDivClassName={"max-sm:hidden"}></IceBlueButton>
-            <IceBlueButton btnName={"Get Started"} btnClassName={'text-[15px] font-semibold'} onclickFunc={()=>{window.open('/auth-docs','_blank')}}></IceBlueButton>
+            <IceBlueButton btnName={"Read API Docs"} btnClassName={'text-[15px] font-semibold'} onclickFunc={()=>{window.open('/auth-docs','_blank')}}></IceBlueButton>
         </div>
         
         <Lottie

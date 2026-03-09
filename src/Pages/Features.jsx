@@ -28,7 +28,7 @@ export const FeaturesPage = () => {
                 One-Time Login URL
               </h1>
               <h3 className="text-purple-100 mt-2">
-                After receiving the API key, a unique login link is generated — valid only once to ensure security.
+                Generate secure, single-use authentication links via our FastAPI backend. Links are cryptographically signed and expire automatically to prevent replay attacks.
               </h3>
             </div>
           </div>

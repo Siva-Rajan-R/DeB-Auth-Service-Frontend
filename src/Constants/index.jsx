@@ -4,39 +4,28 @@ import Keys from '../assets/lotties/keys.json'
 
 export const authFLowSteps=[
     {
-        'title':'API Key → One-Time Login Form',
-        'subTitle':`When a client wants to start the authentication process, it sends its API Key to the server.
-                    The server validates this key and responds with a secure, one-time login URL.
-                    This ensures that only valid API key holders can initiate the flow.`
+        'title':'API Key → Authorization:',
+        'subTitle':`Initialize the flow with a validated API Key. We respond with a secure, one-time login URL for your users.`
 
     },
     {
-        'title':'User Signs In',
-        'subTitle':`Once the user opens the login page, they can sign in using multiple options such as:
-
-                    OTP-based login (mobile or email verification)
-                    Social logins like Google, Facebook, or GitHub
-
-                    After successful login, the server generates a temporary authorization code that will be used in the next step.`
+        'title':'Verified User Sign-In:',
+        'subTitle':`Users authenticate via Social OAuth or Email/SMS OTP. Upon success, a short-lived authorization code is generated.`
 
     },
     {
-        'title':'Redirect',
-        'subTitle':`The server then redirects the user back to the client's registered redirect URL.
-        During this redirect, the authorization code is securely attached as a query parameter.
-        This code is short-lived and valid only for a single exchange.`
+        'title':'Secure Code Exchange:',
+        'subTitle':`Swap the authorization code and client secret for a production-ready JWT. This follows the standard OAuth2 Authorization Code flow.`
 
     },
     {
-        'title':'Code Exchange',
-        'subTitle':`The client now takes the received authorization code and sends it along with its Client Secret to the server. The server verifies both values. If valid → the server issues a JWT Access Token. If invalid → the server denies access with an error.
-        This step ensures that only trusted clients can exchange codes for tokens.`
+        'title':'The Token Swap',
+        'subTitle':`The client application exchanges the received authorization code and Client Secret for a secure JWT Access Token. This server-to-server handshake ensures that only verified, trusted clients can access user data. Our system implements a strict OAuth2 exchange flow to prevent token theft and unauthorized access..`
 
     },
     {
         'title':'User Info',
-        'subTitle':`With the valid JWT Access Token, the client can now call the /userinfo endpoint.
-        The server decodes the token, validates it, and returns user profile details such as: User ID, Name, Email`
+        'subTitle':`Once the client possesses a valid JWT Bearer Token, it can query the /userinfo endpoint. Our server decodes the OIDC-compliant token, validates the signature, and returns a JSON object containing verified User Claims such as User ID, Name, and Email for seamless profile synchronization.`
 
     },
 
@@ -87,10 +76,10 @@ export const DialogContents={
 
 
 export const featuresCardDatas=[
-    {'title':'Multiple Sign-In Options','desc':'OTP, Google, Facebook, GitHub — users can sign in their way.','imageUrl':'/social_links.png','lottieUrl':null},
-    {'title':'Secure JWT Delivery','desc':'Client secret swap → JWT issued with full profile info.','imageUrl':null,'lottieUrl':Security},
-    {'title':'Multiple API Keys & Configs','desc':'Create different API keys with custom login options — OTP, Google, Facebook, GitHub','imageUrl':null,'lottieUrl':Keys},
-    {'title':'OAuth-Like Simplicity','desc':'Works just like OAuth — login, redirect, code exchange, and user info. Simple and secure.','imageUrl':null,'lottieUrl':Oauth}
+    {'title':'Multiple Sign-In Options','desc':'Native support for Passwordless OTP, Google OAuth, and GitHub Login. Switch between providers with a simple configuration change.','imageUrl':'/social_links.png','lottieUrl':null},
+    {'title':'Secure JWT Delivery','desc':'FastAPI-powered token generation. We issue Pydantic-validated JWTs (JSON Web Tokens) containing verified user profile metadata.','imageUrl':null,'lottieUrl':Security},
+    {'title':'Multiple API Keys & Configs','desc':'Manage unique API configurations for development, staging, and production environments with ease.','imageUrl':null,'lottieUrl':Keys},
+    {'title':'OAuth-Like Simplicity','desc':'A familiar OAuth2 Authorization Code flow. Integrate secure login, redirect, and code exchange into your app in under 5 minutes.','imageUrl':null,'lottieUrl':Oauth}
 ]
 
 
