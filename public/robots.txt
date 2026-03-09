@@ -1,1 +1,4 @@
-google-site-verification=rfbAkZ9BkYNjpmwRAg3DqiVjKJEFHLzuoSbXl_xifxo
+User-agent: *
+Allow: /
+
+Sitemap: https://authdebuggers.vercel.app/sitemap.xml
