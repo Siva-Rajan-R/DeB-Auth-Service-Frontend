@@ -26,13 +26,13 @@ export const Hero = () => {
                 Secure Login & User Authentication System
             </h2>
             <h1 className='text-cyan-100 font-semibold max-sm:text-[12px] max-lg:text-[15px] max-sm:px-0 max-lg:px-40'>
-                “Stop building custom login flows from scratch <strong>DeB-Auth-System</strong> developer-first authentication API that handles everything from <strong> OTP logins</strong> to  <strong>social authentication (OAuth)</strong> . Drop in your API key, grab a JWT, and get back to building your core product.”
+                “Authentication API for Developers Secure Login API with OTP, OAuth & JWT Authentication”
             </h1>
         </div>
 
         <div className='flex w-150 justify-evenly mt-10 z-[90]'>
             <IceBlueButton btnName={"Grab API Key"} btnClassName={'text-[15px] font-semibold'} btnDivClassName={"max-sm:hidden"}></IceBlueButton>
-            <IceBlueButton btnName={"Read API Docs"} btnClassName={'text-[15px] font-semibold'} onclickFunc={()=>{window.open('/auth-docs','_blank')}}></IceBlueButton>
+            <IceBlueButton btnName={"View API Documentation"} btnClassName={'text-[15px] font-semibold'} onclickFunc={()=>{window.open('/auth-docs','_blank')}}></IceBlueButton>
         </div>
         
         <Lottie
