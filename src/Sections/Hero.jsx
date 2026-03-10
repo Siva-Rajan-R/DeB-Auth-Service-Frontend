@@ -23,7 +23,7 @@ export const Hero = () => {
                 Authentication API for Developers
             </h1>
             <h1 className='text-[80px] max-sm:text-2xl max-lg:text-3xl max-sm:mb-2 max-lg:mb-2 bg-linear-to-r from-cyan-100 via-cyan-200 to-cyan-300 bg-clip-text text-transparent font-bold'>
-                The No-Fluff Auth API for Developers Who Ship Fast
+                Developer Authentication API – Secure Login & User Authentication System
             </h1>
             <h1 className='text-cyan-100 font-semibold max-sm:text-[12px] max-lg:text-[15px] max-sm:px-0 max-lg:px-40'>
                 “Stop building custom login flows from scratch <strong>DeB-Auth-System</strong> developer-first authentication API that handles everything from <strong> OTP logins</strong> to  <strong>social authentication (OAuth)</strong> . Drop in your API key, grab a JWT, and get back to building your core product.”

@@ -86,7 +86,7 @@ export const featuresCardDatas=[
 export const navigationTexts = [
     { navName: 'Home', href: 'home' },
     { navName: 'Features', href: 'features' },
-    { navName: 'Auth-Flow', href: 'auth-flow' },
+    { navName: 'How Authentication Works', href: 'How Authentication Works' },
     { navName: 'Know-Us', href: 'know-us' }
 ];
 
