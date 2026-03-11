@@ -1,7 +1,7 @@
 import { FeaturesCard } from '../Components/FeaturesCard'
 import OTL from '../assets/lotties/Login and Sign up.json'
 import Lottie from 'lottie-react'
-import { fedaturesCardDatas } from '../Constants/index'
+import { featuresCardDatas } from '../Constants/index'
 
 export const FeaturesPage = () => {
   return (
