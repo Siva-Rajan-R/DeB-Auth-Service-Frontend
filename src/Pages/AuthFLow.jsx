@@ -9,7 +9,7 @@ export const AuthFLowPage = () => {
         {/* Title */}
         <div className="w-full flex justify-start items-start">
           <h1 className="w-fit text-4xl max-sm:text-xl max-lg:text-2xl bg-linear-to-r from-purple-200 via-purple-300 to-purple-800 bg-clip-text text-transparent font-semibold rounded-1xl px-2 pb-2 border-b-2 border-purple-300 rounded">
-            Auth Flow
+            How Authentication Work
           </h1>
         </div>
         {/* End Title */}
