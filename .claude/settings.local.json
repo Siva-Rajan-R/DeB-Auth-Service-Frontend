@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx vite:*)",
+      "Bash(npx tsc *)",
+      "Bash(grep -v \"//.*MOCK_\")",
+      "Bash(xargs grep *)",
+      "Bash(grep \"\\\\.py$\")",
+      "Bash(awk '{print $NF}' echo --- ls -la /d/projects/airport-marketplace/Services/HyperLocal_Services/Offer_Service/infra/primary_db/repos)",
+      "Bash(awk '{print $NF}')",
+      "Bash(cat)",
+      "Bash(/c/Users/siva9/AppData/Local/Programs/Python/Python313/python /tmp/fix_saga_merge.py)"
+    ]
+  }
+}

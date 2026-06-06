@@ -98,6 +98,7 @@ export const navigationTexts = [
     { navName: 'Home', href: 'home' },
     { navName: 'Features', href: 'features' },
     { navName: 'Auth-Flow', href: 'auth-flow' },
+    { navName: 'Pricing', href: 'pricing' },
     { navName: 'Know-Us', href: 'know-us' }
 ];
 
@@ -320,3 +321,8 @@ curl -X GET "https://api.yourservice.com/user" \\
     }
 };
 
+
+
+export const DashboardDatas=[
+  {'logoUrl':"",title:"",authType:"Oauth 2.0",authMethods:['Google',"Github"],authId:""}
+]

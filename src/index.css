@@ -1,11 +1,34 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
+  /* Default Light Theme */
+  --bg-deep: #eff6ff;
+  --bg-card: rgba(255, 255, 255, 0.95);
+  --bg-surface: rgba(255, 255, 255, 0.8);
+  --bg-navbar: rgba(255, 255, 255, 0.9);
+  
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --text-dim: #94a3b8;
+  
+  --border-glass: rgba(0, 0, 0, 0.08);
+  --border-active: rgba(99, 102, 241, 0.3);
+  
+  --accent-cyan: #6366f1;
+  --accent-purple: #8b5cf6;
+  --accent-indigo: #4f46e5;
+  --accent-emerald: #10b981;
 
+  --glass-blur: blur(12px);
+  --glass-shadow: 0 4px 24px -4px rgba(17, 24, 39, 0.08);
+  
+  color-scheme: light;
+  color: var(--text-main);
+  background-color: var(--bg-deep);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -13,11 +36,61 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-body{
-  background-color: black;
-  margin: 0;
-  padding: 5px;
+[data-theme='dark'] {
+  --bg-deep: #020617;
+  --bg-card: rgba(15, 23, 42, 0.6);
+  --bg-surface: rgba(30, 41, 59, 0.4);
+  --bg-navbar: rgba(2, 6, 23, 0.8);
   
+  --text-main: rgba(255, 255, 255, 0.95);
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+  
+  --border-glass: rgba(255, 255, 255, 0.08);
+  --border-active: rgba(34, 211, 238, 0.3);
+  
+  --accent-cyan: #22d3ee;
+  --accent-purple: #a855f7;
+  --accent-indigo: #6366f1;
+  --accent-emerald: #10b981;
+
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+  
+  color-scheme: dark;
+  color: var(--text-main);
+  background-color: var(--bg-deep);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-deep);
+  color: var(--text-main);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-glass);
+  border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-active);
 }
 
 .scrollbar-hide::-webkit-scrollbar {
@@ -25,7 +98,30 @@ body{
 }
 
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* IE & Edge */
-  scrollbar-width: none;     /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Glassmorphism Classes */
+.glass-panel {
+  background: var(--bg-card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-glass);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-card {
+  background: var(--bg-surface);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-glass);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  background: var(--bg-card);
+  border-color: var(--border-active);
+  transform: translateY(-4px);
 }
 

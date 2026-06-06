@@ -46,7 +46,13 @@ export const NavBar = () => {
       const res=await call({method:'GET',path:'/user/auth',withCred:false})
       if (res){
         Cookies.set('isInitiated',true)
-        window.location.href=res.login_url
+        const targetUrl = res.signin_url || res.login_url || res.data?.signin_url || res.data?.login_url;
+        if (targetUrl) {
+            window.location.href = targetUrl;
+        } else {
+            console.error("Login failed, unexpected response:", res);
+            window.location.href = "/?debug=" + encodeURIComponent(JSON.stringify(res));
+        }
       }
       setLoading(false)
     }
@@ -112,16 +118,16 @@ export const NavBar = () => {
       <div className="flex justify-between items-center m-3 pb-3 w-full" id="home">
         {/* Title */}
         <div className=''>
-          <h1 className="text-3xl bg-linear-to-r from-cyan-100 via-cyan-200 to-cyan-300 bg-clip-text text-transparent font-bold max-sm:text-2xl">
+          <h1 className="text-3xl text-indigo-600 font-extrabold max-sm:text-2xl tracking-tight">
             DeB-Auth-System
           </h1>
         </div>
 
         {/* for navigation */}
-            <div className='bg-transparent shadow shadow-cyan-400 w-100 h-15 rounded-2xl flex items-center justify-evenly max-sm:hidden max-lg:hidden'>
+            <div className='bg-white/70 backdrop-blur-md shadow-sm border border-slate-200 w-100 h-15 rounded-2xl flex items-center justify-evenly max-sm:hidden max-lg:hidden'>
                 {
                     navigationTexts.map((nav,index)=>{
-                        return <a key={index} href={`#${nav.href}`} className={`font-semibold ${curNavName==nav.navName && 'border-b-3'} border-cyan-500 cursor-pointer text-[18px]`} onClick={(event)=>handleNavClick(event, nav.navName)}>{nav.navName}</a>
+                        return <a key={index} href={`#${nav.href}`} className={`font-semibold ${curNavName==nav.navName ? 'text-indigo-600 border-b-2 border-indigo-500' : 'text-slate-600 hover:text-indigo-500'} transition-colors cursor-pointer text-[16px]`} onClick={(event)=>handleNavClick(event, nav.navName)}>{nav.navName}</a>
                     })
                 }
             </div>
@@ -133,7 +139,7 @@ export const NavBar = () => {
               {/* Profile */}
               <div 
                 ref={profileRef}
-                className="relative mr-3 w-12 h-12 rounded-full border-2 border-cyan-400 cursor-pointer flex justify-center items-center"
+                className="relative mr-3 w-12 h-12 rounded-full border-2 border-indigo-400 cursor-pointer flex justify-center items-center"
               >
                 {isImgError === false ? (
                   <img
@@ -154,14 +160,14 @@ export const NavBar = () => {
 
                 {/* Dropdown */}
                 {showProfileCard && (
-                  <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-cyan-300 p-4 z-1000">
+                  <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-indigo-300 p-4 z-1000">
                     <p className="text-gray-700 font-semibold mb-3">
-                      👋 Hi, <span className="text-cyan-500">{Cookies.get('user_name')}</span>
+                      👋 Hi, <span className="text-indigo-500">{Cookies.get('user_name')}</span>
                     </p>
                     <div className="flex flex-col gap-2">
                       <button
                         onClick={() => navigate('/dashboard')}
-                        className="text-left px-3 py-2 rounded-lg hover:bg-cyan-50 text-gray-600 font-medium"
+                        className="text-left px-3 py-2 rounded-lg hover:bg-indigo-50 text-gray-600 font-medium"
                       >
                         📊 Dashboard
                       </button>

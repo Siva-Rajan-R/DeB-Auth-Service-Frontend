@@ -15,7 +15,7 @@ export const SecretsInputBox = ({ inputTxt,setValueState,isForSecret=true,icon,i
     
 
     return (
-        <div className="flex items-center w-full bg-white/20 backdrop-blur-md rounded px-4 py-2 shadow shadow-cyan-300">
+        <div className="flex items-center w-full bg-white/20 backdrop-blur-md rounded px-4 py-2 shadow shadow-indigo-300">
         {/* Input field */}
         <input
             type="text"
