@@ -114,8 +114,8 @@ export const NavBar = () => {
   };
 
   return (
-    <div className="w-full">
-      <div className="flex justify-between items-center m-3 pb-3 w-full" id="home">
+    <div className="w-full sticky top-0 z-[100] bg-blue-50/90 backdrop-blur-md rounded-b-3xl shadow-sm mb-4">
+      <div className="flex justify-between items-center px-4 py-3 w-full" id="home">
         {/* Title */}
         <div className=''>
           <h1 className="text-3xl text-indigo-600 font-extrabold max-sm:text-2xl tracking-tight">

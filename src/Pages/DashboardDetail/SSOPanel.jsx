@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuthConfigStore } from '../../Store/useAuthConfigStore';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Trash2, ShieldAlert } from 'lucide-react';
+import { Plus, Trash2, ShieldAlert, Lock } from 'lucide-react';
 
 const validate = (domain) => {
   const d = domain.trim().toLowerCase().replace(/^https?:\/\//, '');
@@ -35,14 +35,14 @@ export const SSOPanel = () => {
             <ShieldAlert size={18} />
           </div>
           <div>
-            <h3 className='text-[var(--text-main)] font-bold text-sm'>SSO Configuration</h3>
+            <h3 className='text-[var(--text-main)] font-bold text-sm text-slate-500'>SSO Configuration</h3>
             <p className='text-[var(--text-muted)] text-[11px] font-medium'>Enterprise single sign-on domains</p>
           </div>
         </div>
-        <label className='relative inline-flex items-center cursor-pointer'>
-          <input type='checkbox' className='sr-only peer' checked={sso.enabled} onChange={toggleSSO} />
-          <div className="w-11 h-6 bg-[var(--bg-surface)] border border-[var(--border-glass)] rounded-full peer peer-checked:bg-indigo-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5 shadow-inner" />
-        </label>
+        <div className='flex items-center gap-2 px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-full'>
+          <Lock size={14} className='text-slate-500' />
+          <span className='text-xs font-bold text-slate-500 uppercase tracking-wider'>Coming Soon</span>
+        </div>
       </div>
 
       {sso.enabled && (

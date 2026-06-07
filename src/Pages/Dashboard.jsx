@@ -5,11 +5,12 @@ import Cookies from 'js-cookie';
 import { useNetworkCalls } from '../Utils/NetworkCalls';
 import { AuthContext } from '../Contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export const DashboardPage = () => {
   const [secrets, setSecrets] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
   const { call } = useNetworkCalls();
   const { isSecretsAdded } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -32,6 +33,18 @@ export const DashboardPage = () => {
   const handleCreateNew = () => navigate('/dashboard-detail');
   const handleEdit = (id) => navigate(`/dashboard-detail?id=${id}`);
 
+  const executeDelete = async () => {
+    if (!deleteConfirm) return;
+    
+    setLoading(true);
+    const res = await call({ method: 'DELETE', path: `/user/secrets/remove?apikey=${deleteConfirm}`, withCred: true });
+    if (res) {
+      await getSecrets();
+    }
+    setDeleteConfirm(null);
+    setLoading(false);
+  };
+
   return (
     <div 
       className='w-full flex-1 flex flex-col relative overflow-y-auto overflow-x-hidden custom-scrollbar'
@@ -53,8 +66,6 @@ export const DashboardPage = () => {
               Auth <span className='text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-indigo)] to-[var(--accent-purple)]'>Projects</span>
             </h1>
           </motion.div>
-          
-
         </div>
 
         {loading ? (
@@ -67,23 +78,10 @@ export const DashboardPage = () => {
           </div>
         ) : secrets.length === 0 ? (
           /* Empty State */
-          <div className='flex flex-col items-center justify-center min-h-[50vh] text-center'>
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className='p-12 rounded-[2.5rem] bg-[var(--bg-surface)] border border-[var(--border-glass)] shadow-sm mb-8'
-            >
-              <div className='w-24 h-24 bg-gradient-to-br from-[var(--accent-indigo)]/10 to-[var(--accent-purple)]/10 rounded-[2rem] flex items-center justify-center mx-auto mb-8 border border-[var(--border-glass)]'>
-                <div className='w-12 h-12 border-4 border-dashed border-[var(--accent-indigo)]/40 rounded-2xl' />
-              </div>
-              <h2 className='text-2xl font-bold text-[var(--text-main)] mb-3'>No Projects Found</h2>
-              <p className='text-[var(--text-muted)] max-w-sm mx-auto mb-8'>
-                You haven't created any authentication systems yet. Get started by creating your first project.
-              </p>
-              <div className='max-w-xs mx-auto'>
-                <CreateNewCard heading='Create your first Auth System' onClick={handleCreateNew} />
-              </div>
-            </motion.div>
+          <div className='flex flex-col items-center justify-center min-h-[50vh] w-full'>
+            <div className='w-full max-w-md mx-auto'>
+              <CreateNewCard heading='Create your first project' onClick={handleCreateNew} />
+            </div>
           </div>
         ) : (
           /* Projects Grid */
@@ -95,14 +93,53 @@ export const DashboardPage = () => {
                   authMethods={item.configurations?.auth_methods || []}
                   ssoEnabled={item.configurations?.sso?.enabled || false}
                   onEdit={() => handleEdit(item.apikey)}
-                  onDelete={() => {}}
+                  onDelete={() => setDeleteConfirm(item.apikey)}
                 />
               </div>
             ))}
-
           </div>
         )}
       </div>
+
+      {/* Custom Delete Confirmation Modal */}
+      <AnimatePresence>
+        {deleteConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 10 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 10 }}
+              className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden"
+            >
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-slate-800 mb-2">Delete Project</h3>
+                <p className="text-slate-500 text-sm">
+                  Are you sure you want to delete this project? This action cannot be undone and will permanently remove all related authentication data.
+                </p>
+              </div>
+              <div className="flex bg-slate-50 p-4 gap-3 justify-end border-t border-slate-100">
+                <button
+                  onClick={() => setDeleteConfirm(null)}
+                  className="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-200 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={executeDelete}
+                  className="px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors shadow-sm shadow-red-500/20"
+                >
+                  Delete
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
