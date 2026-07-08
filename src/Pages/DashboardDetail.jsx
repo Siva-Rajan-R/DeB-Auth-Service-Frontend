@@ -12,13 +12,16 @@ import { LivePreview } from './DashboardDetail/LivePreview';
 import { RedirectURLPanel } from './DashboardDetail/RedirectURLPanel';
 import { AdminPanel } from './DashboardDetail/AdminPanel';
 import { KeysPanel } from './DashboardDetail/KeysPanel';
+import { TwoFactorPanel } from './DashboardDetail/TwoFactorPanel';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Paintbrush2, Users2, ShieldCheck, UserPlus2, Link2, UserCog, Check, Copy, AlertTriangle, Key, Eye, PencilLine } from 'lucide-react';
+import { Paintbrush2, Users2, ShieldCheck, UserPlus2, Link2, UserCog, Check, Copy, AlertTriangle, Key, Eye, PencilLine, ShieldAlert } from 'lucide-react';
+
 
 const TABS_SIGNIN = [
   { id: 'ui',      label: 'UI Style',  icon: <Paintbrush2 size={15} /> },
   { id: 'methods', label: 'Providers', icon: <Users2      size={15} /> },
   { id: 'sso',     label: 'SSO',       icon: <ShieldCheck size={15} /> },
+  { id: '2fa',     label: '2-Factor',  icon: <ShieldAlert size={15} /> },
 ];
 
 const TABS_SIGNUP = [
@@ -26,7 +29,9 @@ const TABS_SIGNUP = [
   { id: 'methods', label: 'Providers', icon: <Users2      size={15} /> },
   { id: 'fields',  label: 'Fields',    icon: <UserPlus2   size={15} /> },
   { id: 'sso',     label: 'SSO',       icon: <ShieldCheck size={15} /> },
+  { id: '2fa',     label: '2-Factor',  icon: <ShieldAlert size={15} /> },
 ];
+
 
 const TABS_SHARED = [
   { id: 'redirect', label: 'Redirects', icon: <Link2 size={15} /> },
@@ -34,13 +39,40 @@ const TABS_SHARED = [
 ];
 
 export const DashboardDetail = () => {
-  const { projectName, setProjectName, activeMode, setActiveMode, resetToDefaults, sso, getExportConfig } = useAuthConfigStore();
+  const { projectName, setProjectName, activeMode, setActiveMode, resetToDefaults, sso, getExportConfig, hydrateFromConfig } = useAuthConfigStore();
   const [activeTab, setActiveTab] = useState('ui');
   const [searchParams, setSearchParams] = useSearchParams();
   const { call } = useNetworkCalls();
   const apikey = searchParams.get('id');
   const [newCredentials, setNewCredentials] = useState(null);
   const [copiedKey, setCopiedKey] = useState('');
+  const [isLoadingConfig, setIsLoadingConfig] = useState(false);
+
+  // Load existing config from backend on mount/apikey change
+  useEffect(() => {
+    if (!apikey) {
+      // New project: reset to defaults so there's no stale state from a previous project
+      resetToDefaults();
+      return;
+    }
+    const loadConfig = async () => {
+      setIsLoadingConfig(true);
+      try {
+        const res = await call({ method: 'GET', path: '/user/secrets', withCred: true });
+        if (res?.secrets) {
+          const match = res.secrets.find((s) => s.apikey === apikey);
+          if (match?.configurations) {
+            hydrateFromConfig(match.configurations);
+          }
+        }
+      } catch (_) {
+        // silently ignore – user can still edit and save
+      }
+      setIsLoadingConfig(false);
+    };
+    loadConfig();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [apikey]);
 
   // Track changes and listen for external save trigger
   useEffect(() => {
@@ -100,40 +132,37 @@ export const DashboardDetail = () => {
     }
   };
 
-  // Build dynamic tab list — Admin tab only when SSO is enabled
-  const adminTab = sso.enabled
-    ? [{ id: 'admin', label: 'Admin', icon: <UserCog size={15} /> }]
-    : [];
-
   const tabs = [
     ...(activeMode === 'signup' ? TABS_SIGNUP : TABS_SIGNIN),
     ...TABS_SHARED,
-    ...adminTab,
   ];
-
-  // If SSO gets disabled while on Admin tab, snap back to UI tab
-  useEffect(() => {
-    if (activeTab === 'admin' && !sso.enabled) {
-      setActiveTab('ui');
-    }
-  }, [sso.enabled]);
 
   const handleModeSwitch = (mode) => {
     setActiveMode(mode);
-    // Only reset if the current tab isn't a shared tab
-    if (activeTab !== 'redirect' && activeTab !== 'admin') {
+    if (activeTab !== 'redirect') {
       setActiveTab('ui');
     }
   };
 
   const [showMobilePreview, setShowMobilePreview] = useState(false);
-  const isAdminActive = activeTab === 'admin';
+  const [isAdminActive, setIsAdminActive] = useState(false);
+
 
   return (
     <div className='w-full flex-1 min-h-0 flex flex-col md:flex-row bg-[var(--bg-deep)] overflow-hidden text-[var(--text-main)] relative'>
       {/* Decorative Background Glows */}
       <div className='absolute top-[-10%] right-[-10%] w-[30%] h-[30%] bg-[var(--accent-indigo)]/5 blur-[120px] rounded-full pointer-events-none' />
       <div className='absolute bottom-[-10%] left-[-10%] w-[30%] h-[30%] bg-[var(--accent-purple)]/5 blur-[120px] rounded-full pointer-events-none' />
+
+      {/* Config loading overlay */}
+      {isLoadingConfig && (
+        <div className='absolute inset-0 z-50 flex items-center justify-center bg-[var(--bg-deep)]/80 backdrop-blur-sm'>
+          <div className='flex flex-col items-center gap-3'>
+            <div className='w-10 h-10 border-4 border-[var(--accent-indigo)]/20 border-t-[var(--accent-indigo)] rounded-full animate-spin' />
+            <p className='text-[var(--text-muted)] text-sm font-medium'>Loading configuration…</p>
+          </div>
+        </div>
+      )}
 
       {/* LEFT PANEL — Settings & Controls (Mobile: 100%, Desktop: 42%) */}
       <div className={`w-full md:w-[42%] flex-1 md:flex-none min-h-0 flex flex-col bg-[var(--bg-navbar)] backdrop-blur-xl border-r border-[var(--border-glass)] relative z-10 ${showMobilePreview ? 'hidden md:flex' : 'flex'}`}>
@@ -221,10 +250,13 @@ export const DashboardDetail = () => {
             >
               {activeTab === 'ui'       && <SignInCustomizer />}
               {activeTab === 'methods'  && <AuthMethodSelector />}
-              {activeTab === 'sso'      && <SSOPanel />}
+              {activeTab === 'sso'      && <SSOPanel onOpenAdmin={() => setIsAdminActive(true)} />}
+              {activeTab === '2fa'      && <TwoFactorPanel />}
               {activeTab === 'fields'   && <SignUpBuilder />}
               {activeTab === 'redirect' && <RedirectURLPanel />}
               {activeTab === 'keys'     && <KeysPanel apikey={apikey} />}
+
+
             </motion.div>
           </AnimatePresence>
         </div>
@@ -313,11 +345,12 @@ export const DashboardDetail = () => {
                 </div>
               </div>
               <button 
-                onClick={() => setActiveTab('ui')}
-                className='px-4 py-2 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-black/10 dark:hover:bg-white/10 transition-all text-xs font-bold'
+                onClick={() => setIsAdminActive(false)}
+                className='px-4 py-2 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 hover:text-white hover:bg-purple-600 transition-all text-xs font-bold'
               >
                 Exit Admin View
               </button>
+
             </div>
             <div className='flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar'>
               <AdminPanel />

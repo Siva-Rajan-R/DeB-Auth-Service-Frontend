@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaGoogle, FaGithub, FaFacebook } from 'react-icons/fa';
 import { BsMicrosoft } from 'react-icons/bs';
 import { MdOutlineSms } from 'react-icons/md';
 import { RiLockPasswordLine } from 'react-icons/ri';
-import { Eye, EyeOff, Check } from 'lucide-react';
+import { Eye, EyeOff, Check, Lock } from 'lucide-react';
 import axios from 'axios';
 import { UAParser } from 'ua-parser-js';
 
@@ -48,7 +48,19 @@ const getDeviceFingerprintHeaders = () => {
   };
 };
 
-const FInput = ({ label, name, type = 'text', placeholder, textColor, inputStyle, inputBorderColor, borderRadius, value, onChange }) => {
+// ─── Locked field badge ───────────────────────────────────────────────────────
+const LockedBadge = ({ color }) => (
+  <div
+    className='absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold'
+    style={{ backgroundColor: `${color}20`, border: `1px solid ${color}40`, color }}
+  >
+    <Lock size={9} />
+    locked
+  </div>
+);
+
+// ─── Input field (supports locked / readonly mode) ────────────────────────────
+const FInput = ({ label, name, type = 'text', placeholder, textColor, inputStyle, inputBorderColor, borderRadius, value, onChange, locked, primary }) => {
   const [show, setShow] = useState(false);
   const isPass = type === 'password';
   const isFilled = inputStyle === 'filled';
@@ -64,17 +76,24 @@ const FInput = ({ label, name, type = 'text', placeholder, textColor, inputStyle
           type={isPass && !show ? 'password' : type}
           placeholder={placeholder || label}
           value={value || ''}
-          onChange={onChange}
-          className='w-full px-4 py-3 text-sm outline-none border transition-all duration-300'
+          onChange={locked ? undefined : onChange}
+          readOnly={locked}
+          className={`w-full px-4 py-3 text-sm outline-none border transition-all duration-300 ${locked ? 'cursor-not-allowed select-none' : ''}`}
           style={{
             borderRadius,
-            backgroundColor: isFilled ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)',
-            borderColor: inputBorderColor || 'rgba(255,255,255,0.1)',
-            color: `${textColor}`,
+            backgroundColor: locked
+              ? `${primary || '#22d3ee'}0a`
+              : isFilled ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)',
+            borderColor: locked
+              ? `${primary || '#22d3ee'}40`
+              : inputBorderColor || 'rgba(255,255,255,0.1)',
+            color: textColor,
+            paddingRight: locked ? '90px' : undefined,
           }}
         />
-        {isPass && (
-          <button type="button" onClick={() => setShow((v) => !v)} className='absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-indigo-400 transition-colors'>
+        {locked && <LockedBadge color={primary || '#22d3ee'} />}
+        {isPass && !locked && (
+          <button type="button" onClick={() => setShow(v => !v)} className='absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-indigo-400 transition-colors'>
             {show ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>
         )}
@@ -83,27 +102,12 @@ const FInput = ({ label, name, type = 'text', placeholder, textColor, inputStyle
   );
 };
 
+// ─── Primary action button ────────────────────────────────────────────────────
 const FButton = ({ children, primary, textColor, buttonStyle, borderRadius, onClick, disabled }) => {
   const styles = {
-    filled:   { 
-      backgroundColor: primary, 
-      color: textColor, 
-      border: 'none',
-      boxShadow: `0 10px 25px -5px ${primary}40`,
-    },
-    outlined: { 
-      backgroundColor: 'transparent', 
-      color: primary, 
-      border: `2px solid ${primary}`,
-    },
-    ghost:    { 
-      backgroundColor: 'transparent', 
-      color: primary, 
-      border: 'none', 
-      textDecoration: 'underline', 
-      textUnderlineOffset: '4px',
-      fontWeight: 'bold',
-    },
+    filled:   { backgroundColor: primary, color: textColor, border: 'none', boxShadow: `0 10px 25px -5px ${primary}40` },
+    outlined: { backgroundColor: 'transparent', color: primary, border: `2px solid ${primary}` },
+    ghost:    { backgroundColor: 'transparent', color: primary, border: 'none', textDecoration: 'underline', textUnderlineOffset: '4px', fontWeight: 'bold' },
   };
   return (
     <button
@@ -120,6 +124,7 @@ const FButton = ({ children, primary, textColor, buttonStyle, borderRadius, onCl
   );
 };
 
+// ─── Social provider buttons ──────────────────────────────────────────────────
 const SocialButton = ({ method, textColor, borderRadius, request_id }) => (
   <button
     onClick={() => window.location.href = `${backend_url}/auth/${method.id}/login/${request_id}`}
@@ -149,144 +154,165 @@ const SocialMethods = ({ methods, socialLayout, textColor, borderRadius, request
   if (socialLayout === 'grid') {
     return (
       <div className='flex justify-center gap-2.5 flex-wrap'>
-        {methods.map((m) => <SocialIcon key={m.id} method={m} borderRadius={borderRadius} request_id={request_id} />)}
+        {methods.map(m => <SocialIcon key={m.id} method={m} borderRadius={borderRadius} request_id={request_id} />)}
       </div>
     );
   }
   return (
     <div className='space-y-2'>
-      {methods.map((m) => (
+      {methods.map(m => (
         <SocialButton key={m.id} method={m} textColor={textColor} borderRadius={borderRadius} request_id={request_id} />
       ))}
     </div>
   );
 };
 
-const OTPFlow = ({ request_id, onComplete, onSuccess, onBack, primary, textColor, buttonStyle, inputStyle, inputBorderColor, borderRadius }) => {
+// ─── OTP Flow — supports prefill + locked email + auto-send ──────────────────
+const OTPFlow = ({
+  request_id, onComplete, onSuccess, onBack,
+  primary, textColor, buttonStyle, inputStyle, inputBorderColor, borderRadius,
+  prefillEmail, lockedEmail,          // ← autofill props
+}) => {
   const [step, setStep] = useState(0);
-  const [formData, setFormData] = useState({ email: '', otp: '' });
+  const [formData, setFormData] = useState({ email: prefillEmail || '', otp: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const autoSentRef = useRef(false);
 
-  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (e) => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
-  const handleSendOTP = async () => {
-    if (!formData.email) {
-      setError('Please enter your email address');
-      return;
-    }
+  const handleSendOTP = async (emailOverride) => {
+    const email = emailOverride || formData.email;
+    if (!email) { setError('Please enter your email address'); return; }
     setError('');
     setLoading(true);
     try {
-      const res = await axios.post(`${backend_url}/auth/login/otp`, {
-        request_id,
-        email: formData.email
-      }, {
+      const res = await axios.post(`${backend_url}/auth/login/otp`, { request_id, email }, {
         headers: getDeviceFingerprintHeaders()
       });
-      if (res.data.success) {
-        setStep(1);
-      }
+      if (res.data.success) setStep(1);
     } catch (err) {
       const detail = err.response?.data?.detail;
-      if (detail && detail.redirect_url) {
-        window.location.href = detail.redirect_url;
-        return;
-      }
+      if (detail && detail.redirect_url) { window.location.href = detail.redirect_url; return; }
       setError(typeof detail === 'string' ? detail : detail?.message || 'Failed to send OTP');
     }
     setLoading(false);
   };
 
   const handleVerifyOTP = async () => {
-    if (!formData.otp) {
-      setError('Please enter the OTP');
-      return;
-    }
+    if (!formData.otp) { setError('Please enter the OTP'); return; }
     setError('');
     setLoading(true);
     try {
-      const res = await axios.post(`${backend_url}/auth/login/verify`, {
-        request_id,
-        otp: formData.otp
-      }, {
+      const res = await axios.post(`${backend_url}/auth/login/verify`, { request_id, otp: formData.otp }, {
         withCredentials: true,
         headers: getDeviceFingerprintHeaders()
       });
-      
-      if (res.data.next_step) {
-        onComplete(res.data.next_step); // advances to additional fields
-      } else if (res.data.redirect_url) {
-        onSuccess(res.data.redirect_url, 'Sign in successful! Redirecting...');
-      }
+      if (res.data.next_step) onComplete(res.data.next_step);
+      else if (res.data.redirect_url) onSuccess(res.data.redirect_url, 'Sign in successful! Redirecting...');
     } catch (err) {
       const detail = err.response?.data?.detail;
-      if (detail && detail.redirect_url) {
-        window.location.href = detail.redirect_url;
-        return;
-      }
+      if (detail && detail.redirect_url) { window.location.href = detail.redirect_url; return; }
       setError(typeof detail === 'string' ? detail : detail?.message || 'Failed to verify OTP');
     }
     setLoading(false);
   };
 
+  // Auto-send OTP when email is prefilled & locked
+  useEffect(() => {
+    if (lockedEmail && prefillEmail && !autoSentRef.current) {
+      autoSentRef.current = true;
+      handleSendOTP(prefillEmail);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <AnimatePresence mode='wait'>
       {step === 0 ? (
         <motion.div key='otp-email' initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -15 }} className='space-y-3'>
+          {lockedEmail && prefillEmail && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
+              className='flex items-center gap-2 text-xs py-2.5 px-3.5 rounded-xl font-medium'
+              style={{ backgroundColor: `${primary}12`, border: `1px solid ${primary}30`, color: `${textColor}80` }}
+            >
+              <Lock size={11} style={{ color: primary }} />
+              <span>OTP will be sent to <strong style={{ color: textColor }}>{prefillEmail}</strong></span>
+            </motion.div>
+          )}
           {error && <p className='text-red-400 text-xs text-center'>{error}</p>}
-          <FInput label='Email Address' name='email' type='email' placeholder='you@example.com' textColor={textColor} inputStyle={inputStyle} inputBorderColor={inputBorderColor} borderRadius={borderRadius} value={formData.email} onChange={handleChange} />
-          <FButton disabled={loading} primary={primary} textColor={textColor} buttonStyle={buttonStyle} borderRadius={borderRadius} onClick={handleSendOTP}>{loading ? 'Sending...' : 'Send OTP'}</FButton>
+          <FInput
+            label='Email Address' name='email' type='email' placeholder='you@example.com'
+            textColor={textColor} inputStyle={inputStyle} inputBorderColor={inputBorderColor} borderRadius={borderRadius}
+            value={formData.email} onChange={handleChange}
+            locked={!!lockedEmail} primary={primary}
+          />
+          <FButton disabled={loading} primary={primary} textColor={textColor} buttonStyle={buttonStyle} borderRadius={borderRadius} onClick={() => handleSendOTP()}>
+            {loading ? 'Sending OTP…' : 'Send OTP'}
+          </FButton>
+          {onBack && <button onClick={onBack} className='w-full text-xs transition-colors mt-2' style={{ color: `${textColor}40` }}>← Back to options</button>}
         </motion.div>
       ) : (
         <motion.div key='otp-code' initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -15 }} className='space-y-3'>
-          <p className='text-xs text-center' style={{ color: `${textColor}60` }}>Enter the 6-digit code sent to your email</p>
+          {/* Show where code was sent */}
+          <div className='text-center'>
+            <p className='text-xs' style={{ color: `${textColor}60` }}>
+              A 6-digit code was sent to
+            </p>
+            <p className='text-sm font-bold mt-0.5' style={{ color: textColor }}>
+              {formData.email}
+            </p>
+          </div>
           {error && <p className='text-red-400 text-xs text-center'>{error}</p>}
-          <FInput label='OTP' name='otp' placeholder='123456' textColor={textColor} inputStyle={inputStyle} inputBorderColor={inputBorderColor} borderRadius={borderRadius} value={formData.otp} onChange={handleChange} />
-          <FButton disabled={loading} primary={primary} textColor={textColor} buttonStyle={buttonStyle} borderRadius={borderRadius} onClick={handleVerifyOTP}>{loading ? 'Verifying...' : 'Verify OTP'}</FButton>
-          <button onClick={() => setStep(0)} className='w-full text-xs transition-colors mt-2' style={{ color: `${textColor}40` }}>← Back</button>
+          <FInput
+            label='OTP Code' name='otp' placeholder='123456'
+            textColor={textColor} inputStyle={inputStyle} inputBorderColor={inputBorderColor} borderRadius={borderRadius}
+            value={formData.otp} onChange={handleChange}
+          />
+          <FButton disabled={loading} primary={primary} textColor={textColor} buttonStyle={buttonStyle} borderRadius={borderRadius} onClick={handleVerifyOTP}>
+            {loading ? 'Verifying…' : 'Verify OTP'}
+          </FButton>
+          <div className='flex items-center justify-between'>
+            <button onClick={() => handleSendOTP()} className='text-xs hover:underline' style={{ color: primary }}>
+              Resend code
+            </button>
+            {!lockedEmail && (
+              <button onClick={() => setStep(0)} className='text-xs transition-colors' style={{ color: `${textColor}40` }}>← Back</button>
+            )}
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
   );
 };
 
-const PasswordFlow = ({ request_id, onComplete, onSuccess, onBack, onForgotPassword, forgotPasswordEnabled, primary, textColor, buttonStyle, inputStyle, inputBorderColor, borderRadius }) => {
-  const [formData, setFormData] = useState({ email: '', password: '' });
+// ─── Password Flow — supports prefill + locked email ─────────────────────────
+const PasswordFlow = ({
+  request_id, onComplete, onSuccess, onBack, onForgotPassword, forgotPasswordEnabled,
+  primary, textColor, buttonStyle, inputStyle, inputBorderColor, borderRadius,
+  prefillEmail, lockedEmail,          // ← autofill props
+}) => {
+  const [formData, setFormData] = useState({ email: prefillEmail || '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (e) => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
   const handleLogin = async () => {
-    if (!formData.email || !formData.password) {
-      setError('Please enter both email and password');
-      return;
-    }
+    if (!formData.email || !formData.password) { setError('Please enter both email and password'); return; }
     setError('');
     setLoading(true);
     try {
       const res = await axios.post(`${backend_url}/auth/login/password`, {
-        request_id,
-        email: formData.email,
-        password: formData.password
-      }, {
-        withCredentials: true,
-        headers: getDeviceFingerprintHeaders()
-      });
-      
-      if (res.data.next_step) {
-        onComplete(res.data.next_step);
-      } else if (res.data.redirect_url) {
-        onSuccess(res.data.redirect_url, 'Sign in successful! Redirecting...');
-      }
+        request_id, email: formData.email, password: formData.password
+      }, { withCredentials: true, headers: getDeviceFingerprintHeaders() });
+      if (res.data.next_step) onComplete(res.data.next_step);
+      else if (res.data.redirect_url) onSuccess(res.data.redirect_url, 'Sign in successful! Redirecting...');
     } catch (err) {
       const detail = err.response?.data?.detail;
-      if (detail && detail.redirect_url) {
-        window.location.href = detail.redirect_url;
-        return;
-      }
+      if (detail && detail.redirect_url) { window.location.href = detail.redirect_url; return; }
       setError(typeof detail === 'string' ? detail : detail?.message || 'Failed to authenticate');
     }
     setLoading(false);
@@ -294,12 +320,31 @@ const PasswordFlow = ({ request_id, onComplete, onSuccess, onBack, onForgotPassw
 
   return (
     <motion.div initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -15 }} className='space-y-3'>
+      {lockedEmail && prefillEmail && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
+          className='flex items-center gap-2 text-xs py-2.5 px-3.5 rounded-xl font-medium'
+          style={{ backgroundColor: `${primary}12`, border: `1px solid ${primary}30`, color: `${textColor}80` }}
+        >
+          <Lock size={11} style={{ color: primary }} />
+          <span>Signing in as <strong style={{ color: textColor }}>{prefillEmail}</strong></span>
+        </motion.div>
+      )}
       {error && <p className='text-red-400 text-xs text-center'>{error}</p>}
-      <FInput label='Email Address' name='email' type='email' placeholder='you@example.com' textColor={textColor} inputStyle={inputStyle} inputBorderColor={inputBorderColor} borderRadius={borderRadius} value={formData.email} onChange={handleChange} />
+      <FInput
+        label='Email Address' name='email' type='email' placeholder='you@example.com'
+        textColor={textColor} inputStyle={inputStyle} inputBorderColor={inputBorderColor} borderRadius={borderRadius}
+        value={formData.email} onChange={handleChange}
+        locked={!!lockedEmail} primary={primary}
+      />
       <div className='relative'>
-        <FInput label='Password' name='password' type={showPassword ? 'text' : 'password'} placeholder='••••••••' textColor={textColor} inputStyle={inputStyle} inputBorderColor={inputBorderColor} borderRadius={borderRadius} value={formData.password} onChange={handleChange} />
-        <button 
-          onClick={() => setShowPassword(!showPassword)}
+        <FInput
+          label='Password' name='password' type={showPassword ? 'text' : 'password'} placeholder='••••••••'
+          textColor={textColor} inputStyle={inputStyle} inputBorderColor={inputBorderColor} borderRadius={borderRadius}
+          value={formData.password} onChange={handleChange}
+        />
+        <button
+          onClick={() => setShowPassword(v => !v)}
           className='absolute right-3 top-9 text-gray-400 hover:text-white transition-colors'
           style={{ color: `${textColor}80` }}
         >
@@ -307,41 +352,36 @@ const PasswordFlow = ({ request_id, onComplete, onSuccess, onBack, onForgotPassw
         </button>
       </div>
       <FButton disabled={loading} primary={primary} textColor={textColor} buttonStyle={buttonStyle} borderRadius={borderRadius} onClick={handleLogin}>
-        {loading ? 'Authenticating...' : 'Sign In'}
+        {loading ? 'Authenticating…' : 'Sign In'}
       </FButton>
       {forgotPasswordEnabled && (
         <button onClick={onForgotPassword} className='w-full text-xs transition-colors mt-1 hover:underline' style={{ color: primary }}>
           Forgot password?
         </button>
       )}
-      <button onClick={onBack} className='w-full text-xs transition-colors mt-2' style={{ color: `${textColor}40` }}>← Back to options</button>
+      {onBack && !lockedEmail && (
+        <button onClick={onBack} className='w-full text-xs transition-colors mt-2' style={{ color: `${textColor}40` }}>← Back to options</button>
+      )}
     </motion.div>
   );
 };
 
-const ForgotPasswordFlow = ({ request_id, onBack, primary, textColor, buttonStyle, inputStyle, inputBorderColor, borderRadius }) => {
-  const [email, setEmail] = useState('');
+// ─── Forgot Password ──────────────────────────────────────────────────────────
+const ForgotPasswordFlow = ({ request_id, onBack, primary, textColor, buttonStyle, inputStyle, inputBorderColor, borderRadius, prefillEmail }) => {
+  const [email, setEmail] = useState(prefillEmail || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [sent, setSent] = useState(false);
 
   const handleSend = async () => {
-    if (!email) {
-      setError('Please enter your email address');
-      return;
-    }
+    if (!email) { setError('Please enter your email address'); return; }
     setError('');
     setLoading(true);
     try {
-      const res = await axios.post(`${backend_url}/auth/forgot-password/send`, {
-        request_id,
-        email
-      }, {
+      const res = await axios.post(`${backend_url}/auth/forgot-password/send`, { request_id, email }, {
         headers: getDeviceFingerprintHeaders()
       });
-      if (res.data.success) {
-        setSent(true);
-      }
+      if (res.data.success) setSent(true);
     } catch (err) {
       const detail = err.response?.data?.detail;
       setError(typeof detail === 'string' ? detail : detail?.message || 'Failed to send reset email');
@@ -358,7 +398,7 @@ const ForgotPasswordFlow = ({ request_id, onBack, primary, textColor, buttonStyl
         <div>
           <h3 className='text-base font-bold' style={{ color: textColor }}>Check your email</h3>
           <p className='text-xs mt-2 leading-relaxed' style={{ color: `${textColor}60` }}>
-            We've sent a password reset link to <strong style={{ color: `${textColor}90` }}>{email}</strong>. 
+            We've sent a password reset link to <strong style={{ color: `${textColor}90` }}>{email}</strong>.{' '}
             The link will expire in 15 minutes.
           </p>
         </div>
@@ -371,18 +411,23 @@ const ForgotPasswordFlow = ({ request_id, onBack, primary, textColor, buttonStyl
     <motion.div initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -15 }} className='space-y-3'>
       <p className='text-xs text-center mb-2' style={{ color: `${textColor}60` }}>Enter your email and we'll send you a link to reset your password.</p>
       {error && <p className='text-red-400 text-xs text-center'>{error}</p>}
-      <FInput label='Email Address' name='email' type='email' placeholder='you@example.com' textColor={textColor} inputStyle={inputStyle} inputBorderColor={inputBorderColor} borderRadius={borderRadius} value={email} onChange={(e) => setEmail(e.target.value)} />
+      <FInput
+        label='Email Address' name='email' type='email' placeholder='you@example.com'
+        textColor={textColor} inputStyle={inputStyle} inputBorderColor={inputBorderColor} borderRadius={borderRadius}
+        value={email} onChange={(e) => setEmail(e.target.value)}
+      />
       <FButton disabled={loading} primary={primary} textColor={textColor} buttonStyle={buttonStyle} borderRadius={borderRadius} onClick={handleSend}>
-        {loading ? 'Sending...' : 'Send Reset Link'}
+        {loading ? 'Sending…' : 'Send Reset Link'}
       </FButton>
       <button onClick={onBack} className='w-full text-xs transition-colors mt-2' style={{ color: `${textColor}40` }}>← Back to sign in</button>
     </motion.div>
   );
 };
 
+// ─── Provider Selection Flow ──────────────────────────────────────────────────
 const ProviderSelectionFlow = ({ enabledMethods, socialLayout, textColor, borderRadius, request_id, onSelectOTP, onSelectPassword }) => {
-  const socialMethods = enabledMethods.filter((m) => m.id !== 'password' && m.id !== 'otp');
-  const hasOTP = enabledMethods.some((m) => m.id === 'otp');
+  const socialMethods = enabledMethods.filter(m => m.id !== 'password' && m.id !== 'otp');
+  const hasOTP = enabledMethods.some(m => m.id === 'otp');
 
   return (
     <div className='space-y-3'>
@@ -394,7 +439,7 @@ const ProviderSelectionFlow = ({ enabledMethods, socialLayout, textColor, border
           Continue with OTP
         </button>
       )}
-      {enabledMethods.some((m) => m.id === 'password') && (
+      {enabledMethods.some(m => m.id === 'password') && (
         <button onClick={onSelectPassword} className='w-full flex items-center justify-center gap-2 border py-3 text-sm font-bold hover:opacity-80 transition-all'
           style={{ backgroundColor: 'rgba(59,130,246,0.08)', borderColor: 'rgba(59,130,246,0.2)', color: textColor, borderRadius }}>
           <span className='text-blue-400 text-lg'><RiLockPasswordLine /></span>
@@ -405,39 +450,28 @@ const ProviderSelectionFlow = ({ enabledMethods, socialLayout, textColor, border
   );
 };
 
+// ─── Additional Fields (signup completion) ────────────────────────────────────
 const AdditionalFieldsFlow = ({ request_id, signupFields, onSuccess, primary, textColor, buttonStyle, inputStyle, inputBorderColor, borderRadius }) => {
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (e) => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
   const handleComplete = async () => {
-    // Basic validation
     const missing = signupFields.filter(f => f.required && !formData[f.name]);
-    if (missing.length > 0) {
-      setError(`Please fill all required fields.`);
-      return;
-    }
+    if (missing.length > 0) { setError('Please fill all required fields.'); return; }
     setError('');
     setLoading(true);
     try {
-      const res = await axios.post(`${backend_url}/api/auth/request/signup/complete`, {
-        request_id,
-        custom_fields: formData
-      }, {
+      const res = await axios.post(`${backend_url}/api/auth/request/signup/complete`, { request_id, custom_fields: formData }, {
         withCredentials: true,
         headers: getDeviceFingerprintHeaders()
       });
-      if (res.data.redirect_url) {
-        onSuccess(res.data.redirect_url, 'Sign up successful! Redirecting...');
-      }
+      if (res.data.redirect_url) onSuccess(res.data.redirect_url, 'Sign up successful! Redirecting...');
     } catch (err) {
       const detail = err.response?.data?.detail;
-      if (detail && detail.redirect_url) {
-        window.location.href = detail.redirect_url;
-        return;
-      }
+      if (detail && detail.redirect_url) { window.location.href = detail.redirect_url; return; }
       setError(typeof detail === 'string' ? detail : detail?.message || 'Failed to complete signup');
     }
     setLoading(false);
@@ -447,32 +481,39 @@ const AdditionalFieldsFlow = ({ request_id, signupFields, onSuccess, primary, te
     <div className='space-y-3'>
       <p className='text-xs text-center mb-4' style={{ color: `${textColor}80` }}>Just a few more details to complete your registration...</p>
       {error && <p className='text-red-400 text-xs text-center'>{error}</p>}
-      
       {signupFields.map(f => (
-        <FInput 
-          key={f.name} 
-          label={`${f.label || f.name} ${f.required ? '*' : ''}`} 
-          name={f.name} 
-          type={f.type || 'text'} 
-          textColor={textColor} 
-          inputStyle={inputStyle} 
-          inputBorderColor={inputBorderColor} 
-          borderRadius={borderRadius} 
-          value={formData[f.name] || ''} 
-          onChange={handleChange} 
+        <FInput
+          key={f.name}
+          label={`${f.label || f.name} ${f.required ? '*' : ''}`}
+          name={f.name} type={f.type || 'text'}
+          textColor={textColor} inputStyle={inputStyle} inputBorderColor={inputBorderColor} borderRadius={borderRadius}
+          value={formData[f.name] || ''} onChange={handleChange}
         />
       ))}
       <div className='pt-2'>
         <FButton disabled={loading} primary={primary} textColor={textColor} buttonStyle={buttonStyle} borderRadius={borderRadius} onClick={handleComplete}>
-          {loading ? 'Completing...' : 'Create Account'}
+          {loading ? 'Completing…' : 'Create Account'}
         </FButton>
       </div>
     </div>
   );
 };
 
+// ─── Main LoginPortal ─────────────────────────────────────────────────────────
 export const LoginPortal = () => {
   const { request_id, flow_type } = useParams();
+  const [searchParams] = useSearchParams();
+
+  // ── Autofill params ─────────────────────────────────────────────────────────
+  // Supported URL params:
+  //   ?prefill_email=user@example.com   — pre-fill email field
+  //   ?lock_method=otp|password         — force a specific auth method & lock email
+  // Example:
+  //   /auth/REQ_ID/signin?prefill_email=user@example.com&lock_method=otp
+  const prefillEmail  = searchParams.get('prefill_email') || '';
+  const lockMethod    = searchParams.get('lock_method') || '';   // 'otp' | 'password' | ''
+  const lockedEmail   = !!(prefillEmail && lockMethod);           // true = lock the email field
+
   const [configData, setConfigData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -481,37 +522,28 @@ export const LoginPortal = () => {
 
   const handleSuccessRedirect = (url, message) => {
     setSuccessState({ url, message });
-    setTimeout(() => {
-      window.location.href = url;
-    }, 2000);
+    setTimeout(() => { window.location.href = url; }, 2000);
   };
 
   useEffect(() => {
-    if (!request_id) {
-      setError('Missing request_id in URL');
-      setLoading(false);
-      return;
-    }
+    if (!request_id) { setError('Missing request_id in URL'); setLoading(false); return; }
     const fetchConfig = async () => {
       try {
-        const res = await axios.post(`${backend_url}/api/auth/request/${request_id}/init`, 
-          { flow_type: flow_type || 'signin' }, 
-          { 
-            withCredentials: true,
-            headers: getDeviceFingerprintHeaders()
-          }
+        const res = await axios.post(
+          `${backend_url}/api/auth/request/${request_id}/init`,
+          {
+            flow_type: flow_type || 'signin',
+            // Send prefill_email so the backend stores it as locked_email in Redis.
+            // Any subsequent OTP/password call with a different email will be rejected 403.
+            ...(prefillEmail ? { prefill_email: prefillEmail } : {}),
+          },
+          { withCredentials: true, headers: getDeviceFingerprintHeaders() }
         );
-        if (res.data.redirect_url) {
-          window.location.href = res.data.redirect_url;
-          return;
-        }
+        if (res.data.redirect_url) { window.location.href = res.data.redirect_url; return; }
         setConfigData(res.data);
       } catch (err) {
         const detail = err.response?.data?.detail;
-        if (detail && detail.redirect_url) {
-          window.location.href = detail.redirect_url;
-          return;
-        }
+        if (detail && detail.redirect_url) { window.location.href = detail.redirect_url; return; }
         setError(typeof detail === 'string' ? detail : detail?.message || 'Failed to initialize authentication flow');
       }
       setLoading(false);
@@ -519,6 +551,14 @@ export const LoginPortal = () => {
     fetchConfig();
   }, [request_id, flow_type]);
 
+  // Auto-navigate to locked method once config is loaded
+  useEffect(() => {
+    if (!configData || !lockMethod) return;
+    if (lockMethod === 'otp') setCurrentStep('otp_verification');
+    else if (lockMethod === 'password') setCurrentStep('password_verification');
+  }, [configData, lockMethod]);
+
+  // Load Google Font
   useEffect(() => {
     const font_family = configData?.config?.ui?.font_family;
     if (!font_family || font_family === 'system') return;
@@ -598,13 +638,17 @@ export const LoginPortal = () => {
     right:  'items-end text-right',
   }[logo_position] || 'items-center text-center';
 
-  const hasPwd    = enabled_methods.some((m) => m.id === 'password');
-
   const sharedFormProps = {
     primary: primary_color, textColor: text_color,
     buttonStyle: button_style, inputStyle: input_style,
     inputBorderColor: input_border_color, borderRadius: btnRadius,
+    prefillEmail, lockedEmail,
   };
+
+  // Title for locked-mode header
+  const pageSubtitle = lockedEmail
+    ? `Verify your identity`
+    : flow_type === 'signup' ? 'Create your account' : 'Sign in to your account';
 
   return (
     <div
@@ -643,6 +687,7 @@ export const LoginPortal = () => {
       >
         {custom_css && <style>{custom_css}</style>}
 
+        {/* Brand header */}
         <div className={`flex flex-col mb-7 ${logoAlign}`}>
           {brand_logo ? (
             <img src={brand_logo} alt='logo' className='h-12 mb-3 object-contain rounded-xl' />
@@ -657,52 +702,64 @@ export const LoginPortal = () => {
           <h1 className='font-bold text-xl tracking-tight' style={{ color: text_color }}>
             {brand_name || branding || 'Your Brand'}
           </h1>
-          <p className='text-xs mt-1.5' style={{ color: `${text_color}50` }}>
-            {flow_type === 'signup' ? 'Create your account' : 'Sign in to your account'}
-          </p>
+          <p className='text-xs mt-1.5' style={{ color: `${text_color}50` }}>{pageSubtitle}</p>
         </div>
 
-        {successState ? (
-          <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className='flex flex-col items-center justify-center py-8 text-center space-y-4'>
-            <div className='w-16 h-16 rounded-full flex items-center justify-center' style={{ backgroundColor: `${primary_color}22`, color: primary_color }}>
-              <Check size={32} />
-            </div>
-            <div>
-              <h2 className='text-lg font-bold' style={{ color: text_color }}>Success</h2>
-              <p className='text-sm mt-1' style={{ color: `${text_color}80` }}>{successState.message}</p>
-            </div>
-          </motion.div>
-        ) : currentStep === 'additional_fields' ? (
-          <AdditionalFieldsFlow request_id={request_id} signupFields={signup_fields} onSuccess={handleSuccessRedirect} {...sharedFormProps} />
-        ) : currentStep === 'otp_verification' ? (
-          <OTPFlow request_id={request_id} onComplete={(ns) => setCurrentStep(ns)} onSuccess={handleSuccessRedirect} onBack={() => setCurrentStep('provider_selection')} {...sharedFormProps} />
-        ) : currentStep === 'password_verification' ? (
-          <PasswordFlow 
-            request_id={request_id} 
-            onComplete={(ns) => setCurrentStep(ns)} 
-            onSuccess={handleSuccessRedirect} 
-            onBack={() => setCurrentStep('provider_selection')} 
-            onForgotPassword={() => setCurrentStep('forgot_password')}
-            forgotPasswordEnabled={configData.config?.forgot_password_enabled !== false}
-            {...sharedFormProps} 
-          />
-        ) : currentStep === 'forgot_password' ? (
-          <ForgotPasswordFlow 
-            request_id={request_id} 
-            onBack={() => setCurrentStep('password_verification')} 
-            {...sharedFormProps} 
-          />
-        ) : (
-          <ProviderSelectionFlow
-            enabledMethods={enabled_methods}
-            socialLayout={social_layout}
-            request_id={request_id}
-            textColor={text_color}
-            borderRadius={btnRadius}
-            onSelectOTP={() => setCurrentStep('otp_verification')}
-            onSelectPassword={() => setCurrentStep('password_verification')}
-          />
-        )}
+        {/* Flow content */}
+        <AnimatePresence mode='wait'>
+          {successState ? (
+            <motion.div key='success' initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className='flex flex-col items-center justify-center py-8 text-center space-y-4'>
+              <div className='w-16 h-16 rounded-full flex items-center justify-center' style={{ backgroundColor: `${primary_color}22`, color: primary_color }}>
+                <Check size={32} />
+              </div>
+              <div>
+                <h2 className='text-lg font-bold' style={{ color: text_color }}>Success</h2>
+                <p className='text-sm mt-1' style={{ color: `${text_color}80` }}>{successState.message}</p>
+              </div>
+            </motion.div>
+          ) : currentStep === 'additional_fields' ? (
+            <AdditionalFieldsFlow key='fields' request_id={request_id} signupFields={signup_fields} onSuccess={handleSuccessRedirect} {...sharedFormProps} />
+          ) : currentStep === 'otp_verification' ? (
+            <OTPFlow
+              key='otp'
+              request_id={request_id}
+              onComplete={ns => setCurrentStep(ns)}
+              onSuccess={handleSuccessRedirect}
+              onBack={lockedEmail ? null : () => setCurrentStep('provider_selection')}
+              {...sharedFormProps}
+            />
+          ) : currentStep === 'password_verification' ? (
+            <PasswordFlow
+              key='password'
+              request_id={request_id}
+              onComplete={ns => setCurrentStep(ns)}
+              onSuccess={handleSuccessRedirect}
+              onBack={lockedEmail ? null : () => setCurrentStep('provider_selection')}
+              onForgotPassword={() => setCurrentStep('forgot_password')}
+              forgotPasswordEnabled={configData.config?.forgot_password_enabled !== false}
+              {...sharedFormProps}
+            />
+          ) : currentStep === 'forgot_password' ? (
+            <ForgotPasswordFlow
+              key='forgot'
+              request_id={request_id}
+              onBack={() => setCurrentStep('password_verification')}
+              prefillEmail={prefillEmail}
+              {...sharedFormProps}
+            />
+          ) : (
+            <ProviderSelectionFlow
+              key='select'
+              enabledMethods={enabled_methods}
+              socialLayout={social_layout}
+              request_id={request_id}
+              textColor={text_color}
+              borderRadius={btnRadius}
+              onSelectOTP={() => setCurrentStep('otp_verification')}
+              onSelectPassword={() => setCurrentStep('password_verification')}
+            />
+          )}
+        </AnimatePresence>
       </motion.div>
     </div>
   );

@@ -31,38 +31,41 @@ export const AdminPanel = () => {
   const handleCloseModal = () => { setShowModal(false); setEditingUser(null); };
 
   const tabs = [
-    { id: 'overview', label: 'Overview', icon: <LayoutDashboard size={16} /> },
-    { id: 'users', label: 'Users', icon: <Users size={16} /> },
-    { id: 'roles', label: 'Roles', icon: <Shield size={16} /> },
-    { id: 'security', label: 'Security Settings', icon: <Lock size={16} /> },
-    { id: 'logs', label: 'Audit Logs', icon: <ScrollText size={16} /> },
+    { id: 'overview', label: 'Overview', icon: <LayoutDashboard size={14} /> },
+    { id: 'users', label: 'Users & Sites', icon: <Users size={14} /> },
+    { id: 'roles', label: 'Access Roles', icon: <Shield size={14} /> },
+    { id: 'security', label: 'Security & Keys', icon: <Lock size={14} /> },
+    { id: 'logs', label: 'Audit Logs', icon: <ScrollText size={14} /> },
   ];
 
   return (
-    <div className='flex h-full bg-[var(--bg-card)] rounded-2xl border border-[var(--border-glass)] overflow-hidden shadow-xl'>
+    <div className='flex h-full bg-[var(--bg-deep)] rounded-[1.5rem] border border-[var(--border-glass)] overflow-hidden shadow-2xl relative'>
       {/* Sidebar Navigation */}
-      <div className='w-64 flex-none border-r border-[var(--border-glass)] bg-[var(--bg-surface)]/50 flex flex-col'>
-        <div className='p-6 pb-4 border-b border-[var(--border-glass)]'>
-          <div className='flex items-center gap-3 mb-1'>
-            <div className='w-8 h-8 rounded-xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center shadow-lg shadow-purple-500/10'>
-              <Shield size={16} className='text-purple-400' />
+      <div className='w-56 flex-none border-r border-[var(--border-glass)] bg-[var(--bg-card)]/40 flex flex-col'>
+        <div className='p-5 border-b border-[var(--border-glass)]'>
+          <div className='flex items-center gap-2.5'>
+            <div className='w-7 h-7 rounded-lg bg-purple-500/10 border border-purple-500/25 flex items-center justify-center text-purple-400'>
+              <Shield size={14} />
             </div>
-            <h2 className='text-[var(--text-main)] font-bold text-sm'>Admin Center</h2>
+            <span className='text-[var(--text-main)] font-extrabold text-xs tracking-wider uppercase'>Admin Center</span>
           </div>
         </div>
 
-        <div className='flex-1 py-4 px-3 flex flex-col gap-1 overflow-y-auto custom-scrollbar'>
+        <div className='flex-1 py-4 px-2.5 flex flex-col gap-1 overflow-y-auto custom-scrollbar'>
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all w-full text-left ${
+              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[11px] font-bold tracking-wide transition-all w-full text-left relative ${
                 activeTab === tab.id
-                  ? 'bg-purple-600/20 text-purple-400 border border-purple-500/30 shadow-sm'
+                  ? 'bg-purple-500/10 text-purple-300 border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.05)]'
                   : 'text-[var(--text-dim)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface)] border border-transparent'
               }`}
             >
-              {tab.icon}
+              {activeTab === tab.id && (
+                <span className='absolute left-0 top-1/3 bottom-1/3 w-0.5 bg-purple-500 rounded-full' />
+              )}
+              <span className={activeTab === tab.id ? 'text-purple-400' : ''}>{tab.icon}</span>
               {tab.label}
             </button>
           ))}
@@ -70,15 +73,15 @@ export const AdminPanel = () => {
       </div>
 
       {/* Main Content Area */}
-      <div className='flex-1 flex flex-col min-w-0 overflow-hidden relative'>
+      <div className='flex-1 flex flex-col min-w-0 overflow-hidden bg-[var(--bg-card)]/20 relative'>
         {/* Dynamic Header Actions */}
         <div className='absolute top-4 right-6 z-10 flex items-center gap-3'>
           {activeTab === 'users' && (
             <button
               onClick={handleAddUser}
-              className='flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg shadow-purple-600/20 active:scale-95'
+              className='flex items-center gap-1.5 bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-lg shadow-purple-600/10 active:scale-95 border border-purple-500/30'
             >
-              <UserPlus size={14} /> Add User
+              <UserPlus size={13} /> Add User
             </button>
           )}
         </div>
@@ -88,9 +91,11 @@ export const AdminPanel = () => {
           {activeTab === 'users' && <UserTable onEdit={handleEditUser} />}
           {activeTab === 'roles' && (
             <div className='max-w-2xl'>
-              <div className='mb-6'>
-                <h3 className='text-[var(--text-main)] font-bold text-lg mb-1'>Role Management</h3>
-                <p className='text-[var(--text-muted)] text-xs font-medium'>Create and manage roles. Default roles cannot be deleted. Custom roles can be assigned to users per product.</p>
+              <div className='mb-6 pl-1'>
+                <h3 className='text-[var(--text-main)] font-bold text-base mb-1'>Role Management</h3>
+                <p className='text-[var(--text-dim)] text-[11px] font-medium leading-relaxed'>
+                  Create and manage authorization groups. Default system roles cannot be deleted. Custom roles can be assigned to users per target SSO application.
+                </p>
               </div>
               <RoleManager />
             </div>
@@ -107,4 +112,3 @@ export const AdminPanel = () => {
     </div>
   );
 };
-

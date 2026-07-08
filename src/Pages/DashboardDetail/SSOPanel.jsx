@@ -13,7 +13,7 @@ const validate = (domain) => {
   return ok ? d : null;
 };
 
-export const SSOPanel = () => {
+export const SSOPanel = ({ onOpenAdmin }) => {
   const { sso, toggleSSO, addSSODomain, removeSSODomain } = useAuthConfigStore();
   const [input, setInput] = useState('');
   const [error, setError] = useState('');
@@ -35,18 +35,31 @@ export const SSOPanel = () => {
             <ShieldAlert size={18} />
           </div>
           <div>
-            <h3 className='text-[var(--text-main)] font-bold text-sm text-slate-500'>SSO Configuration</h3>
+            <h3 className='text-[var(--text-main)] font-bold text-sm'>SSO Configuration</h3>
             <p className='text-[var(--text-muted)] text-[11px] font-medium'>Enterprise single sign-on domains</p>
           </div>
         </div>
-        <div className='flex items-center gap-2 px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-full'>
-          <Lock size={14} className='text-slate-500' />
-          <span className='text-xs font-bold text-slate-500 uppercase tracking-wider'>Coming Soon</span>
-        </div>
+        
+        {/* Active Toggle Switch */}
+        <label className='relative inline-flex items-center cursor-pointer'>
+          <input 
+            type='checkbox' 
+            className='sr-only peer' 
+            checked={sso.enabled} 
+            onChange={toggleSSO} 
+          />
+          <div className="w-11 h-6 bg-slate-800 rounded-full peer peer-checked:bg-indigo-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5 shadow-inner" />
+        </label>
       </div>
 
+      {!sso.enabled && (
+        <div className='text-xs text-[var(--text-dim)] leading-relaxed pl-1'>
+          Single sign-on is disabled. Enable this module to configure wildcard domains for seamless cross-site authentication sharing.
+        </div>
+      )}
+
       {sso.enabled && (
-        <div className='space-y-4 pt-6 border-t border-[var(--border-glass)]'>
+        <div className='space-y-6 pt-6 border-t border-[var(--border-glass)]'>
           <div className='flex gap-3'>
             <div className='flex-1 space-y-2'>
               <input
@@ -91,8 +104,26 @@ export const SSOPanel = () => {
               </AnimatePresence>
             </div>
           )}
+
+          <div className='border-t border-[var(--border-glass)] pt-5 flex flex-col gap-3'>
+            <div>
+              <h4 className='text-xs font-bold text-[var(--text-main)] mb-1'>SSO Admin Console</h4>
+              <p className='text-[10px] text-[var(--text-dim)]'>Monitor logged users, sessions, locations, and roles for this Single Sign-On cluster.</p>
+            </div>
+            <button
+              onClick={() => {
+                const id = new URLSearchParams(window.location.search).get('id');
+                window.open(`/admin-portal${id ? `?id=${id}` : ''}`, '_blank');
+              }}
+              className='w-full py-2.5 rounded-xl bg-purple-600/15 border border-purple-500/35 hover:bg-purple-600/30 text-purple-300 hover:text-white transition-all text-xs font-bold shadow-lg shadow-purple-600/5 active:scale-[0.98]'
+            >
+              Open Admin Portal
+            </button>
+          </div>
         </div>
       )}
     </div>
   );
 };
+
+

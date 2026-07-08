@@ -71,6 +71,27 @@ const DEFAULT_ROLES = [
 export const useAuthConfigStore = create(
   persist(
     (set, get) => ({
+      // Hydrate entire store from a backend config object
+      hydrateFromConfig: (apiConfig) => {
+        const { project_name, ui, auth_methods, forgot_password_enabled, signup_fields, sso, redirect_urls, two_factor } = apiConfig;
+        set({
+          projectName: project_name || 'Untitled Project',
+          uiConfig: { ...DEFAULT_UI_CONFIG, ...(ui || {}) },
+          authMethods: auth_methods?.length
+            ? auth_methods.map((m) => ({ id: m.id, name: m.name || m.id, enabled: !!m.enabled }))
+            : DEFAULT_AUTH_METHODS.map((m) => ({ ...m })),
+          forgotPasswordEnabled: forgot_password_enabled !== undefined ? forgot_password_enabled : true,
+          signupFields: signup_fields?.length
+            ? signup_fields.map((f, i) => ({ id: f.id || `field-${i}`, ...f }))
+            : DEFAULT_SIGNUP_FIELDS.map((f) => ({ ...f })),
+          sso: sso ? { enabled: !!sso.enabled, domains: (sso.domains || []).map((d, i) => typeof d === 'string' ? { id: `d-${i}`, domain: d } : d) } : { enabled: false, domains: [] },
+          redirectURLs: redirect_urls ? { ...DEFAULT_REDIRECT_URLS, ...redirect_urls } : { ...DEFAULT_REDIRECT_URLS },
+          twoFactor: two_factor ? { enabled: !!two_factor.enabled } : { enabled: false },
+          hasUnsavedChanges: false,
+        });
+      },
+
+
       hasUnsavedChanges: false,
       setHasUnsavedChanges: (val) => set({ hasUnsavedChanges: val }),
       projectName: 'Untitled Project',
@@ -127,6 +148,10 @@ export const useAuthConfigStore = create(
           sso: { ...s.sso, domains: s.sso.domains.filter((d) => d.id !== id) },
         })),
 
+      twoFactor: { enabled: false },
+      updateTwoFactor: (updates) => set((s) => ({ twoFactor: { ...s.twoFactor, ...updates } })),
+
+
       // Redirect URLs
       redirectURLs: { ...DEFAULT_REDIRECT_URLS },
       updateRedirectURL: (key, value) =>
@@ -179,13 +204,15 @@ export const useAuthConfigStore = create(
           forgotPasswordEnabled: true,
           signupFields: DEFAULT_SIGNUP_FIELDS.map((f) => ({ ...f })),
           sso: { enabled: false, domains: [] },
+          twoFactor: { enabled: false },
           redirectURLs: { ...DEFAULT_REDIRECT_URLS },
+
           adminUsers: [],
           adminRoles: DEFAULT_ROLES.map((r) => ({ ...r })),
         }),
 
       getExportConfig: () => {
-        const { projectName, uiConfig, authMethods, forgotPasswordEnabled, signupFields, sso, redirectURLs } = get();
+        const { projectName, uiConfig, authMethods, forgotPasswordEnabled, signupFields, sso, redirectURLs, twoFactor } = get();
         return {
           project_name: projectName,
           ui: { ...uiConfig },
@@ -193,6 +220,7 @@ export const useAuthConfigStore = create(
           forgot_password_enabled: forgotPasswordEnabled,
           signup_fields: signupFields.map(({ label, name, type, required }) => ({ label, name, type, required })),
           sso: { enabled: sso.enabled, domains: sso.domains.map((d) => d.domain) },
+          two_factor: { enabled: twoFactor.enabled },
           redirect_urls: { ...redirectURLs },
         };
       },
@@ -200,3 +228,4 @@ export const useAuthConfigStore = create(
     { name: 'deb-auth-config' }
   )
 );
+

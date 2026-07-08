@@ -5,7 +5,7 @@ import { FaGoogle, FaGithub, FaFacebook } from 'react-icons/fa';
 import { BsMicrosoft } from 'react-icons/bs';
 import { MdOutlineSms } from 'react-icons/md';
 import { RiLockPasswordLine } from 'react-icons/ri';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Check } from 'lucide-react';
 
 const PROVIDER_META = {
   password:  { icon: <RiLockPasswordLine />, label: 'Password',  color: '#22d3ee'  },
@@ -33,33 +33,32 @@ const SHADOW_MAP    = (primary) => ({
   lg:   `0 40px 80px rgba(0,0,0,0.7), 0 0 40px ${primary}30`,
 });
 
-// ─── Shared fake input ────────────────────────────────────────────────────────
+// ─── Shared fake input (read-only) ────────────────────────────────────────────
 const FInput = ({ label, type = 'text', placeholder, textColor, inputStyle, inputBorderColor, borderRadius }) => {
   const [show, setShow] = useState(false);
   const isPass = type === 'password';
   const isFilled = inputStyle === 'filled';
-
   return (
-    <div className='space-y-2 text-left'>
+    <div className='space-y-1.5 text-left'>
       {label && (
         <label className='text-[11px] font-bold uppercase tracking-wider block' style={{ color: `${textColor}70` }}>{label}</label>
       )}
-      <div className='relative group/input'>
+      <div className='relative'>
         <input
           type={isPass && !show ? 'password' : 'text'}
           placeholder={placeholder || label}
           readOnly
-          className='w-full px-4 py-3 text-sm outline-none border transition-all duration-300'
+          className='w-full px-3 py-2.5 text-sm outline-none border transition-all duration-300'
           style={{
             borderRadius,
             backgroundColor: isFilled ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)',
             borderColor: inputBorderColor || 'rgba(255,255,255,0.1)',
-            color: `${textColor}`,
+            color: textColor,
           }}
         />
         {isPass && (
-          <button onClick={() => setShow((v) => !v)} className='absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-indigo-400 transition-colors'>
-            {show ? <EyeOff size={16} /> : <Eye size={16} />}
+          <button onClick={() => setShow(v => !v)} className='absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-indigo-400 transition-colors'>
+            {show ? <EyeOff size={14} /> : <Eye size={14} />}
           </button>
         )}
       </div>
@@ -70,109 +69,39 @@ const FInput = ({ label, type = 'text', placeholder, textColor, inputStyle, inpu
 // ─── Shared styled button ─────────────────────────────────────────────────────
 const FButton = ({ children, primary, textColor, buttonStyle, borderRadius, onClick }) => {
   const styles = {
-    filled:   { 
-      backgroundColor: primary, 
-      color: textColor, 
-      border: 'none',
-      boxShadow: `0 10px 25px -5px ${primary}40`,
-    },
-    outlined: { 
-      backgroundColor: 'transparent', 
-      color: primary, 
-      border: `2px solid ${primary}`,
-    },
-    ghost:    { 
-      backgroundColor: 'transparent', 
-      color: primary, 
-      border: 'none', 
-      textDecoration: 'underline', 
-      textUnderlineOffset: '4px',
-      fontWeight: 'bold',
-    },
+    filled:   { backgroundColor: primary, color: textColor, border: 'none', boxShadow: `0 10px 25px -5px ${primary}40` },
+    outlined: { backgroundColor: 'transparent', color: primary, border: `2px solid ${primary}` },
+    ghost:    { backgroundColor: 'transparent', color: primary, border: 'none', textDecoration: 'underline', textUnderlineOffset: '4px', fontWeight: 'bold' },
   };
   return (
     <button
       onClick={onClick}
-      className='w-full py-3 font-bold text-sm active:scale-[0.98] transition-all relative overflow-hidden group/btn'
+      className='w-full py-2.5 font-bold text-sm active:scale-[0.98] transition-all relative overflow-hidden group/btn'
       style={{ borderRadius, ...(styles[buttonStyle] || styles.filled) }}
     >
       <span className='relative z-10'>{children}</span>
-      {buttonStyle === 'filled' && (
-        <div className='absolute inset-0 bg-white/10 opacity-0 group-hover/btn:opacity-100 transition-opacity' />
-      )}
+      {buttonStyle === 'filled' && <div className='absolute inset-0 bg-white/10 opacity-0 group-hover/btn:opacity-100 transition-opacity' />}
     </button>
   );
 };
 
-// ─── Social button — list variant ────────────────────────────────────────────
-const SocialButton = ({ method, textColor, borderRadius, onClick }) => (
-  <button
-    onClick={onClick}
-    className='w-full flex items-center justify-center gap-3 border py-3 text-sm font-bold hover:bg-white/5 transition-all group/social'
-    style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)', color: textColor, borderRadius }}
-  >
-    <span className='text-lg transition-transform group-hover/social:scale-110' style={{ color: PROVIDER_META[method.id]?.color }}>
-      {PROVIDER_META[method.id]?.icon}
-    </span>
-    <span>Continue with {PROVIDER_META[method.id]?.label}</span>
-  </button>
+// ─── Password form (for when password is the ONLY or first method) ────────────
+const PasswordForm = ({ primary, textColor, buttonStyle, inputStyle, inputBorderColor, borderRadius, showForgotPassword, onBack }) => (
+  <motion.div key='pwd-form' initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -15 }} className='space-y-3'>
+    <FInput label='Email Address' type='email' placeholder='you@example.com' textColor={textColor} inputStyle={inputStyle} inputBorderColor={inputBorderColor} borderRadius={borderRadius} />
+    <FInput label='Password' type='password' placeholder='••••••••' textColor={textColor} inputStyle={inputStyle} inputBorderColor={inputBorderColor} borderRadius={borderRadius} />
+    <FButton primary={primary} textColor={textColor} buttonStyle={buttonStyle} borderRadius={borderRadius}>Sign In</FButton>
+    {showForgotPassword && (
+      <p className='text-center text-xs pt-1 cursor-pointer hover:underline' style={{ color: primary }}>Forgot password?</p>
+    )}
+    {onBack && (
+      <button onClick={onBack} className='w-full text-xs transition-colors mt-1' style={{ color: `${textColor}40` }}>← Back to options</button>
+    )}
+  </motion.div>
 );
 
-// ─── Social button — grid variant ────────────────────────────────────────────
-const SocialIcon = ({ method, textColor, borderRadius }) => (
-  <div
-    title={PROVIDER_META[method.id]?.label}
-    className='w-14 h-14 border flex items-center justify-center text-2xl cursor-pointer hover:opacity-80 transition-all group/soc shadow-sm'
-    style={{ backgroundColor: 'transparent', borderColor: `${textColor}20`, color: PROVIDER_META[method.id]?.color, borderRadius }}
-  >
-    <span className='group-hover/soc:scale-110 transition-transform'>{PROVIDER_META[method.id]?.icon}</span>
-  </div>
-);
-
-// ─── Social button — compact variant ─────────────────────────────────────────
-const SocialCompact = ({ method, textColor }) => (
-  <div
-    title={PROVIDER_META[method.id]?.label}
-    className='w-10 h-10 border flex items-center justify-center text-base cursor-pointer hover:opacity-80 transition-all rounded-xl group/soc shadow-sm'
-    style={{ backgroundColor: 'transparent', borderColor: `${textColor}20`, color: PROVIDER_META[method.id]?.color }}
-  >
-    <span className='group-hover/soc:scale-110 transition-transform'>{PROVIDER_META[method.id]?.icon}</span>
-  </div>
-);
-
-// ─── Render social methods based on layout preference ────────────────────────
-const SocialMethods = ({ methods, socialLayout, textColor, borderRadius, onSelect }) => {
-  if (!methods.length) return null;
-  
-  // Auto-switch to grid if there are 2 or more methods
-  const effectiveLayout = methods.length >= 2 ? 'grid' : socialLayout;
-
-  if (effectiveLayout === 'grid') {
-    return (
-      <div className='flex justify-center gap-2.5 flex-wrap'>
-        {methods.map((m) => <SocialIcon key={m.id} method={m} textColor={textColor} borderRadius={borderRadius} />)}
-      </div>
-    );
-  }
-  if (effectiveLayout === 'compact') {
-    return (
-      <div className='flex justify-center gap-2'>
-        {methods.map((m) => <SocialCompact key={m.id} method={m} textColor={textColor} />)}
-      </div>
-    );
-  }
-  // list (default)
-  return (
-    <div className='space-y-2'>
-      {methods.map((m) => (
-        <SocialButton key={m.id} method={m} textColor={textColor} borderRadius={borderRadius} onClick={onSelect} />
-      ))}
-    </div>
-  );
-};
-
-// ─── OTP flow ─────────────────────────────────────────────────────────────────
-const OTPFlow = ({ primary, textColor, buttonStyle, inputStyle, inputBorderColor, borderRadius }) => {
+// ─── OTP form ────────────────────────────────────────────────────────────────
+const OTPForm = ({ primary, textColor, buttonStyle, inputStyle, inputBorderColor, borderRadius, onBack }) => {
   const [step, setStep] = useState(0);
   return (
     <AnimatePresence mode='wait'>
@@ -180,13 +109,14 @@ const OTPFlow = ({ primary, textColor, buttonStyle, inputStyle, inputBorderColor
         <motion.div key='otp-email' initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -15 }} className='space-y-3'>
           <FInput label='Email Address' type='email' placeholder='you@example.com' textColor={textColor} inputStyle={inputStyle} inputBorderColor={inputBorderColor} borderRadius={borderRadius} />
           <FButton primary={primary} textColor={textColor} buttonStyle={buttonStyle} borderRadius={borderRadius} onClick={() => setStep(1)}>Send OTP</FButton>
+          {onBack && <button onClick={onBack} className='w-full text-xs transition-colors' style={{ color: `${textColor}40` }}>← Back to options</button>}
         </motion.div>
       ) : (
         <motion.div key='otp-code' initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -15 }} className='space-y-3'>
           <p className='text-xs text-center' style={{ color: `${textColor}60` }}>Enter the 6-digit code sent to your email</p>
-          <div className='flex gap-2 justify-center'>
+          <div className='flex gap-1 justify-center'>
             {Array(6).fill(0).map((_, i) => (
-              <div key={i} className='w-10 h-12 flex items-center justify-center text-lg font-mono border'
+              <div key={i} className='w-8 h-9 flex items-center justify-center text-sm font-mono border'
                 style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.1)', color: `${textColor}50`, borderRadius }}>_</div>
             ))}
           </div>
@@ -198,17 +128,111 @@ const OTPFlow = ({ primary, textColor, buttonStyle, inputStyle, inputBorderColor
   );
 };
 
-// ─── Password form ────────────────────────────────────────────────────────────
-const PasswordForm = ({ primary, textColor, label = 'Sign In', buttonStyle, inputStyle, inputBorderColor, borderRadius, showForgotPassword }) => (
-  <div className='space-y-3'>
-    <FInput label='Email' type='email' placeholder='you@example.com' textColor={textColor} inputStyle={inputStyle} inputBorderColor={inputBorderColor} borderRadius={borderRadius} />
-    <FInput label='Password' type='password' placeholder='••••••••' textColor={textColor} inputStyle={inputStyle} inputBorderColor={inputBorderColor} borderRadius={borderRadius} />
-    <FButton primary={primary} textColor={textColor} buttonStyle={buttonStyle} borderRadius={borderRadius}>{label}</FButton>
-    {showForgotPassword && (
-      <p className='text-center text-xs pt-1 cursor-pointer hover:underline' style={{ color: primary }}>Forgot password?</p>
-    )}
+// ─── Social provider button (list layout) ────────────────────────────────────
+const SocialBtn = ({ method, textColor, borderRadius }) => (
+  <button
+    className='w-full flex items-center justify-center gap-2 border py-2.5 text-sm font-bold hover:bg-white/5 transition-all group/social'
+    style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)', color: textColor, borderRadius }}
+  >
+    <span className='text-base transition-transform group-hover/social:scale-110' style={{ color: PROVIDER_META[method.id]?.color }}>
+      {PROVIDER_META[method.id]?.icon}
+    </span>
+    <span>Continue with {PROVIDER_META[method.id]?.label}</span>
+  </button>
+);
+
+// ─── Social icon grid ─────────────────────────────────────────────────────────
+const SocialGrid = ({ methods, textColor, borderRadius }) => (
+  <div className='flex justify-center gap-2.5 flex-wrap'>
+    {methods.map(m => (
+      <div
+        key={m.id}
+        title={PROVIDER_META[m.id]?.label}
+        className='w-12 h-12 border flex items-center justify-center text-xl cursor-pointer hover:opacity-80 transition-all group/soc'
+        style={{ backgroundColor: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.08)', color: PROVIDER_META[m.id]?.color, borderRadius }}
+      >
+        <span className='group-hover/soc:scale-110 transition-transform'>{PROVIDER_META[m.id]?.icon}</span>
+      </div>
+    ))}
   </div>
 );
+
+// ─── Provider selection flow (exact match of real LoginPortal) ────────────────
+const ProviderSelectionFlow = ({ enabledMethods, socialLayout, textColor, borderRadius, primary, buttonStyle, inputStyle, inputBorderColor, showForgotPassword }) => {
+  const [step, setStep] = useState('select'); // 'select' | 'password' | 'otp'
+
+  const socialMethods = enabledMethods.filter(m => m.id !== 'password' && m.id !== 'otp');
+  const hasPassword = enabledMethods.some(m => m.id === 'password');
+  const hasOTP = enabledMethods.some(m => m.id === 'otp');
+  const sharedProps = { primary, textColor, buttonStyle, inputStyle, inputBorderColor, borderRadius };
+
+  // Auto-advance if only one method
+  useEffect(() => {
+    if (enabledMethods.length === 1) {
+      if (hasPassword) setStep('password');
+      else if (hasOTP) setStep('otp');
+    } else {
+      setStep('select');
+    }
+  }, [enabledMethods.length, hasPassword, hasOTP]);
+
+  return (
+    <AnimatePresence mode='wait'>
+      {step === 'password' ? (
+        <PasswordForm
+          key='password'
+          {...sharedProps}
+          showForgotPassword={showForgotPassword}
+          onBack={enabledMethods.length > 1 ? () => setStep('select') : null}
+        />
+      ) : step === 'otp' ? (
+        <OTPForm
+          key='otp'
+          {...sharedProps}
+          onBack={enabledMethods.length > 1 ? () => setStep('select') : null}
+        />
+      ) : (
+        <motion.div key='select' initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -15 }} className='space-y-2.5'>
+          {/* Social providers */}
+          {socialMethods.length > 0 && (
+            socialLayout === 'grid'
+              ? <SocialGrid methods={socialMethods} textColor={textColor} borderRadius={borderRadius} />
+              : socialMethods.map(m => <SocialBtn key={m.id} method={m} textColor={textColor} borderRadius={borderRadius} />)
+          )}
+          {/* Divider if social AND password/otp */}
+          {socialMethods.length > 0 && (hasPassword || hasOTP) && (
+            <div className='relative flex items-center justify-center py-1'>
+              <div className='absolute inset-0 flex items-center'><div className='w-full border-t' style={{ borderColor: `${textColor}15` }} /></div>
+              <span className='relative px-3 text-xs' style={{ color: `${textColor}40` }}>or continue with</span>
+            </div>
+          )}
+          {/* OTP button */}
+          {hasOTP && (
+            <button
+              onClick={() => setStep('otp')}
+              className='w-full flex items-center justify-center gap-2.5 border py-3 text-sm font-bold hover:opacity-80 transition-all'
+              style={{ backgroundColor: 'rgba(34,197,94,0.08)', borderColor: 'rgba(34,197,94,0.2)', color: textColor, borderRadius }}
+            >
+              <span className='text-green-400 text-lg'><MdOutlineSms /></span>
+              Continue with OTP
+            </button>
+          )}
+          {/* Password button */}
+          {hasPassword && (
+            <button
+              onClick={() => setStep('password')}
+              className='w-full flex items-center justify-center gap-2.5 border py-3 text-sm font-bold hover:opacity-80 transition-all'
+              style={{ backgroundColor: 'rgba(59,130,246,0.08)', borderColor: 'rgba(59,130,246,0.2)', color: textColor, borderRadius }}
+            >
+              <span className='text-blue-400 text-lg'><RiLockPasswordLine /></span>
+              Continue with Password
+            </button>
+          )}
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
 
 // ─── Signup flow ──────────────────────────────────────────────────────────────
 const SignupFlow = ({ enabledMethods, signupFields, primary, textColor, buttonStyle, inputStyle, inputBorderColor, borderRadius, socialLayout }) => {
@@ -219,14 +243,14 @@ const SignupFlow = ({ enabledMethods, signupFields, primary, textColor, buttonSt
   const visibleFields = signupFields.slice(step * perPage, (step + 1) * perPage);
   const isLastStep = step === totalSteps - 1;
 
-  const hasPwd = enabledMethods.some((m) => m.id === 'password');
-  const hasOTP = enabledMethods.some((m) => m.id === 'otp');
-  const socialMethods = enabledMethods.filter((m) => m.id !== 'password' && m.id !== 'otp');
+  const hasPwd = enabledMethods.some(m => m.id === 'password');
+  const hasOTP = enabledMethods.some(m => m.id === 'otp');
+  const socialMethods = enabledMethods.filter(m => m.id !== 'password' && m.id !== 'otp');
   const sharedProps = { primary, textColor, buttonStyle, inputStyle, inputBorderColor, borderRadius };
 
   if (!authDone) {
     return (
-      <div className='space-y-3'>
+      <div className='space-y-2.5'>
         {hasPwd && (
           <>
             <FInput label='Email' type='email' placeholder='you@example.com' {...sharedProps} />
@@ -242,9 +266,13 @@ const SignupFlow = ({ enabledMethods, signupFields, primary, textColor, buttonSt
                 <span className='relative px-3 text-xs' style={{ color: `${textColor}40` }}>or sign up with</span>
               </div>
             )}
-            <SocialMethods methods={socialMethods} socialLayout={socialLayout} textColor={textColor} borderRadius={borderRadius} onSelect={() => setAuthDone(true)} />
+            {socialMethods.length > 0 && (
+              socialLayout === 'grid'
+                ? <SocialGrid methods={socialMethods} textColor={textColor} borderRadius={borderRadius} />
+                : socialMethods.map(m => <SocialBtn key={m.id} method={m} textColor={textColor} borderRadius={borderRadius} />)
+            )}
             {hasOTP && (
-              <button onClick={() => setAuthDone(true)} className='w-full flex items-center justify-center gap-2 border py-2.5 text-sm font-medium hover:opacity-80 transition-all'
+              <button onClick={() => setAuthDone(true)} className='w-full flex items-center justify-center gap-2.5 border py-2.5 text-sm font-bold hover:opacity-80 transition-all'
                 style={{ backgroundColor: 'rgba(34,197,94,0.08)', borderColor: 'rgba(34,197,94,0.2)', color: textColor, borderRadius }}>
                 <span className='text-green-400'><MdOutlineSms /></span>
                 Continue with OTP
@@ -273,15 +301,15 @@ const SignupFlow = ({ enabledMethods, signupFields, primary, textColor, buttonSt
       <p className='text-xs text-center mb-2' style={{ color: `${textColor}50` }}>Just a few more details…</p>
       <AnimatePresence mode='wait'>
         <motion.div key={step} initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -15 }} className='space-y-3'>
-          {visibleFields.map((f) => <FInput key={f.id} label={f.label} type={f.type} textColor={textColor} inputStyle={inputStyle} inputBorderColor={inputBorderColor} borderRadius={borderRadius} />)}
+          {visibleFields.map(f => <FInput key={f.id} label={f.label} type={f.type} {...sharedProps} />)}
         </motion.div>
       </AnimatePresence>
       <div className='flex gap-2 pt-1'>
         {step > 0 && (
-          <button onClick={() => setStep((s) => s - 1)} className='px-4 py-2.5 text-sm font-medium border transition-colors'
+          <button onClick={() => setStep(s => s - 1)} className='px-4 py-2.5 text-sm font-medium border transition-colors'
             style={{ borderRadius, borderColor: `${textColor}20`, color: `${textColor}70`, backgroundColor: 'transparent' }}>Back</button>
         )}
-        <FButton {...sharedProps} onClick={() => !isLastStep && setStep((s) => s + 1)}>
+        <FButton {...sharedProps} onClick={() => !isLastStep && setStep(s => s + 1)}>
           {isLastStep ? 'Create Account' : 'Next'}
         </FButton>
       </div>
@@ -330,17 +358,14 @@ export const LivePreview = () => {
     ? { background: `linear-gradient(${gradient_direction}, ${gradient_start}, ${gradient_end})` }
     : { backgroundColor: screen_bg_color };
 
-  // Logo alignment classes
+  // Logo alignment
   const logoAlign = {
     left:   'items-start text-left',
     center: 'items-center text-center',
     right:  'items-end text-right',
   }[logo_position] || 'items-center text-center';
 
-  const enabledMethods = authMethods.filter((m) => m.enabled);
-  const hasPwd    = enabledMethods.some((m) => m.id === 'password');
-  const hasOTP    = !hasPwd && enabledMethods.length === 1 && enabledMethods[0].id === 'otp';
-  const socialOnly = enabledMethods.filter((m) => m.id !== 'password' && m.id !== 'otp');
+  const enabledMethods = authMethods.filter(m => m.enabled);
 
   const sharedFormProps = {
     primary: primary_color, textColor: text_color,
@@ -350,38 +375,39 @@ export const LivePreview = () => {
 
   return (
     <div
-      className='w-full h-full flex items-center justify-center overflow-auto relative transition-all duration-500'
+      className='w-full h-full flex items-start justify-center overflow-y-auto relative transition-all duration-500 py-8'
       style={bgStyle}
     >
       {/* Background pattern overlay */}
       {bg_pattern === 'dots' && (
         <div className='absolute inset-0 pointer-events-none'
-          style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
+          style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
       )}
       {bg_pattern === 'diagonal' && (
         <div className='absolute inset-0 pointer-events-none'
           style={{ backgroundImage: 'repeating-linear-gradient(45deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 12px)' }} />
       )}
 
-      {/* Ambient glow */}
+      {/* Ambient glow — smaller so it fits inside the preview panel */}
       <div
-        className='absolute w-96 h-96 rounded-full pointer-events-none opacity-10 blur-3xl'
-        style={{ backgroundColor: primary_color, top: '10%', left: '50%', transform: 'translateX(-50%)' }}
+        className='absolute w-48 h-48 rounded-full pointer-events-none opacity-15 blur-3xl'
+        style={{ backgroundColor: primary_color, top: '5%', left: '50%', transform: 'translateX(-50%)' }}
       />
 
       <motion.div
         key={`${activeMode}-${login_card_bg_color}-${primary_color}-${border_radius}`}
-        initial={{ opacity: 0, scale: 0.97, y: 10 }}
+        initial={{ opacity: 0, scale: 0.97, y: 8 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.3, ease: 'easeOut' }}
-        className='relative w-full max-w-sm mx-4 p-8 z-10'
+        className='relative w-full mx-4 p-6 z-10 flex-shrink-0'
         style={{
+          maxWidth: '320px',
           backgroundColor: login_card_bg_color,
-          backdropFilter: `blur(${blur_amount}px)`,
-          WebkitBackdropFilter: `blur(${blur_amount}px)`,
+          backdropFilter: `blur(${Math.min(blur_amount, 20)}px)`,
+          WebkitBackdropFilter: `blur(${Math.min(blur_amount, 20)}px)`,
           border: `${border_width}px solid ${border_color}`,
           borderRadius: cardRadius,
-          boxShadow: cardShadow,
+          boxShadow: shadow_intensity === 'none' ? 'none' : `0 20px 40px rgba(0,0,0,0.4), 0 0 20px ${primary_color}18`,
           fontFamily: fontFamilyStr,
           fontSize: fontSizeStr,
         }}
@@ -390,13 +416,13 @@ export const LivePreview = () => {
         {custom_css && <style>{custom_css}</style>}
 
         {/* Brand */}
-        <div className={`flex flex-col mb-7 ${logoAlign}`}>
+        <div className={`flex flex-col mb-4 ${logoAlign}`}>
           {brand_logo ? (
             <img src={brand_logo} alt='logo' className='h-12 mb-3 object-contain rounded-xl' />
           ) : (
             <div
-              className='w-12 h-12 flex items-center justify-center mb-3 text-2xl'
-              style={{ backgroundColor: `${primary_color}22`, border: `1px solid ${primary_color}33`, borderRadius: cardRadius }}
+              className='w-12 h-12 flex items-center justify-center mb-3 text-2xl font-bold'
+              style={{ backgroundColor: `${primary_color}22`, border: `1px solid ${primary_color}33`, borderRadius: cardRadius, color: primary_color }}
             >
               {brand_name?.[0] || '✦'}
             </div>
@@ -409,38 +435,25 @@ export const LivePreview = () => {
           </p>
         </div>
 
-        {/* Form content */}
+        {/* Form content — exact match of real login page */}
         {activeMode === 'signup' ? (
           <SignupFlow
-            enabledMethods={enabledMethods} signupFields={signupFields}
-            socialLayout={social_layout} {...sharedFormProps}
+            enabledMethods={enabledMethods}
+            signupFields={signupFields}
+            socialLayout={social_layout}
+            {...sharedFormProps}
           />
-        ) : hasOTP ? (
-          <OTPFlow {...sharedFormProps} />
-        ) : hasPwd ? (
-          <>
-            <PasswordForm {...sharedFormProps} label='Sign In' showForgotPassword={forgotPasswordEnabled} />
-            {(socialOnly.length > 0 || enabledMethods.some((m) => m.id === 'otp')) && (
-              <div className='mt-5'>
-                <div className='relative flex items-center justify-center mb-4'>
-                  <div className='absolute inset-0 flex items-center'><div className='w-full border-t' style={{ borderColor: `${text_color}10` }} /></div>
-                  <span className='relative px-3 text-xs' style={{ color: `${text_color}35` }}>or</span>
-                </div>
-                <SocialMethods
-                  methods={enabledMethods.filter((m) => m.id !== 'password')}
-                  socialLayout={social_layout} textColor={text_color} borderRadius={btnRadius}
-                />
-              </div>
-            )}
-          </>
         ) : (
-          <SocialMethods
-            methods={enabledMethods} socialLayout={social_layout}
-            textColor={text_color} borderRadius={btnRadius}
+          <ProviderSelectionFlow
+            enabledMethods={enabledMethods}
+            socialLayout={social_layout}
+            showForgotPassword={forgotPasswordEnabled}
+            {...sharedFormProps}
           />
         )}
 
-        <p className='text-center text-xs mt-6' style={{ color: `${text_color}30` }}>
+        {/* Sign in / Sign up switcher */}
+        <p className='text-center text-xs mt-4' style={{ color: `${text_color}30` }}>
           {activeMode === 'signin' ? "Don't have an account? " : 'Already have an account? '}
           <span className='cursor-pointer hover:underline' style={{ color: primary_color }}>
             {activeMode === 'signin' ? 'Sign up' : 'Sign in'}

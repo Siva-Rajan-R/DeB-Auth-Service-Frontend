@@ -7,6 +7,7 @@ import { Route, Routes } from 'react-router-dom'
 import { AuthDocs } from './Pages/Docs'
 import { DashboardPage } from './Pages/Dashboard'
 import { DashboardDetail } from './Pages/DashboardDetail'
+import { AdminPageStandalone } from './Pages/AdminPageStandalone'
 import { LoginPortal } from './Pages/LoginPortal'
 import { ResetPassword } from './Pages/ResetPassword'
 import { DashboardLayout } from './Components/DashboardLayout'
@@ -26,10 +27,12 @@ function App() {
           <Route path='/auth-docs' element={<AuthDocs/>}></Route>
           <Route path='/dashboard' element={<DashboardPage/>}></Route>
           <Route path='/dashboard-detail' element={<DashboardDetail/>}></Route>
+          <Route path='/admin-portal' element={<AdminPageStandalone/>}></Route>
         </Route>
       </Routes>
     </>
   )
 }
+
 
 export default App

@@ -37,6 +37,7 @@ export const UserTable = ({ onEdit }) => {
             <th className='px-5 py-4 text-left text-[10px] font-bold text-[var(--text-dim)] uppercase tracking-widest'>Name</th>
             <th className='px-5 py-4 text-left text-[10px] font-bold text-[var(--text-dim)] uppercase tracking-widest'>Email</th>
             <th className='px-5 py-4 text-left text-[10px] font-bold text-[var(--text-dim)] uppercase tracking-widest'>Products</th>
+            <th className='px-5 py-4 text-left text-[10px] font-bold text-[var(--text-dim)] uppercase tracking-widest'>SSO Sites</th>
             <th className='px-5 py-4 text-left text-[10px] font-bold text-[var(--text-dim)] uppercase tracking-widest'>Last Login</th>
             <th className='px-5 py-4 text-left text-[10px] font-bold text-[var(--text-dim)] uppercase tracking-widest'>Status</th>
             <th className='px-5 py-4 text-right text-[10px] font-bold text-[var(--text-dim)] uppercase tracking-widest'>Actions</th>
@@ -61,7 +62,7 @@ export const UserTable = ({ onEdit }) => {
               {/* Products */}
               <td className='px-5 py-4'>
                 {user.products?.length > 0 ? (
-                  <div className='flex flex-wrap gap-1.5 max-w-[240px]'>
+                  <div className='flex flex-wrap gap-1.5 max-w-[200px]'>
                     {user.products.map((p, i) => (
                       <span key={i} className='flex items-center gap-1.5 text-[10px] bg-[var(--bg-navbar)] border border-[var(--border-glass)] text-[var(--text-muted)] px-2.5 py-1 rounded-lg whitespace-nowrap shadow-sm'>
                         <span className='truncate max-w-[90px] font-medium' title={p.url}>{p.url || '—'}</span>
@@ -74,17 +75,32 @@ export const UserTable = ({ onEdit }) => {
                 )}
               </td>
 
+              {/* SSO Sites */}
+              <td className='px-5 py-4'>
+                {user.custom_fields?.signed_in_sites?.length > 0 ? (
+                  <div className='flex flex-wrap gap-1.5 max-w-[200px]'>
+                    {user.custom_fields.signed_in_sites.map((s, i) => (
+                      <span key={i} className='text-[10px] bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-2 py-1 rounded-lg whitespace-nowrap shadow-sm' title={`Last accessed: ${new Date(s.timestamp * 1000).toLocaleString()}`}>
+                        {s.url ? s.url.replace(/^https?:\/\//, '') : '—'}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <span className='text-[var(--text-dim)] text-xs italic font-medium'>—</span>
+                )}
+              </td>
+
               {/* Last Login */}
               <td className='px-5 py-4'>
                 <div className='flex items-center gap-2 text-[var(--text-dim)] whitespace-nowrap font-medium'>
                   <Clock size={14} className='opacity-60' />
-                  <span className='text-xs'>{formatDate(user.lastLogin)}</span>
+                  <span className='text-xs'>{formatDate(user.lastLogin || user.created_at)}</span>
                 </div>
               </td>
 
               {/* Status */}
               <td className='px-5 py-4'>
-                {user.status === 'active' ? (
+                {user.status === 'active' || user.created_at ? (
                   <span className='inline-flex items-center gap-1.5 text-[10px] font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-3 py-1.5 rounded-xl uppercase tracking-wider'>
                     <span className='w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]' />
                     Active
@@ -96,6 +112,7 @@ export const UserTable = ({ onEdit }) => {
                   </span>
                 )}
               </td>
+
 
               {/* Actions */}
               <td className='px-5 py-4 text-right'>

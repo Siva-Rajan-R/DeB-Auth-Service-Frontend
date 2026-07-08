@@ -3,11 +3,12 @@ import { DndContext, closestCenter, MouseSensor, TouchSensor, KeyboardSensor, us
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, arrayMove, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GripVertical, Lock, Users2, KeyRound } from 'lucide-react';
+import { GripVertical, Lock, Users2, KeyRound, ShieldCheck } from 'lucide-react';
 import { FaGoogle, FaGithub, FaFacebook } from 'react-icons/fa';
 import { BsMicrosoft } from 'react-icons/bs';
 import { MdOutlineSms } from 'react-icons/md';
 import { RiLockPasswordLine } from 'react-icons/ri';
+
 
 const ICONS = {
   password:  <RiLockPasswordLine size={20} className='text-indigo-400'   />,
@@ -16,7 +17,9 @@ const ICONS = {
   facebook:  <FaFacebook  size={20} className='text-[#1877f2]'   />,
   microsoft: <BsMicrosoft size={18} className='text-[#00a4ef]'    />,
   otp:       <MdOutlineSms size={20} className='text-emerald-400' />,
+  totp:      <ShieldCheck size={20} className='text-cyan-400' />,
 };
+
 
 const SortableItem = ({ method, onToggle, enabledCount }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: method.id });

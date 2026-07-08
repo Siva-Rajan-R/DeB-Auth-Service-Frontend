@@ -3,9 +3,11 @@ import { useAuthConfigStore } from '../../Store/useAuthConfigStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   RotateCcw, ChevronDown, ChevronUp, Type, Layers, MousePointer2,
-  LayoutTemplate, ImageIcon, Code2
+  LayoutTemplate, ImageIcon, Code2, Sparkles, Check, Upload, FileImage
 } from 'lucide-react';
 import Select from 'react-select';
+import axios from 'axios';
+
 
 // ─── Primitive: Color picker row ─────────────────────────────────────────────
 const ColorRow = ({ label, storeKey }) => {
@@ -122,6 +124,92 @@ const Section = ({ title, icon, sectionKey, openSections, toggleSection, childre
   </div>
 );
 
+// ─── Component: Logo Uploader Widget ─────────────────────────────────────────
+const LogoUploader = () => {
+  const { updateUIConfig } = useAuthConfigStore();
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setError('');
+    setSuccess(false);
+
+    if (file.size > 2 * 1024 * 1024) {
+      setError('File size must be under 2MB.');
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      setError('Only image files are allowed.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    setUploading(true);
+    try {
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:8000';
+      const token = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('token='))
+        ?.split('=')[1];
+
+      const res = await axios.post(`${backendUrl}/user/secrets/upload-logo`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        withCredentials: true,
+      });
+
+      if (res.data.logo_url) {
+        updateUIConfig('brand_logo', res.data.logo_url);
+        setSuccess(true);
+      }
+    } catch (err) {
+      const msg = err.response?.data?.detail || 'Failed to upload image. Ensure server configuration is active.';
+      setError(msg);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <div className='space-y-2.5 pt-1'>
+      <label className='text-[var(--text-dim)] text-[10px] font-bold uppercase tracking-widest block'>Or Upload File</label>
+      <div className='flex items-center gap-3'>
+        <label className='flex items-center gap-2 px-4 py-2 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 hover:bg-indigo-500/20 hover:text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm active:scale-95 flex-shrink-0'>
+          <Upload size={14} />
+          <span>{uploading ? 'Uploading...' : 'Choose Image'}</span>
+          <input
+            type='file'
+            accept='image/*'
+            onChange={handleFileChange}
+            disabled={uploading}
+            className='hidden'
+          />
+        </label>
+        <span className='text-[10px] text-[var(--text-dim)] font-medium truncate max-w-[180px]'>
+          Max 2MB (PNG, JPG, SVG, WEBP)
+        </span>
+      </div>
+
+      {error && (
+        <p className='text-red-400 text-[10px] font-bold mt-1.5 pl-1 leading-relaxed'>{error}</p>
+      )}
+      {success && (
+        <p className='text-emerald-400 text-[10px] font-bold mt-1.5 pl-1 flex items-center gap-1'><Check size={11} /> Logo uploaded & applied successfully!</p>
+      )}
+    </div>
+  );
+};
+
+
 // ─── react-select theme-aware styles ───────────────────────────────────────────
 const selectStyles = {
   control: (b, s) => ({
@@ -161,6 +249,168 @@ const selectStyles = {
   dropdownIndicator: (b) => ({ ...b, color: 'var(--text-dim)', padding: '0 12px' }),
 };
 
+// ─── Preset theme palette ─────────────────────────────────────────────────────
+const PRESET_THEMES = [
+  {
+    key: 'midnight',
+    label: 'Midnight',
+    preview: ['#0f172a', '#22d3ee', '#ffffff'],
+    config: {
+      screen_bg_color: '#0a0e1a', login_card_bg_color: 'rgba(15,23,42,0.85)',
+      primary_color: '#22d3ee', text_color: '#f1f5f9',
+      bg_pattern: 'dots', border_radius: 'rounded', shadow_intensity: 'lg',
+      blur_amount: 24, border_width: 1, border_color: 'rgba(34,211,238,0.15)',
+      button_style: 'filled', input_style: 'outlined', input_border_color: 'rgba(34,211,238,0.15)',
+      gradient_start: '#0a0e1a', gradient_end: '#1e1b4b',
+    },
+  },
+  {
+    key: 'neon_purple',
+    label: 'Neon Pulse',
+    preview: ['#09090b', '#a855f7', '#ffffff'],
+    config: {
+      screen_bg_color: '#09090b', login_card_bg_color: 'rgba(9,9,11,0.80)',
+      primary_color: '#a855f7', text_color: '#faf5ff',
+      bg_pattern: 'dots', border_radius: 'rounded', shadow_intensity: 'lg',
+      blur_amount: 32, border_width: 1, border_color: 'rgba(168,85,247,0.20)',
+      button_style: 'filled', input_style: 'outlined', input_border_color: 'rgba(168,85,247,0.18)',
+      gradient_start: '#09090b', gradient_end: '#2e1065',
+    },
+  },
+  {
+    key: 'emerald',
+    label: 'Emerald',
+    preview: ['#052e16', '#10b981', '#ecfdf5'],
+    config: {
+      screen_bg_color: '#052e16', login_card_bg_color: 'rgba(5,46,22,0.85)',
+      primary_color: '#10b981', text_color: '#ecfdf5',
+      bg_pattern: 'gradient', gradient_start: '#052e16', gradient_end: '#0d3321', gradient_direction: '135deg',
+      border_radius: 'rounded', shadow_intensity: 'md',
+      blur_amount: 24, border_width: 1, border_color: 'rgba(16,185,129,0.20)',
+      button_style: 'filled', input_style: 'outlined', input_border_color: 'rgba(16,185,129,0.18)',
+    },
+  },
+  {
+    key: 'ocean',
+    label: 'Ocean',
+    preview: ['#0c1a4a', '#3b82f6', '#e0f2fe'],
+    config: {
+      screen_bg_color: '#0c1a4a', login_card_bg_color: 'rgba(12,26,74,0.85)',
+      primary_color: '#3b82f6', text_color: '#e0f2fe',
+      bg_pattern: 'gradient', gradient_start: '#0c1a4a', gradient_end: '#0f2857', gradient_direction: '135deg',
+      border_radius: 'pill', shadow_intensity: 'md',
+      blur_amount: 20, border_width: 1, border_color: 'rgba(59,130,246,0.20)',
+      button_style: 'filled', input_style: 'outlined', input_border_color: 'rgba(59,130,246,0.18)',
+    },
+  },
+  {
+    key: 'rose',
+    label: 'Rose',
+    preview: ['#1a0a0f', '#f43f5e', '#fff1f2'],
+    config: {
+      screen_bg_color: '#1a0a0f', login_card_bg_color: 'rgba(26,10,15,0.85)',
+      primary_color: '#f43f5e', text_color: '#fff1f2',
+      bg_pattern: 'dots', border_radius: 'rounded', shadow_intensity: 'lg',
+      blur_amount: 28, border_width: 1, border_color: 'rgba(244,63,94,0.18)',
+      button_style: 'filled', input_style: 'filled', input_border_color: 'rgba(244,63,94,0.15)',
+    },
+  },
+  {
+    key: 'clean_light',
+    label: 'Clean Light',
+    preview: ['#f8fafc', '#4f46e5', '#1e293b'],
+    config: {
+      screen_bg_color: '#f8fafc', login_card_bg_color: '#ffffff',
+      primary_color: '#4f46e5', text_color: '#1e293b',
+      bg_pattern: 'solid', border_radius: 'rounded', shadow_intensity: 'md',
+      blur_amount: 0, border_width: 1, border_color: 'rgba(0,0,0,0.08)',
+      button_style: 'filled', input_style: 'outlined', input_border_color: 'rgba(0,0,0,0.12)',
+    },
+  },
+  {
+    key: 'minimal_light',
+    label: 'Minimal',
+    preview: ['#ffffff', '#111827', '#6b7280'],
+    config: {
+      screen_bg_color: '#f1f5f9', login_card_bg_color: '#ffffff',
+      primary_color: '#111827', text_color: '#111827',
+      bg_pattern: 'solid', border_radius: 'square', shadow_intensity: 'sm',
+      blur_amount: 0, border_width: 1, border_color: 'rgba(0,0,0,0.10)',
+      button_style: 'outlined', input_style: 'outlined', input_border_color: 'rgba(0,0,0,0.15)',
+    },
+  },
+  {
+    key: 'glass',
+    label: 'Glass',
+    preview: ['#1e293b', '#818cf8', 'rgba(255,255,255,0.15)'],
+    config: {
+      screen_bg_color: '#1e293b', login_card_bg_color: 'rgba(255,255,255,0.07)',
+      primary_color: '#818cf8', text_color: '#f1f5f9',
+      bg_pattern: 'gradient', gradient_start: '#1e293b', gradient_end: '#312e81', gradient_direction: '135deg',
+      border_radius: 'rounded', shadow_intensity: 'lg',
+      blur_amount: 40, border_width: 1, border_color: 'rgba(255,255,255,0.12)',
+      button_style: 'filled', input_style: 'outlined', input_border_color: 'rgba(255,255,255,0.12)',
+    },
+  },
+];
+
+// ─── Quick Theme Picker ───────────────────────────────────────────────────────
+const QuickThemes = () => {
+  const { uiConfig, updateUIConfig } = useAuthConfigStore();
+  const [appliedKey, setAppliedKey] = useState(null);
+
+  const applyTheme = (theme) => {
+    Object.entries(theme.config).forEach(([k, v]) => updateUIConfig(k, v));
+    setAppliedKey(theme.key);
+    setTimeout(() => setAppliedKey(null), 1500);
+  };
+
+  return (
+    <div className='space-y-3'>
+      <div className='flex items-center gap-2'>
+        <Sparkles size={12} className='text-amber-400' />
+        <span className='text-[var(--text-dim)] text-[10px] font-bold uppercase tracking-widest'>One-click presets</span>
+      </div>
+      <div className='grid grid-cols-4 gap-2'>
+        {PRESET_THEMES.map((theme) => (
+          <button
+            key={theme.key}
+            onClick={() => applyTheme(theme)}
+            title={theme.label}
+            className='relative group flex flex-col items-center gap-2 p-2.5 rounded-xl border transition-all hover:border-[var(--border-active)] hover:scale-[1.04] active:scale-95'
+            style={{
+              borderColor: appliedKey === theme.key ? theme.config.primary_color : 'var(--border-glass)',
+              backgroundColor: appliedKey === theme.key ? `${theme.config.primary_color}15` : 'var(--bg-surface)',
+            }}
+          >
+            {/* Color dots */}
+            <div className='flex gap-1 items-center'>
+              {theme.preview.map((c, i) => (
+                <div key={i} className='w-4 h-4 rounded-full ring-1 ring-black/20 flex-shrink-0' style={{ backgroundColor: c }} />
+              ))}
+            </div>
+            <span className='text-[10px] font-bold text-[var(--text-muted)] group-hover:text-[var(--text-main)] transition-colors leading-tight text-center'>{theme.label}</span>
+            {/* Applied checkmark */}
+            <AnimatePresence>
+              {appliedKey === theme.key && (
+                <motion.div
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0, opacity: 0 }}
+                  className='absolute top-1.5 right-1.5 w-4 h-4 rounded-full flex items-center justify-center'
+                  style={{ backgroundColor: theme.config.primary_color }}
+                >
+                  <Check size={10} className='text-white' />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const FONT_OPTIONS = [
   { value: 'system',     label: 'System Default' },
   { value: 'Inter',      label: 'Inter' },
@@ -190,6 +440,15 @@ export const SignInCustomizer = () => {
   return (
     <div className='space-y-4'>
 
+      {/* 0. Quick Themes */}
+      <div className='rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4 space-y-3'>
+        <div className='flex items-center gap-2 mb-1'>
+          <Sparkles size={14} className='text-amber-400' />
+          <h3 className='text-sm font-bold text-[var(--text-main)]'>Quick Themes</h3>
+        </div>
+        <QuickThemes />
+      </div>
+
       {/* 1. Branding */}
       <Section title='Branding' icon={<LayoutTemplate size={20} />} sectionKey='branding' openSections={openSections} toggleSection={toggleSection}>
         <div className='space-y-5'>
@@ -207,14 +466,18 @@ export const SignInCustomizer = () => {
             <label className='text-[var(--text-dim)] text-[10px] font-bold uppercase tracking-widest block'>Brand Logo URL</label>
             <input
               type='text'
-              value={uiConfig.brand_logo}
+              value={uiConfig.brand_logo || ''}
               onChange={(e) => updateUIConfig('brand_logo', e.target.value)}
               className='w-full bg-[var(--bg-deep)] border border-[var(--border-glass)] rounded-xl px-4 py-3 text-[var(--text-main)] text-sm focus:outline-none focus:border-indigo-500/50 focus:bg-[var(--bg-surface)] transition-all placeholder-[var(--text-dim)] font-bold shadow-inner'
               placeholder='https://example.com/logo.png'
             />
           </div>
+          
+          {/* Logo file uploader */}
+          <LogoUploader />
         </div>
       </Section>
+
 
       {/* 2. Colors */}
       <Section title='Colors' icon={<Layers size={20} />} sectionKey='colors' openSections={openSections} toggleSection={toggleSection}>
