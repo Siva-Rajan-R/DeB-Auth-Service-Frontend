@@ -83,6 +83,7 @@ export const DashboardDetail = () => {
         state.authMethods !== prevState.authMethods ||
         state.signupFields !== prevState.signupFields ||
         state.sso !== prevState.sso ||
+        state.twoFactor !== prevState.twoFactor ||
         state.redirectURLs !== prevState.redirectURLs
       ) {
         if (!state.hasUnsavedChanges) {

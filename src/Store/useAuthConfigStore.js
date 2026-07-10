@@ -9,6 +9,8 @@ const DEFAULT_UI_CONFIG = {
   brand_name: 'De-Buggers',
   primary_color: '#4f46e5',
   text_color: '#111827',
+  btn_text_color: '#ffffff',
+  link_color: '#3b82f6',
 
   // Typography
   font_family: 'system',       // 'system'|'Inter'|'Roboto'|'Poppins'|'Nunito'|'Montserrat'
@@ -49,12 +51,13 @@ const DEFAULT_REDIRECT_URLS = {
 
 // Password is the first/default method
 const DEFAULT_AUTH_METHODS = [
-  { id: 'password',  name: 'Password',  enabled: true  },
-  { id: 'google',    name: 'Google',    enabled: false },
-  { id: 'github',    name: 'GitHub',    enabled: false },
-  { id: 'facebook',  name: 'Facebook',  enabled: false },
-  { id: 'microsoft', name: 'Microsoft', enabled: false },
-  { id: 'otp',       name: 'OTP',       enabled: false },
+  { id: 'password',   name: 'Password',   enabled: true  },
+  { id: 'google',     name: 'Google',     enabled: false },
+  { id: 'github',     name: 'GitHub',     enabled: false },
+  { id: 'facebook',   name: 'Facebook',   enabled: false },
+  { id: 'microsoft',  name: 'Microsoft',  enabled: false },
+  { id: 'email_otp',  name: 'Email OTP',  enabled: false },
+  { id: 'mobile_otp', name: 'Mobile OTP', enabled: false },
 ];
 
 const DEFAULT_SIGNUP_FIELDS = [
@@ -77,9 +80,23 @@ export const useAuthConfigStore = create(
         set({
           projectName: project_name || 'Untitled Project',
           uiConfig: { ...DEFAULT_UI_CONFIG, ...(ui || {}) },
-          authMethods: auth_methods?.length
-            ? auth_methods.map((m) => ({ id: m.id, name: m.name || m.id, enabled: !!m.enabled }))
-            : DEFAULT_AUTH_METHODS.map((m) => ({ ...m })),
+          authMethods: (() => {
+            const loaded = auth_methods || [];
+            const mapped = loaded.map((m) => ({ id: m.id, name: m.name || m.id, enabled: !!m.enabled }));
+            const oldOtpObj = mapped.find(m => m.id === 'otp');
+            const oldOtpEnabled = oldOtpObj ? !!oldOtpObj.enabled : false;
+            
+            DEFAULT_AUTH_METHODS.forEach(def => {
+              if (!mapped.some(m => m.id === def.id)) {
+                let enabled = def.enabled;
+                if (def.id === 'email_otp' && oldOtpEnabled) {
+                  enabled = true;
+                }
+                mapped.push({ ...def, enabled });
+              }
+            });
+            return mapped;
+          })(),
           forgotPasswordEnabled: forgot_password_enabled !== undefined ? forgot_password_enabled : true,
           signupFields: signup_fields?.length
             ? signup_fields.map((f, i) => ({ id: f.id || `field-${i}`, ...f }))

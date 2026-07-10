@@ -17,6 +17,8 @@ const PROVIDER_META = {
   github:    { icon: <FaGithub   />,         label: 'GitHub',    color: '#e2e8f0'  },
   facebook:  { icon: <FaFacebook />,         label: 'Facebook',  color: '#1877f2'  },
   microsoft: { icon: <BsMicrosoft />,        label: 'Microsoft', color: '#00a4ef'  },
+  email_otp:  { icon: <MdOutlineSms />,       label: 'Email OTP',       color: '#22c55e'  },
+  mobile_otp: { icon: <MdOutlineSms />,       label: 'Mobile OTP',      color: '#06b6d4'  },
   otp:       { icon: <MdOutlineSms />,       label: 'OTP',       color: '#22c55e'  },
 };
 
@@ -103,9 +105,9 @@ const FInput = ({ label, name, type = 'text', placeholder, textColor, inputStyle
 };
 
 // ─── Primary action button ────────────────────────────────────────────────────
-const FButton = ({ children, primary, textColor, buttonStyle, borderRadius, onClick, disabled }) => {
+const FButton = ({ children, primary, textColor, btnTextColor, buttonStyle, borderRadius, onClick, disabled }) => {
   const styles = {
-    filled:   { backgroundColor: primary, color: textColor, border: 'none', boxShadow: `0 10px 25px -5px ${primary}40` },
+    filled:   { backgroundColor: primary, color: btnTextColor || textColor, border: 'none', boxShadow: `0 10px 25px -5px ${primary}40` },
     outlined: { backgroundColor: 'transparent', color: primary, border: `2px solid ${primary}` },
     ghost:    { backgroundColor: 'transparent', color: primary, border: 'none', textDecoration: 'underline', textUnderlineOffset: '4px', fontWeight: 'bold' },
   };
@@ -170,8 +172,9 @@ const SocialMethods = ({ methods, socialLayout, textColor, borderRadius, request
 // ─── OTP Flow — supports prefill + locked email + auto-send ──────────────────
 const OTPFlow = ({
   request_id, onComplete, onSuccess, onBack,
-  primary, textColor, buttonStyle, inputStyle, inputBorderColor, borderRadius,
+  primary, textColor, btnTextColor, linkColor, buttonStyle, inputStyle, inputBorderColor, borderRadius,
   prefillEmail, lockedEmail,          // ← autofill props
+  mode = 'email',
 }) => {
   const [step, setStep] = useState(0);
   const [formData, setFormData] = useState({ email: prefillEmail || '', otp: '' });
@@ -182,18 +185,29 @@ const OTPFlow = ({
   const handleChange = (e) => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
   const handleSendOTP = async (emailOverride) => {
-    const email = emailOverride || formData.email;
-    if (!email) { setError('Please enter your email address'); return; }
+    const identifier = emailOverride || formData.email;
+    if (!identifier) { setError('Please enter your email address or mobile number'); return; }
     setError('');
     setLoading(true);
     try {
-      const res = await axios.post(`${backend_url}/auth/login/otp`, { request_id, email }, {
+      const payload = { request_id };
+      if (identifier.includes('@')) {
+        payload.email = identifier;
+      } else {
+        payload.mobile_number = identifier;
+      }
+      const res = await axios.post(`${backend_url}/auth/login/otp`, payload, {
         headers: getDeviceFingerprintHeaders()
       });
       if (res.data.success) setStep(1);
     } catch (err) {
       const detail = err.response?.data?.detail;
-      if (detail && detail.redirect_url) { window.location.href = detail.redirect_url; return; }
+      if (detail && detail.redirect_url) {
+        setError(detail.message || 'Failed to send OTP');
+        setLoading(true);
+        setTimeout(() => { window.location.href = detail.redirect_url; }, 3000);
+        return;
+      }
       setError(typeof detail === 'string' ? detail : detail?.message || 'Failed to send OTP');
     }
     setLoading(false);
@@ -212,7 +226,12 @@ const OTPFlow = ({
       else if (res.data.redirect_url) onSuccess(res.data.redirect_url, 'Sign in successful! Redirecting...');
     } catch (err) {
       const detail = err.response?.data?.detail;
-      if (detail && detail.redirect_url) { window.location.href = detail.redirect_url; return; }
+      if (detail && detail.redirect_url) {
+        setError(detail.message || 'Failed to verify OTP');
+        setLoading(true);
+        setTimeout(() => { window.location.href = detail.redirect_url; }, 3000);
+        return;
+      }
       setError(typeof detail === 'string' ? detail : detail?.message || 'Failed to verify OTP');
     }
     setLoading(false);
@@ -243,15 +262,18 @@ const OTPFlow = ({
           )}
           {error && <p className='text-red-400 text-xs text-center'>{error}</p>}
           <FInput
-            label='Email Address' name='email' type='email' placeholder='you@example.com'
+            label={mode === 'email' ? 'Email Address' : 'Mobile Number'} 
+            name='email' 
+            type={mode === 'email' ? 'email' : 'text'} 
+            placeholder={mode === 'email' ? 'you@example.com' : '+919876543210'}
             textColor={textColor} inputStyle={inputStyle} inputBorderColor={inputBorderColor} borderRadius={borderRadius}
             value={formData.email} onChange={handleChange}
             locked={!!lockedEmail} primary={primary}
           />
-          <FButton disabled={loading} primary={primary} textColor={textColor} buttonStyle={buttonStyle} borderRadius={borderRadius} onClick={() => handleSendOTP()}>
+          <FButton disabled={loading} primary={primary} textColor={textColor} btnTextColor={btnTextColor} buttonStyle={buttonStyle} borderRadius={borderRadius} onClick={() => handleSendOTP()}>
             {loading ? 'Sending OTP…' : 'Send OTP'}
           </FButton>
-          {onBack && <button onClick={onBack} className='w-full text-xs transition-colors mt-2' style={{ color: `${textColor}40` }}>← Back to options</button>}
+          {onBack && <button onClick={onBack} className='w-full text-xs transition-colors mt-2' style={{ color: `${textColor}60` }}>← Back to options</button>}
         </motion.div>
       ) : (
         <motion.div key='otp-code' initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -15 }} className='space-y-3'>
@@ -270,15 +292,15 @@ const OTPFlow = ({
             textColor={textColor} inputStyle={inputStyle} inputBorderColor={inputBorderColor} borderRadius={borderRadius}
             value={formData.otp} onChange={handleChange}
           />
-          <FButton disabled={loading} primary={primary} textColor={textColor} buttonStyle={buttonStyle} borderRadius={borderRadius} onClick={handleVerifyOTP}>
+          <FButton disabled={loading} primary={primary} textColor={textColor} btnTextColor={btnTextColor} buttonStyle={buttonStyle} borderRadius={borderRadius} onClick={handleVerifyOTP}>
             {loading ? 'Verifying…' : 'Verify OTP'}
           </FButton>
           <div className='flex items-center justify-between'>
-            <button onClick={() => handleSendOTP()} className='text-xs hover:underline' style={{ color: primary }}>
+            <button onClick={() => handleSendOTP()} className='text-xs hover:underline' style={{ color: linkColor || '#3b82f6' }}>
               Resend code
             </button>
             {!lockedEmail && (
-              <button onClick={() => setStep(0)} className='text-xs transition-colors' style={{ color: `${textColor}40` }}>← Back</button>
+              <button onClick={() => setStep(0)} className='text-xs transition-colors' style={{ color: `${textColor}60` }}>← Back</button>
             )}
           </div>
         </motion.div>
@@ -290,7 +312,7 @@ const OTPFlow = ({
 // ─── Password Flow — supports prefill + locked email ─────────────────────────
 const PasswordFlow = ({
   request_id, onComplete, onSuccess, onBack, onForgotPassword, forgotPasswordEnabled,
-  primary, textColor, buttonStyle, inputStyle, inputBorderColor, borderRadius,
+  primary, textColor, btnTextColor, linkColor, buttonStyle, inputStyle, inputBorderColor, borderRadius,
   prefillEmail, lockedEmail,          // ← autofill props
 }) => {
   const [formData, setFormData] = useState({ email: prefillEmail || '', password: '' });
@@ -312,7 +334,12 @@ const PasswordFlow = ({
       else if (res.data.redirect_url) onSuccess(res.data.redirect_url, 'Sign in successful! Redirecting...');
     } catch (err) {
       const detail = err.response?.data?.detail;
-      if (detail && detail.redirect_url) { window.location.href = detail.redirect_url; return; }
+      if (detail && detail.redirect_url) {
+        setError(detail.message || 'Failed to authenticate');
+        setLoading(true);
+        setTimeout(() => { window.location.href = detail.redirect_url; }, 3000);
+        return;
+      }
       setError(typeof detail === 'string' ? detail : detail?.message || 'Failed to authenticate');
     }
     setLoading(false);
@@ -351,16 +378,16 @@ const PasswordFlow = ({
           {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
         </button>
       </div>
-      <FButton disabled={loading} primary={primary} textColor={textColor} buttonStyle={buttonStyle} borderRadius={borderRadius} onClick={handleLogin}>
+      <FButton disabled={loading} primary={primary} textColor={textColor} btnTextColor={btnTextColor} buttonStyle={buttonStyle} borderRadius={borderRadius} onClick={handleLogin}>
         {loading ? 'Authenticating…' : 'Sign In'}
       </FButton>
       {forgotPasswordEnabled && (
-        <button onClick={onForgotPassword} className='w-full text-xs transition-colors mt-1 hover:underline' style={{ color: primary }}>
+        <button onClick={onForgotPassword} className='w-full text-xs transition-colors mt-1 hover:underline' style={{ color: '#ef4444' }}>
           Forgot password?
         </button>
       )}
       {onBack && !lockedEmail && (
-        <button onClick={onBack} className='w-full text-xs transition-colors mt-2' style={{ color: `${textColor}40` }}>← Back to options</button>
+        <button onClick={onBack} className='w-full text-xs transition-colors mt-2' style={{ color: `${textColor}60` }}>← Back to options</button>
       )}
     </motion.div>
   );
@@ -425,23 +452,48 @@ const ForgotPasswordFlow = ({ request_id, onBack, primary, textColor, buttonStyl
 };
 
 // ─── Provider Selection Flow ──────────────────────────────────────────────────
-const ProviderSelectionFlow = ({ enabledMethods, socialLayout, textColor, borderRadius, request_id, onSelectOTP, onSelectPassword }) => {
-  const socialMethods = enabledMethods.filter(m => m.id !== 'password' && m.id !== 'otp');
-  const hasOTP = enabledMethods.some(m => m.id === 'otp');
+const ProviderSelectionFlow = ({ enabledMethods, socialLayout, textColor, btnTextColor, borderRadius, request_id, onSelectEmailOTP, onSelectMobileOTP, onSelectPassword }) => {
+  const socialMethods = enabledMethods.filter(m => m.id !== 'password' && m.id !== 'email_otp' && m.id !== 'mobile_otp' && m.id !== 'otp');
+  const hasEmailOTP = enabledMethods.some(m => m.id === 'email_otp' || m.id === 'otp');
+  const hasMobileOTP = enabledMethods.some(m => m.id === 'mobile_otp');
 
   return (
     <div className='space-y-3'>
       <SocialMethods methods={socialMethods} socialLayout={socialLayout} textColor={textColor} borderRadius={borderRadius} request_id={request_id} />
-      {hasOTP && (
-        <button onClick={onSelectOTP} className='w-full flex items-center justify-center gap-2 border py-3 text-sm font-bold hover:opacity-80 transition-all'
-          style={{ backgroundColor: 'rgba(34,197,94,0.08)', borderColor: 'rgba(34,197,94,0.2)', color: textColor, borderRadius }}>
+      {hasEmailOTP && hasMobileOTP ? (
+        <div className='space-y-2'>
+          <p className='text-xs font-bold text-center uppercase tracking-wider' style={{ color: `${textColor}50` }}>
+            Continue with OTP
+          </p>
+          <div className='flex gap-2.5'>
+            <button onClick={onSelectEmailOTP} className='flex-1 flex items-center justify-center gap-2 border py-3 text-sm font-bold hover:opacity-80 transition-all'
+              style={{ backgroundColor: 'rgba(34,197,94,0.08)', borderColor: 'rgba(34,197,94,0.2)', color: btnTextColor || textColor, borderRadius }}>
+              <span className='text-green-400 text-base'><MdOutlineSms /></span>
+              Email
+            </button>
+            <button onClick={onSelectMobileOTP} className='flex-1 flex items-center justify-center gap-2 border py-3 text-sm font-bold hover:opacity-80 transition-all'
+              style={{ backgroundColor: 'rgba(6,182,212,0.08)', borderColor: 'rgba(6,182,212,0.2)', color: btnTextColor || textColor, borderRadius }}>
+              <span className='text-cyan-400 text-base'><MdOutlineSms /></span>
+              Mobile
+            </button>
+          </div>
+        </div>
+      ) : hasEmailOTP ? (
+        <button onClick={onSelectEmailOTP} className='w-full flex items-center justify-center gap-2 border py-3 text-sm font-bold hover:opacity-80 transition-all'
+          style={{ backgroundColor: 'rgba(34,197,94,0.08)', borderColor: 'rgba(34,197,94,0.2)', color: btnTextColor || textColor, borderRadius }}>
           <span className='text-green-400 text-lg'><MdOutlineSms /></span>
           Continue with OTP
         </button>
-      )}
+      ) : hasMobileOTP ? (
+        <button onClick={onSelectMobileOTP} className='w-full flex items-center justify-center gap-2 border py-3 text-sm font-bold hover:opacity-80 transition-all'
+          style={{ backgroundColor: 'rgba(6,182,212,0.08)', borderColor: 'rgba(6,182,212,0.2)', color: btnTextColor || textColor, borderRadius }}>
+          <span className='text-cyan-400 text-lg'><MdOutlineSms /></span>
+          Continue with OTP
+        </button>
+      ) : null}
       {enabledMethods.some(m => m.id === 'password') && (
         <button onClick={onSelectPassword} className='w-full flex items-center justify-center gap-2 border py-3 text-sm font-bold hover:opacity-80 transition-all'
-          style={{ backgroundColor: 'rgba(59,130,246,0.08)', borderColor: 'rgba(59,130,246,0.2)', color: textColor, borderRadius }}>
+          style={{ backgroundColor: 'rgba(59,130,246,0.08)', borderColor: 'rgba(59,130,246,0.2)', color: btnTextColor || textColor, borderRadius }}>
           <span className='text-blue-400 text-lg'><RiLockPasswordLine /></span>
           Continue with Password
         </button>
@@ -511,14 +563,33 @@ export const LoginPortal = () => {
   // Example:
   //   /auth/REQ_ID/signin?prefill_email=user@example.com&lock_method=otp
   const prefillEmail  = searchParams.get('prefill_email') || '';
+  const prefillPhone  = searchParams.get('prefill_phone') || '';
   const lockMethod    = searchParams.get('lock_method') || '';   // 'otp' | 'password' | ''
-  const lockedEmail   = !!(prefillEmail && lockMethod);           // true = lock the email field
 
   const [configData, setConfigData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentStep, setCurrentStep] = useState('provider_selection');
   const [successState, setSuccessState] = useState(null);
+
+  const rawMethods = configData?.config?.auth_methods || [];
+  const isEmailOTPEnabled = rawMethods.some(m => (m.id === 'email_otp' || m.id === 'otp') && m.enabled);
+  const isMobileOTPEnabled = rawMethods.some(m => m.id === 'mobile_otp' && m.enabled);
+  const isPasswordEnabled = rawMethods.some(m => m.id === 'password' && m.enabled);
+
+  const lockedEmail = !!(
+    (prefillEmail && isEmailOTPEnabled && lockMethod === 'otp') ||
+    (prefillPhone && isMobileOTPEnabled && lockMethod === 'otp') ||
+    ((prefillEmail || prefillPhone) && lockMethod === 'password' && isPasswordEnabled)
+  );
+
+  const requestedOtpDisabled = !!(
+    lockMethod === 'otp' && (
+      (prefillEmail && !isEmailOTPEnabled) ||
+      (prefillPhone && !isMobileOTPEnabled) ||
+      (!prefillEmail && !prefillPhone && !isEmailOTPEnabled && !isMobileOTPEnabled)
+    )
+  );
 
   const handleSuccessRedirect = (url, message) => {
     setSuccessState({ url, message });
@@ -536,6 +607,8 @@ export const LoginPortal = () => {
             // Send prefill_email so the backend stores it as locked_email in Redis.
             // Any subsequent OTP/password call with a different email will be rejected 403.
             ...(prefillEmail ? { prefill_email: prefillEmail } : {}),
+            ...(prefillPhone ? { prefill_phone: prefillPhone } : {}),
+            ...(lockMethod ? { lock_method: lockMethod } : {}),
           },
           { withCredentials: true, headers: getDeviceFingerprintHeaders() }
         );
@@ -543,7 +616,11 @@ export const LoginPortal = () => {
         setConfigData(res.data);
       } catch (err) {
         const detail = err.response?.data?.detail;
-        if (detail && detail.redirect_url) { window.location.href = detail.redirect_url; return; }
+        if (detail && detail.redirect_url) {
+          setError(detail.message || 'Something went wrong, please try again.');
+          setTimeout(() => { window.location.href = detail.redirect_url; }, 3000);
+          return;
+        }
         setError(typeof detail === 'string' ? detail : detail?.message || 'Failed to initialize authentication flow');
       }
       setLoading(false);
@@ -554,9 +631,16 @@ export const LoginPortal = () => {
   // Auto-navigate to locked method once config is loaded
   useEffect(() => {
     if (!configData || !lockMethod) return;
-    if (lockMethod === 'otp') setCurrentStep('otp_verification');
-    else if (lockMethod === 'password') setCurrentStep('password_verification');
-  }, [configData, lockMethod]);
+    if (lockMethod === 'otp') {
+      if (prefillPhone && isMobileOTPEnabled) {
+        setCurrentStep('mobile_otp_verification');
+      } else if (isEmailOTPEnabled) {
+        setCurrentStep('email_otp_verification');
+      }
+    } else if (lockMethod === 'password' && isPasswordEnabled) {
+      setCurrentStep('password_verification');
+    }
+  }, [configData, lockMethod, isEmailOTPEnabled, isMobileOTPEnabled, isPasswordEnabled, prefillPhone]);
 
   // Load Google Font
   useEffect(() => {
@@ -601,6 +685,8 @@ export const LoginPortal = () => {
     login_card_bg_color = '#ffffff14',
     primary_color = '#22d3ee',
     text_color = '#ffffff',
+    btn_text_color = '#ffffff',
+    link_color = '#3b82f6',
     brand_name,
     brand_logo,
     font_family = 'system',
@@ -639,10 +725,10 @@ export const LoginPortal = () => {
   }[logo_position] || 'items-center text-center';
 
   const sharedFormProps = {
-    primary: primary_color, textColor: text_color,
+    primary: primary_color, textColor: text_color, btnTextColor: btn_text_color, linkColor: link_color,
     buttonStyle: button_style, inputStyle: input_style,
     inputBorderColor: input_border_color, borderRadius: btnRadius,
-    prefillEmail, lockedEmail,
+    prefillEmail: prefillEmail || prefillPhone, lockedEmail,
   };
 
   // Title for locked-mode header
@@ -705,6 +791,13 @@ export const LoginPortal = () => {
           <p className='text-xs mt-1.5' style={{ color: `${text_color}50` }}>{pageSubtitle}</p>
         </div>
 
+        {requestedOtpDisabled && (
+          <div className="mb-4 p-3 rounded-xl border text-xs font-semibold text-center"
+            style={{ backgroundColor: 'rgba(239, 68, 68, 0.08)', borderColor: 'rgba(239, 68, 68, 0.2)', color: '#f87171' }}>
+            Warning: The requested OTP authentication method is not enabled for this project.
+          </div>
+        )}
+
         {/* Flow content */}
         <AnimatePresence mode='wait'>
           {successState ? (
@@ -719,9 +812,20 @@ export const LoginPortal = () => {
             </motion.div>
           ) : currentStep === 'additional_fields' ? (
             <AdditionalFieldsFlow key='fields' request_id={request_id} signupFields={signup_fields} onSuccess={handleSuccessRedirect} {...sharedFormProps} />
-          ) : currentStep === 'otp_verification' ? (
+          ) : currentStep === 'email_otp_verification' || currentStep === 'otp_verification' ? (
             <OTPFlow
-              key='otp'
+              key='email-otp'
+              mode='email'
+              request_id={request_id}
+              onComplete={ns => setCurrentStep(ns)}
+              onSuccess={handleSuccessRedirect}
+              onBack={lockedEmail ? null : () => setCurrentStep('provider_selection')}
+              {...sharedFormProps}
+            />
+          ) : currentStep === 'mobile_otp_verification' ? (
+            <OTPFlow
+              key='mobile-otp'
+              mode='mobile'
               request_id={request_id}
               onComplete={ns => setCurrentStep(ns)}
               onSuccess={handleSuccessRedirect}
@@ -754,8 +858,10 @@ export const LoginPortal = () => {
               socialLayout={social_layout}
               request_id={request_id}
               textColor={text_color}
+              btnTextColor={btn_text_color}
               borderRadius={btnRadius}
-              onSelectOTP={() => setCurrentStep('otp_verification')}
+              onSelectEmailOTP={() => setCurrentStep('email_otp_verification')}
+              onSelectMobileOTP={() => setCurrentStep('mobile_otp_verification')}
               onSelectPassword={() => setCurrentStep('password_verification')}
             />
           )}

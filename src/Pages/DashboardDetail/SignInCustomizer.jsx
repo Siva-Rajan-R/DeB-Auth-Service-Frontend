@@ -156,7 +156,7 @@ const LogoUploader = () => {
       const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:8000';
       const token = document.cookie
         .split('; ')
-        .find((row) => row.startsWith('token='))
+        .find((row) => row.startsWith('access_token='))
         ?.split('=')[1];
 
       const res = await axios.post(`${backendUrl}/user/secrets/upload-logo`, formData, {
@@ -485,7 +485,9 @@ export const SignInCustomizer = () => {
           <ColorRow label='Screen Background' storeKey='screen_bg_color' />
           <ColorRow label='Card Background'   storeKey='login_card_bg_color' />
           <ColorRow label='Primary Button'    storeKey='primary_color' />
+          <ColorRow label='Button Text Color' storeKey='btn_text_color' />
           <ColorRow label='Text Color'        storeKey='text_color' />
+          <ColorRow label='Link Color'        storeKey='link_color' />
         </div>
       </Section>
 

@@ -16,6 +16,8 @@ const ICONS = {
   github:    <FaGithub    size={18} className='text-white'  />,
   facebook:  <FaFacebook  size={20} className='text-[#1877f2]'   />,
   microsoft: <BsMicrosoft size={18} className='text-[#00a4ef]'    />,
+  email_otp:  <MdOutlineSms size={20} className='text-emerald-400' />,
+  mobile_otp: <MdOutlineSms size={20} className='text-cyan-400' />,
   otp:       <MdOutlineSms size={20} className='text-emerald-400' />,
   totp:      <ShieldCheck size={20} className='text-cyan-400' />,
 };
@@ -72,6 +74,53 @@ export const AuthMethodSelector = () => {
   const { authMethods, toggleAuthMethod, reorderAuthMethods, forgotPasswordEnabled, toggleForgotPassword } = useAuthConfigStore();
   const enabledCount = authMethods.filter((m) => m.enabled).length;
 
+  const emailOtp = authMethods.find(m => m.id === 'email_otp');
+  const mobileOtp = authMethods.find(m => m.id === 'mobile_otp');
+  const oldOtp = authMethods.find(m => m.id === 'otp');
+
+  const isOtpEnabled = !!(emailOtp?.enabled || mobileOtp?.enabled || oldOtp?.enabled);
+  const emailOtpEnabled = !!(emailOtp?.enabled || oldOtp?.enabled);
+  const mobileOtpEnabled = !!(mobileOtp?.enabled);
+
+  // Build display methods
+  const displayMethods = [];
+  const addedIds = new Set();
+  authMethods.forEach(m => {
+    if (m.id === 'email_otp' || m.id === 'otp') {
+      if (!addedIds.has('otp')) {
+        displayMethods.push({
+          id: 'otp',
+          name: 'OTP',
+          enabled: isOtpEnabled
+        });
+        addedIds.add('otp');
+      }
+    } else if (m.id === 'mobile_otp') {
+      // skip
+    } else {
+      displayMethods.push(m);
+    }
+  });
+
+  const displayEnabledCount = displayMethods.filter(m => m.enabled).length;
+
+  const handleToggle = (id) => {
+    if (id === 'otp') {
+      if (isOtpEnabled) {
+        // Disable both sub-methods if turning off
+        if (displayEnabledCount <= 1) return; // Keep at least one provider enabled
+        if (emailOtp?.enabled) toggleAuthMethod('email_otp');
+        if (oldOtp?.enabled) toggleAuthMethod('otp');
+        if (mobileOtp?.enabled) toggleAuthMethod('mobile_otp');
+      } else {
+        // Turn ON: Enable email OTP by default
+        toggleAuthMethod('email_otp');
+      }
+    } else {
+      toggleAuthMethod(id);
+    }
+  };
+
   const sensors = useSensors(
     useSensor(MouseSensor, {
       activationConstraint: {
@@ -88,9 +137,22 @@ export const AuthMethodSelector = () => {
 
   const handleDragEnd = ({ active, over }) => {
     if (active.id !== over?.id) {
-      const oldIndex = authMethods.findIndex((m) => m.id === active.id);
-      const newIndex = authMethods.findIndex((m) => m.id === over.id);
-      reorderAuthMethods(arrayMove(authMethods, oldIndex, newIndex));
+      const oldIndex = displayMethods.findIndex((m) => m.id === active.id);
+      const newIndex = displayMethods.findIndex((m) => m.id === over.id);
+      const rearrangedDisplay = arrayMove(displayMethods, oldIndex, newIndex);
+      
+      const newRealMethods = [];
+      rearrangedDisplay.forEach(dm => {
+        if (dm.id === 'otp') {
+          if (emailOtp) newRealMethods.push(emailOtp);
+          if (oldOtp) newRealMethods.push(oldOtp);
+          if (mobileOtp) newRealMethods.push(mobileOtp);
+        } else {
+          const found = authMethods.find(r => r.id === dm.id);
+          if (found) newRealMethods.push(found);
+        }
+      });
+      reorderAuthMethods(newRealMethods);
     }
   };
 
@@ -109,19 +171,20 @@ export const AuthMethodSelector = () => {
         <div className='flex items-center gap-2 px-3 py-1 bg-indigo-400/10 border border-indigo-500/20 rounded-xl'>
           <span className='w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse' />
           <span className='text-indigo-400 text-[10px] font-bold uppercase tracking-widest'>
-            {enabledCount} active
+            {displayEnabledCount} active
           </span>
         </div>
       </div>
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext items={authMethods.map((m) => m.id)} strategy={verticalListSortingStrategy}>
+        <SortableContext items={displayMethods.map((m) => m.id)} strategy={verticalListSortingStrategy}>
           <div className='space-y-3'>
             <AnimatePresence>
-              {authMethods.map((m) => (
+              {displayMethods.map((m) => (
                 <motion.div key={m.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} layout>
-                  <SortableItem method={m} onToggle={toggleAuthMethod} enabledCount={enabledCount} />
-                  {/* Forgot Password sub-toggle — only for 'password' method when enabled */}
+                  <SortableItem method={m} onToggle={handleToggle} enabledCount={displayEnabledCount} />
+                  
+                  {/* Forgot Password sub-toggle */}
                   {m.id === 'password' && m.enabled && (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
@@ -144,6 +207,73 @@ export const AuthMethodSelector = () => {
                       </label>
                     </motion.div>
                   )}
+
+                  {/* Email & Mobile OTP sub-toggles */}
+                  {m.id === 'otp' && m.enabled && (
+                    <div className='space-y-2.5 mt-2 ml-10'>
+                      {/* Email OTP sub-toggle */}
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className='flex items-center gap-3 bg-[var(--bg-surface)] border border-[var(--border-glass)] rounded-xl p-3'
+                      >
+                        <div className='p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'>
+                          <MdOutlineSms size={14} />
+                        </div>
+                        <div className='flex-1 min-w-0'>
+                          <span className='text-[var(--text-main)] font-bold text-xs block'>Email OTP</span>
+                          <span className='text-[var(--text-dim)] text-[9px] font-bold uppercase tracking-widest'>
+                            {emailOtpEnabled ? 'Enabled' : 'Disabled'}
+                          </span>
+                        </div>
+                        <label className='relative inline-flex items-center cursor-pointer'>
+                          <input 
+                            type='checkbox' 
+                            className='sr-only peer' 
+                            checked={emailOtpEnabled} 
+                            onChange={() => {
+                              if (emailOtpEnabled && !mobileOtpEnabled) return; // Keep at least one enabled
+                              if (oldOtp?.enabled) toggleAuthMethod('otp');
+                              if (emailOtp) toggleAuthMethod('email_otp');
+                            }} 
+                          />
+                          <div className="w-9 h-5 bg-slate-800 rounded-full peer peer-checked:bg-emerald-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4 shadow-inner" />
+                        </label>
+                      </motion.div>
+
+                      {/* Mobile OTP sub-toggle */}
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className='flex items-center gap-3 bg-[var(--bg-surface)] border border-[var(--border-glass)] rounded-xl p-3'
+                      >
+                        <div className='p-1.5 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'>
+                          <MdOutlineSms size={14} />
+                        </div>
+                        <div className='flex-1 min-w-0'>
+                          <span className='text-[var(--text-main)] font-bold text-xs block'>Mobile OTP</span>
+                          <span className='text-[var(--text-dim)] text-[9px] font-bold uppercase tracking-widest'>
+                            {mobileOtpEnabled ? 'Enabled' : 'Disabled'}
+                          </span>
+                        </div>
+                        <label className='relative inline-flex items-center cursor-pointer'>
+                          <input 
+                            type='checkbox' 
+                            className='sr-only peer' 
+                            checked={mobileOtpEnabled} 
+                            onChange={() => {
+                              if (mobileOtpEnabled && !emailOtpEnabled) return; // Keep at least one enabled
+                              if (mobileOtp) toggleAuthMethod('mobile_otp');
+                            }} 
+                          />
+                          <div className="w-9 h-5 bg-slate-800 rounded-full peer peer-checked:bg-cyan-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4 shadow-inner" />
+                        </label>
+                      </motion.div>
+                    </div>
+                  )}
+
                 </motion.div>
               ))}
             </AnimatePresence>

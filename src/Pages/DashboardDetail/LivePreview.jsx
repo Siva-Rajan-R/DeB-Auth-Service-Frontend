@@ -13,6 +13,8 @@ const PROVIDER_META = {
   github:    { icon: <FaGithub   />,         label: 'GitHub',    color: '#e2e8f0'  },
   facebook:  { icon: <FaFacebook />,         label: 'Facebook',  color: '#1877f2'  },
   microsoft: { icon: <BsMicrosoft />,        label: 'Microsoft', color: '#00a4ef'  },
+  email_otp:  { icon: <MdOutlineSms />,       label: 'Email OTP',       color: '#22c55e'  },
+  mobile_otp: { icon: <MdOutlineSms />,       label: 'Mobile OTP',      color: '#06b6d4'  },
   otp:       { icon: <MdOutlineSms />,       label: 'OTP',       color: '#22c55e'  },
 };
 
@@ -67,9 +69,9 @@ const FInput = ({ label, type = 'text', placeholder, textColor, inputStyle, inpu
 };
 
 // ─── Shared styled button ─────────────────────────────────────────────────────
-const FButton = ({ children, primary, textColor, buttonStyle, borderRadius, onClick }) => {
+const FButton = ({ children, primary, textColor, btnTextColor, buttonStyle, borderRadius, onClick }) => {
   const styles = {
-    filled:   { backgroundColor: primary, color: textColor, border: 'none', boxShadow: `0 10px 25px -5px ${primary}40` },
+    filled:   { backgroundColor: primary, color: btnTextColor || textColor, border: 'none', boxShadow: `0 10px 25px -5px ${primary}40` },
     outlined: { backgroundColor: 'transparent', color: primary, border: `2px solid ${primary}` },
     ghost:    { backgroundColor: 'transparent', color: primary, border: 'none', textDecoration: 'underline', textUnderlineOffset: '4px', fontWeight: 'bold' },
   };
@@ -86,42 +88,49 @@ const FButton = ({ children, primary, textColor, buttonStyle, borderRadius, onCl
 };
 
 // ─── Password form (for when password is the ONLY or first method) ────────────
-const PasswordForm = ({ primary, textColor, buttonStyle, inputStyle, inputBorderColor, borderRadius, showForgotPassword, onBack }) => (
+const PasswordForm = ({ primary, textColor, btnTextColor, buttonStyle, inputStyle, inputBorderColor, borderRadius, showForgotPassword, onBack }) => (
   <motion.div key='pwd-form' initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -15 }} className='space-y-3'>
     <FInput label='Email Address' type='email' placeholder='you@example.com' textColor={textColor} inputStyle={inputStyle} inputBorderColor={inputBorderColor} borderRadius={borderRadius} />
     <FInput label='Password' type='password' placeholder='••••••••' textColor={textColor} inputStyle={inputStyle} inputBorderColor={inputBorderColor} borderRadius={borderRadius} />
-    <FButton primary={primary} textColor={textColor} buttonStyle={buttonStyle} borderRadius={borderRadius}>Sign In</FButton>
+    <FButton primary={primary} textColor={textColor} btnTextColor={btnTextColor} buttonStyle={buttonStyle} borderRadius={borderRadius}>Sign In</FButton>
     {showForgotPassword && (
-      <p className='text-center text-xs pt-1 cursor-pointer hover:underline' style={{ color: primary }}>Forgot password?</p>
+      <p className='text-center text-xs pt-1 cursor-pointer hover:underline' style={{ color: '#ef4444' }}>Forgot password?</p>
     )}
     {onBack && (
-      <button onClick={onBack} className='w-full text-xs transition-colors mt-1' style={{ color: `${textColor}40` }}>← Back to options</button>
+      <button onClick={onBack} className='w-full text-xs transition-colors mt-1' style={{ color: `${textColor}60` }}>← Back to options</button>
     )}
   </motion.div>
 );
 
 // ─── OTP form ────────────────────────────────────────────────────────────────
-const OTPForm = ({ primary, textColor, buttonStyle, inputStyle, inputBorderColor, borderRadius, onBack }) => {
+const OTPForm = ({ primary, textColor, btnTextColor, buttonStyle, inputStyle, inputBorderColor, borderRadius, onBack, mode = 'email' }) => {
   const [step, setStep] = useState(0);
   return (
     <AnimatePresence mode='wait'>
       {step === 0 ? (
         <motion.div key='otp-email' initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -15 }} className='space-y-3'>
-          <FInput label='Email Address' type='email' placeholder='you@example.com' textColor={textColor} inputStyle={inputStyle} inputBorderColor={inputBorderColor} borderRadius={borderRadius} />
-          <FButton primary={primary} textColor={textColor} buttonStyle={buttonStyle} borderRadius={borderRadius} onClick={() => setStep(1)}>Send OTP</FButton>
-          {onBack && <button onClick={onBack} className='w-full text-xs transition-colors' style={{ color: `${textColor}40` }}>← Back to options</button>}
+          <FInput 
+            label={mode === 'email' ? 'Email Address' : 'Mobile Number'} 
+            type={mode === 'email' ? 'email' : 'text'} 
+            placeholder={mode === 'email' ? 'you@example.com' : '+919876543210'} 
+            textColor={textColor} inputStyle={inputStyle} inputBorderColor={inputBorderColor} borderRadius={borderRadius} 
+          />
+          <FButton primary={primary} textColor={textColor} btnTextColor={btnTextColor} buttonStyle={buttonStyle} borderRadius={borderRadius} onClick={() => setStep(1)}>Send OTP</FButton>
+          {onBack && <button onClick={onBack} className='w-full text-xs transition-colors' style={{ color: `${textColor}60` }}>← Back to options</button>}
         </motion.div>
       ) : (
         <motion.div key='otp-code' initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -15 }} className='space-y-3'>
-          <p className='text-xs text-center' style={{ color: `${textColor}60` }}>Enter the 6-digit code sent to your email</p>
+          <p className='text-xs text-center' style={{ color: `${textColor}60` }}>
+            Enter the 6-digit code sent to your {mode === 'email' ? 'email' : 'mobile number'}
+          </p>
           <div className='flex gap-1 justify-center'>
             {Array(6).fill(0).map((_, i) => (
               <div key={i} className='w-8 h-9 flex items-center justify-center text-sm font-mono border'
                 style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.1)', color: `${textColor}50`, borderRadius }}>_</div>
             ))}
           </div>
-          <FButton primary={primary} textColor={textColor} buttonStyle={buttonStyle} borderRadius={borderRadius}>Verify OTP</FButton>
-          <button onClick={() => setStep(0)} className='w-full text-xs transition-colors' style={{ color: `${textColor}40` }}>← Back</button>
+          <FButton primary={primary} textColor={textColor} btnTextColor={btnTextColor} buttonStyle={buttonStyle} borderRadius={borderRadius}>Verify OTP</FButton>
+          <button onClick={() => setStep(0)} className='w-full text-xs transition-colors' style={{ color: `${textColor}60` }}>← Back</button>
         </motion.div>
       )}
     </AnimatePresence>
@@ -158,23 +167,25 @@ const SocialGrid = ({ methods, textColor, borderRadius }) => (
 );
 
 // ─── Provider selection flow (exact match of real LoginPortal) ────────────────
-const ProviderSelectionFlow = ({ enabledMethods, socialLayout, textColor, borderRadius, primary, buttonStyle, inputStyle, inputBorderColor, showForgotPassword }) => {
-  const [step, setStep] = useState('select'); // 'select' | 'password' | 'otp'
+const ProviderSelectionFlow = ({ enabledMethods, socialLayout, textColor, btnTextColor, linkColor, borderRadius, primary, buttonStyle, inputStyle, inputBorderColor, showForgotPassword }) => {
+  const [step, setStep] = useState('select'); // 'select' | 'password' | 'email_otp' | 'mobile_otp'
 
-  const socialMethods = enabledMethods.filter(m => m.id !== 'password' && m.id !== 'otp');
+  const socialMethods = enabledMethods.filter(m => m.id !== 'password' && m.id !== 'email_otp' && m.id !== 'mobile_otp' && m.id !== 'otp');
   const hasPassword = enabledMethods.some(m => m.id === 'password');
-  const hasOTP = enabledMethods.some(m => m.id === 'otp');
-  const sharedProps = { primary, textColor, buttonStyle, inputStyle, inputBorderColor, borderRadius };
+  const hasEmailOTP = enabledMethods.some(m => m.id === 'email_otp' || m.id === 'otp');
+  const hasMobileOTP = enabledMethods.some(m => m.id === 'mobile_otp');
+  const sharedProps = { primary, textColor, btnTextColor, linkColor, buttonStyle, inputStyle, inputBorderColor, borderRadius };
 
   // Auto-advance if only one method
   useEffect(() => {
     if (enabledMethods.length === 1) {
       if (hasPassword) setStep('password');
-      else if (hasOTP) setStep('otp');
+      else if (hasEmailOTP) setStep('email_otp');
+      else if (hasMobileOTP) setStep('mobile_otp');
     } else {
       setStep('select');
     }
-  }, [enabledMethods.length, hasPassword, hasOTP]);
+  }, [enabledMethods.length, hasPassword, hasEmailOTP, hasMobileOTP]);
 
   return (
     <AnimatePresence mode='wait'>
@@ -185,9 +196,17 @@ const ProviderSelectionFlow = ({ enabledMethods, socialLayout, textColor, border
           showForgotPassword={showForgotPassword}
           onBack={enabledMethods.length > 1 ? () => setStep('select') : null}
         />
-      ) : step === 'otp' ? (
+      ) : step === 'email_otp' ? (
         <OTPForm
-          key='otp'
+          key='email_otp'
+          mode='email'
+          {...sharedProps}
+          onBack={enabledMethods.length > 1 ? () => setStep('select') : null}
+        />
+      ) : step === 'mobile_otp' ? (
+        <OTPForm
+          key='mobile_otp'
+          mode='mobile'
           {...sharedProps}
           onBack={enabledMethods.length > 1 ? () => setStep('select') : null}
         />
@@ -200,29 +219,50 @@ const ProviderSelectionFlow = ({ enabledMethods, socialLayout, textColor, border
               : socialMethods.map(m => <SocialBtn key={m.id} method={m} textColor={textColor} borderRadius={borderRadius} />)
           )}
           {/* Divider if social AND password/otp */}
-          {socialMethods.length > 0 && (hasPassword || hasOTP) && (
+          {socialMethods.length > 0 && (hasPassword || hasEmailOTP || hasMobileOTP) && (
             <div className='relative flex items-center justify-center py-1'>
               <div className='absolute inset-0 flex items-center'><div className='w-full border-t' style={{ borderColor: `${textColor}15` }} /></div>
               <span className='relative px-3 text-xs' style={{ color: `${textColor}40` }}>or continue with</span>
             </div>
           )}
-          {/* OTP button */}
-          {hasOTP && (
-            <button
-              onClick={() => setStep('otp')}
-              className='w-full flex items-center justify-center gap-2.5 border py-3 text-sm font-bold hover:opacity-80 transition-all'
-              style={{ backgroundColor: 'rgba(34,197,94,0.08)', borderColor: 'rgba(34,197,94,0.2)', color: textColor, borderRadius }}
-            >
+          {/* Email/Mobile OTP buttons */}
+          {hasEmailOTP && hasMobileOTP ? (
+            <div className='space-y-2'>
+              <p className='text-xs font-bold text-center uppercase tracking-wider' style={{ color: `${textColor}50` }}>
+                Continue with OTP
+              </p>
+              <div className='flex gap-2'>
+                <button onClick={() => setStep('email_otp')} className='flex-1 flex items-center justify-center gap-2 border py-2.5 text-xs font-bold hover:opacity-80 transition-all'
+                  style={{ backgroundColor: 'rgba(34,197,94,0.08)', borderColor: 'rgba(34,197,94,0.2)', color: btnTextColor || textColor, borderRadius }}>
+                  <span className='text-green-400 text-sm'><MdOutlineSms /></span>
+                  Email
+                </button>
+                <button onClick={() => setStep('mobile_otp')} className='flex-1 flex items-center justify-center gap-2 border py-2.5 text-xs font-bold hover:opacity-80 transition-all'
+                  style={{ backgroundColor: 'rgba(6,182,212,0.08)', borderColor: 'rgba(6,182,212,0.2)', color: btnTextColor || textColor, borderRadius }}>
+                  <span className='text-cyan-400 text-sm'><MdOutlineSms /></span>
+                  Mobile
+                </button>
+              </div>
+            </div>
+          ) : hasEmailOTP ? (
+            <button onClick={() => setStep('email_otp')} className='w-full flex items-center justify-center gap-2.5 border py-3 text-sm font-bold hover:opacity-80 transition-all'
+              style={{ backgroundColor: 'rgba(34,197,94,0.08)', borderColor: 'rgba(34,197,94,0.2)', color: btnTextColor || textColor, borderRadius }}>
               <span className='text-green-400 text-lg'><MdOutlineSms /></span>
               Continue with OTP
             </button>
-          )}
+          ) : hasMobileOTP ? (
+            <button onClick={() => setStep('mobile_otp')} className='w-full flex items-center justify-center gap-2.5 border py-3 text-sm font-bold hover:opacity-80 transition-all'
+              style={{ backgroundColor: 'rgba(6,182,212,0.08)', borderColor: 'rgba(6,182,212,0.2)', color: btnTextColor || textColor, borderRadius }}>
+              <span className='text-cyan-400 text-lg'><MdOutlineSms /></span>
+              Continue with OTP
+            </button>
+          ) : null}
           {/* Password button */}
           {hasPassword && (
             <button
               onClick={() => setStep('password')}
               className='w-full flex items-center justify-center gap-2.5 border py-3 text-sm font-bold hover:opacity-80 transition-all'
-              style={{ backgroundColor: 'rgba(59,130,246,0.08)', borderColor: 'rgba(59,130,246,0.2)', color: textColor, borderRadius }}
+              style={{ backgroundColor: 'rgba(59,130,246,0.08)', borderColor: 'rgba(59,130,246,0.2)', color: btnTextColor || textColor, borderRadius }}
             >
               <span className='text-blue-400 text-lg'><RiLockPasswordLine /></span>
               Continue with Password
@@ -244,8 +284,9 @@ const SignupFlow = ({ enabledMethods, signupFields, primary, textColor, buttonSt
   const isLastStep = step === totalSteps - 1;
 
   const hasPwd = enabledMethods.some(m => m.id === 'password');
-  const hasOTP = enabledMethods.some(m => m.id === 'otp');
-  const socialMethods = enabledMethods.filter(m => m.id !== 'password' && m.id !== 'otp');
+  const hasEmailOTP = enabledMethods.some(m => m.id === 'email_otp' || m.id === 'otp');
+  const hasMobileOTP = enabledMethods.some(m => m.id === 'mobile_otp');
+  const socialMethods = enabledMethods.filter(m => m.id !== 'password' && m.id !== 'email_otp' && m.id !== 'mobile_otp' && m.id !== 'otp');
   const sharedProps = { primary, textColor, buttonStyle, inputStyle, inputBorderColor, borderRadius };
 
   if (!authDone) {
@@ -258,7 +299,7 @@ const SignupFlow = ({ enabledMethods, signupFields, primary, textColor, buttonSt
             <FButton {...sharedProps} onClick={() => setAuthDone(true)}>Continue with Password</FButton>
           </>
         )}
-        {(socialMethods.length > 0 || hasOTP) && (
+        {(socialMethods.length > 0 || hasEmailOTP || hasMobileOTP) && (
           <>
             {hasPwd && (
               <div className='relative flex items-center justify-center py-1'>
@@ -271,13 +312,37 @@ const SignupFlow = ({ enabledMethods, signupFields, primary, textColor, buttonSt
                 ? <SocialGrid methods={socialMethods} textColor={textColor} borderRadius={borderRadius} />
                 : socialMethods.map(m => <SocialBtn key={m.id} method={m} textColor={textColor} borderRadius={borderRadius} />)
             )}
-            {hasOTP && (
+            {hasEmailOTP && hasMobileOTP ? (
+              <div className='space-y-1.5 w-full'>
+                <p className='text-[10px] font-bold text-center uppercase tracking-wider' style={{ color: `${textColor}40` }}>
+                  Sign up with OTP
+                </p>
+                <div className='flex gap-2'>
+                  <button onClick={() => setAuthDone(true)} className='flex-1 flex items-center justify-center gap-2 border py-2.5 text-xs font-bold hover:opacity-80 transition-all'
+                    style={{ backgroundColor: 'rgba(34,197,94,0.08)', borderColor: 'rgba(34,197,94,0.2)', color: textColor, borderRadius }}>
+                    <span className='text-green-400 text-sm'><MdOutlineSms /></span>
+                    Email
+                  </button>
+                  <button onClick={() => setAuthDone(true)} className='flex-1 flex items-center justify-center gap-2 border py-2.5 text-xs font-bold hover:opacity-80 transition-all'
+                    style={{ backgroundColor: 'rgba(6,182,212,0.08)', borderColor: 'rgba(6,182,212,0.2)', color: textColor, borderRadius }}>
+                    <span className='text-cyan-400 text-sm'><MdOutlineSms /></span>
+                    Mobile
+                  </button>
+                </div>
+              </div>
+            ) : hasEmailOTP ? (
               <button onClick={() => setAuthDone(true)} className='w-full flex items-center justify-center gap-2.5 border py-2.5 text-sm font-bold hover:opacity-80 transition-all'
                 style={{ backgroundColor: 'rgba(34,197,94,0.08)', borderColor: 'rgba(34,197,94,0.2)', color: textColor, borderRadius }}>
                 <span className='text-green-400'><MdOutlineSms /></span>
                 Continue with OTP
               </button>
-            )}
+            ) : hasMobileOTP ? (
+              <button onClick={() => setAuthDone(true)} className='w-full flex items-center justify-center gap-2.5 border py-2.5 text-sm font-bold hover:opacity-80 transition-all'
+                style={{ backgroundColor: 'rgba(6,182,212,0.08)', borderColor: 'rgba(6,182,212,0.2)', color: textColor, borderRadius }}>
+                <span className='text-cyan-400'><MdOutlineSms /></span>
+                Continue with OTP
+              </button>
+            ) : null}
           </>
         )}
       </div>
@@ -328,7 +393,7 @@ const SignupFlow = ({ enabledMethods, signupFields, primary, textColor, buttonSt
 export const LivePreview = () => {
   const { uiConfig, authMethods, signupFields, activeMode, forgotPasswordEnabled } = useAuthConfigStore();
   const {
-    screen_bg_color, login_card_bg_color, primary_color, text_color, brand_name, brand_logo,
+    screen_bg_color, login_card_bg_color, primary_color, text_color, btn_text_color, link_color, brand_name, brand_logo,
     font_family, font_size, border_radius, shadow_intensity, blur_amount, border_width, border_color,
     button_style, input_style, input_border_color, logo_position, social_layout,
     bg_pattern, gradient_start, gradient_end, gradient_direction, custom_css,
@@ -368,7 +433,7 @@ export const LivePreview = () => {
   const enabledMethods = authMethods.filter(m => m.enabled);
 
   const sharedFormProps = {
-    primary: primary_color, textColor: text_color,
+    primary: primary_color, textColor: text_color, btnTextColor: btn_text_color,
     buttonStyle: button_style, inputStyle: input_style,
     inputBorderColor: input_border_color, borderRadius: btnRadius,
   };
@@ -455,7 +520,7 @@ export const LivePreview = () => {
         {/* Sign in / Sign up switcher */}
         <p className='text-center text-xs mt-4' style={{ color: `${text_color}30` }}>
           {activeMode === 'signin' ? "Don't have an account? " : 'Already have an account? '}
-          <span className='cursor-pointer hover:underline' style={{ color: primary_color }}>
+          <span className='cursor-pointer hover:underline' style={{ color: link_color || '#3b82f6' }}>
             {activeMode === 'signin' ? 'Sign up' : 'Sign in'}
           </span>
         </p>
