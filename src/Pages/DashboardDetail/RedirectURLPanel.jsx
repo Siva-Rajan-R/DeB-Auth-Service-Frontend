@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { useAuthConfigStore } from '../../Store/useAuthConfigStore';
 import { Link2, CheckCircle2, XCircle, Info, Copy, Check, Lock, Smartphone, Mail } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { APP_CONFIG } from '../../config';
 
-const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL || window.location.origin;
+const FRONTEND_URL = APP_CONFIG.FRONTEND_URL;
 
 const URL_FIELDS = [
   {

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { APP_CONFIG } from "../config";
 import { useContext } from "react";
 import { AuthContext } from "../Contexts/UserContext";
 import Cookies from "js-cookie";
@@ -10,7 +11,7 @@ import { jwtDecode } from "jwt-decode";
 export const useNetworkCalls = () => {
   const { setIsLoggedIn } = useContext(AuthContext);
   const location =useLocation()
-  const backend_url = import.meta.env.VITE_BACKEND_URL;
+  const backend_url = APP_CONFIG.BACKEND_URL;
 
   const call = async ({ method, path, data = null, withCred = true }) => {
     const urlToCall = `${backend_url}${path}`;

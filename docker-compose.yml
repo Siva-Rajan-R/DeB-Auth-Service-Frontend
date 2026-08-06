@@ -1,0 +1,15 @@
+services:
+  dauth-frontend:
+    image: sivarajan001/debuggerstech-dauth-site:latest
+    container_name: dauth-frontend
+    restart: unless-stopped
+
+    env_file:
+      - ./dauth_service/dauth_frontend.env
+
+    ports:
+      - "94:80"
+
+    volumes:
+      - ./dauth_service/dauth_frontend/logs:/app/logs
+

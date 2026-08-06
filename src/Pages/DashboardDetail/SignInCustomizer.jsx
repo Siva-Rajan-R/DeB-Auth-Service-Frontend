@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import Select from 'react-select';
 import axios from 'axios';
+import { APP_CONFIG } from '../../config';
 
 
 // ─── Primitive: Color picker row ─────────────────────────────────────────────
@@ -153,7 +154,7 @@ const LogoUploader = () => {
 
     setUploading(true);
     try {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:8000';
+      const backendUrl = APP_CONFIG.BACKEND_URL;
       const token = document.cookie
         .split('; ')
         .find((row) => row.startsWith('access_token='))

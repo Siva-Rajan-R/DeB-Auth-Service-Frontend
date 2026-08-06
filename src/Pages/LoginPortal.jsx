@@ -8,8 +8,9 @@ import { RiLockPasswordLine } from 'react-icons/ri';
 import { Eye, EyeOff, Check, Lock } from 'lucide-react';
 import axios from 'axios';
 import { UAParser } from 'ua-parser-js';
+import { APP_CONFIG } from '../config';
 
-const backend_url = import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:8000';
+const backend_url = APP_CONFIG.BACKEND_URL;
 
 const PROVIDER_META = {
   password:  { icon: <RiLockPasswordLine />, label: 'Password',  color: '#22d3ee'  },

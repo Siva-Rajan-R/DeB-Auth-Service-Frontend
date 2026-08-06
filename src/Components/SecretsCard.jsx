@@ -5,6 +5,7 @@ import { Copy, Lock } from 'lucide-react' // icon library
 import { SecretsGenerationDialog, SecretsRegenerateDialog, SecretsRemoveDialog } from './Dialogs'
 import { useNetworkCalls } from '../Utils/NetworkCalls'
 import { AuthContext } from '../Contexts/UserContext'
+import { APP_CONFIG } from '../config'
 
 
 import { useToastStore } from '../Store/useToastStore'
@@ -36,7 +37,7 @@ export const SecretsCard = ({ credIndex, apikey = "", clientSecret = "", canChan
     const { call } = useNetworkCalls()
     const [iframeKey, setIframeKey] = useState(0);
 
-    const backend_url = import.meta.env.VITE_BACKEND_URL;
+    const backend_url = APP_CONFIG.BACKEND_URL;
 
     const updateConfigurations = async () => {
         setSaving(true)

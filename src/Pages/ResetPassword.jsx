@@ -3,8 +3,9 @@ import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, Check, AlertTriangle, Lock } from 'lucide-react';
 import axios from 'axios';
+import { APP_CONFIG } from '../config';
 
-const backend_url = import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:8000';
+const backend_url = APP_CONFIG.BACKEND_URL;
 
 export const ResetPassword = () => {
   const { token } = useParams();
