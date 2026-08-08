@@ -39,11 +39,14 @@ export const DashBoardNavBar = ({actions}) => {
               className='text-slate-400 group-hover:text-indigo-400 transition-colors' 
             />
           </div>
-          <div className='flex flex-col'>
-            <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[var(--text-main)] to-[var(--text-muted)] bg-clip-text text-transparent leading-tight">
-              DeB-Auth
-            </h1>
-            <span className='text-[10px] uppercase tracking-[0.2em] text-indigo-500/80 font-bold'>Platform Control</span>
+          <div className='flex items-center gap-3 cursor-pointer' onClick={() => window.location.href="/"}>
+            <img src="/dauth_logo.png" alt="DAuth Logo" className="h-8 w-auto object-contain" />
+            <div className='flex flex-col'>
+              <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#00d2e5] to-teal-400 bg-clip-text text-transparent leading-tight">
+                DAuth
+              </h1>
+              <span className='text-[10px] uppercase tracking-[0.2em] text-cyan-500 font-bold'>Platform Control</span>
+            </div>
           </div>
         </div>
 

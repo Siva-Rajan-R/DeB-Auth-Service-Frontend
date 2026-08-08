@@ -34,8 +34,8 @@ export const DashboardLayout = () => {
     <div className="h-[100dvh] overflow-hidden w-full bg-[var(--bg-deep)] text-[var(--text-main)] transition-colors duration-300 flex flex-col relative">
       {/* Top Background Glow Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-[-15%] right-[-5%] w-[50%] h-[50%] bg-blue-200/20 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-200/20 blur-[120px] rounded-full" />
+        <div className="absolute top-[-15%] right-[-5%] w-[50%] h-[50%] bg-cyan-200/25 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-teal-200/25 blur-[120px] rounded-full" />
       </div>
 
       {/* Top Application Bar (Desktop & Mobile) */}
@@ -45,23 +45,21 @@ export const DashboardLayout = () => {
             onClick={() => window.location.href = "/"}
             className="p-2 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 transition-all cursor-pointer group shadow-sm active:scale-95 z-10"
           >
-            <MdOutlineKeyboardBackspace size={24} className="text-slate-600 group-hover:text-indigo-600 transition-colors" />
+            <MdOutlineKeyboardBackspace size={24} className="text-slate-600 group-hover:text-cyan-600 transition-colors" />
           </div>
         </div>
 
         {/* Center Logo / App Name */}
         <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center justify-center pointer-events-none z-0 h-full w-full overflow-hidden">
           <div className={`flex items-center gap-2 transition-all duration-300 absolute ${isScrolled ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}>
-            <div className="w-5 h-5 md:w-6 md:h-6 bg-indigo-500 rounded flex items-center justify-center shadow-sm">
-              <span className="text-white font-bold text-[10px] md:text-xs">D</span>
-            </div>
+            <img src="/dauth_logo.png" alt="DAuth Logo" className="w-6 h-6 object-contain" />
             <h1 className="text-lg md:text-xl font-extrabold text-[var(--text-main)] tracking-tight">
-              {location.pathname === '/dashboard-detail' ? projectName : 'deb-Authentication'}
+              {location.pathname === '/dashboard-detail' ? projectName : 'DAuth'}
             </h1>
           </div>
           <div className={`flex items-center gap-2 transition-all duration-300 absolute ${isScrolled ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
             <h1 className="text-lg md:text-xl font-bold text-[var(--text-main)] tracking-tight">
-              {location.pathname === '/dashboard' ? 'Auth Projects' : location.pathname === '/dashboard-detail' ? projectName : location.pathname === '/auth-docs' ? 'Deb-auth-docs' : 'Dashboard'}
+              {location.pathname === '/dashboard' ? 'Auth Projects' : location.pathname === '/dashboard-detail' ? projectName : location.pathname === '/auth-docs' ? 'DAuth Docs' : 'Dashboard'}
             </h1>
           </div>
         </div>
@@ -83,9 +81,7 @@ export const DashboardLayout = () => {
                 }}
                 className={`relative px-4 py-2 text-sm font-semibold rounded-lg transition-all ${
                   location.pathname === item.path
-                    ? showSave && hasUnsavedChanges
-                      ? 'bg-indigo-600 text-white shadow-sm'
-                      : 'bg-indigo-600 text-white shadow-sm'
+                    ? 'bg-[#00d2e5] text-slate-950 font-bold shadow-sm'
                     : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-black/5 dark:hover:bg-white/5'
                 }`}
               >
@@ -93,7 +89,7 @@ export const DashboardLayout = () => {
                 {showSave && hasUnsavedChanges && (
                   <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500 border border-indigo-600"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500 border border-cyan-600"></span>
                   </span>
                 )}
               </button>

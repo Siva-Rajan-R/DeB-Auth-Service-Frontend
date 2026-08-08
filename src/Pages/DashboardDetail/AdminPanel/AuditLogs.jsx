@@ -116,12 +116,12 @@ const getStatusColor = (status) => {
 };
 
 const mockLogs = [
-  { time: '2023-10-27 14:32:01', action: 'User Login', user: 'admin@debuggers.com', ip: '192.168.1.104', status: 'success' },
+  { time: '2023-10-27 14:32:01', action: 'User Login', user: 'admin@debuggerstechnologies.com', ip: '192.168.1.104', status: 'success' },
   { time: '2023-10-27 14:28:15', action: 'Failed Login Attempt', user: 'unknown', ip: '45.22.19.102', status: 'error' },
-  { time: '2023-10-27 13:15:42', action: 'Role Created (Editor)', user: 'superadmin@debuggers.com', ip: '192.168.1.101', status: 'info' },
-  { time: '2023-10-27 11:05:12', action: 'API Key Rolled', user: 'admin@debuggers.com', ip: '192.168.1.104', status: 'warning' },
-  { time: '2023-10-26 16:45:33', action: 'User Deleted (john@test.com)', user: 'superadmin@debuggers.com', ip: '192.168.1.101', status: 'error' },
-  { time: '2023-10-26 09:22:11', action: 'SSO Config Updated', user: 'admin@debuggers.com', ip: '192.168.1.104', status: 'info' },
-  { time: '2023-10-25 18:30:00', action: 'User Login', user: 'jane.smith@debuggers.com', ip: '10.0.0.55', status: 'success' },
-  { time: '2023-10-25 10:14:05', action: 'Password Policy Changed', user: 'superadmin@debuggers.com', ip: '192.168.1.101', status: 'warning' },
+  { time: '2023-10-27 13:15:42', action: 'Role Created (Editor)', user: 'superadmin@debuggerstechnologies.com', ip: '192.168.1.101', status: 'info' },
+  { time: '2023-10-27 11:05:12', action: 'API Key Rolled', user: 'admin@debuggerstechnologies.com', ip: '192.168.1.104', status: 'warning' },
+  { time: '2023-10-26 16:45:33', action: 'User Deleted (john@test.com)', user: 'superadmin@debuggerstechnologies.com', ip: '192.168.1.101', status: 'error' },
+  { time: '2023-10-26 09:22:11', action: 'SSO Config Updated', user: 'admin@debuggerstechnologies.com', ip: '192.168.1.104', status: 'info' },
+  { time: '2023-10-25 18:30:00', action: 'User Login', user: 'jane.smith@debuggerstechnologies.com', ip: '10.0.0.55', status: 'success' },
+  { time: '2023-10-25 10:14:05', action: 'Password Policy Changed', user: 'superadmin@debuggerstechnologies.com', ip: '192.168.1.101', status: 'warning' },
 ];

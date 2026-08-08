@@ -26,7 +26,7 @@ export const KnowusPage = () => {
           Trust & Reliability
         </h1>
         <p className="mt-4 text-slate-500 max-w-2xl text-lg">
-          We built DeB-Auth to be the simplest, most secure authentication system available. Here's why developers trust us.
+          We built DAuth to be the simplest, most secure authentication system available. Here's why developers trust us.
         </p>
       </motion.div>
 
@@ -38,7 +38,7 @@ export const KnowusPage = () => {
           style={{ x: xLeft }}
           className="ml-10 max-sm:ml-0 max-lg:ml-0 w-full border border-slate-200/80 rounded-2xl px-6 py-6 bg-white/70 backdrop-blur-xl shadow-lg shadow-slate-200/50"
         >
-          <h1 className="text-2xl max-sm:text-xl font-extrabold text-indigo-600">Why Choose Us</h1>
+          <h1 className="text-2xl max-sm:text-xl font-extrabold text-[#00d2e5]">Why Choose Us</h1>
           <div className="ml-5 mt-5 max-sm:ml-3">
             <ul className="list-disc list-outside space-y-3 text-slate-600">
               <li>
@@ -62,7 +62,7 @@ export const KnowusPage = () => {
           style={{ y: yCenter }}
           className="ml-10 max-sm:ml-0 max-lg:ml-0 w-full border border-slate-200/80 rounded-2xl px-6 py-6 bg-white/70 backdrop-blur-xl shadow-lg shadow-slate-200/50"
         >
-          <h1 className="text-2xl max-sm:text-xl font-extrabold text-indigo-600">What Makes Us Different</h1>
+          <h1 className="text-2xl max-sm:text-xl font-extrabold text-[#00d2e5]">What Makes Us Different</h1>
           <div className="ml-5 mt-5 max-sm:ml-3">
             <ul className="list-disc list-outside space-y-3 text-slate-600">
               <li>
@@ -86,7 +86,7 @@ export const KnowusPage = () => {
           style={{ x: xRight }}
           className="ml-10 max-sm:ml-0 max-lg:ml-0 w-200 max-sm:w-full max-lg:w-full border border-slate-200/80 rounded-2xl px-6 py-6 bg-white/70 backdrop-blur-xl shadow-lg shadow-slate-200/50"
         >
-          <h1 className="text-2xl max-sm:text-xl font-extrabold text-indigo-600">Our Promise</h1>
+          <h1 className="text-2xl max-sm:text-xl font-extrabold text-[#00d2e5]">Our Promise</h1>
           <div className="ml-5 mt-5 max-sm:ml-3">
             <ul className="list-disc list-outside space-y-3 text-slate-600">
               <li>

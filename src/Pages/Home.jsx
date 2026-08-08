@@ -18,20 +18,20 @@ export const HomePage = () => {
   const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
 
   return (
-    <div ref={containerRef} className="relative min-h-screen bg-blue-50">
+    <div ref={containerRef} className="relative min-h-screen bg-cyan-50/40">
       {/* Parallax Background - Light Theme */}
       <div className="absolute inset-0 overflow-hidden z-0 pointer-events-none">
         <motion.div 
           className="absolute inset-0 opacity-80 w-full"
           style={{ 
             y: yBg,
-            backgroundImage: 'radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.15) 0%, transparent 60%), radial-gradient(circle at 80% 60%, rgba(99, 102, 241, 0.1) 0%, transparent 60%)',
+            backgroundImage: 'radial-gradient(circle at 20% 30%, rgba(0, 210, 229, 0.15) 0%, transparent 60%), radial-gradient(circle at 80% 60%, rgba(20, 184, 166, 0.1) 0%, transparent 60%)',
             backgroundSize: '100% 100%, 100% 100%',
             height: '150%' 
           }}
         >
           {/* Floating grid - Light Theme */}
-          <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
+          <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(0, 210, 229, 0.12) 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
         </motion.div>
       </div>
 
@@ -46,7 +46,7 @@ export const HomePage = () => {
         {/* Footer */}
         <div className="mt-20 pt-8 border-t border-slate-200/60 flex justify-center items-center">
           <p className="text-slate-500 font-medium text-sm text-center">
-            A product from <a href="https://debuggers.co.in" target="_blank" rel="noreferrer" className="text-indigo-600 font-bold hover:underline">debuggers</a> | debuggers.co.in
+            A product from <a href="https://debuggerstechnologies.com" target="_blank" rel="noreferrer" className="text-[#00d2e5] font-bold hover:underline">debuggerstechnologies</a> | debuggerstechnologies.com
           </p>
         </div>
       </div>

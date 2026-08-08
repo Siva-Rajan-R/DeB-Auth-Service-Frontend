@@ -90,7 +90,7 @@ export const KeysPanel = ({ apikey }) => {
           API Credentials
         </h2>
         <p className='text-[var(--text-muted)] text-sm'>
-          Use these credentials to authenticate your application with the DeB-Auth-Service.
+          Use these credentials to authenticate your application with the DAuth-Service.
         </p>
       </div>
 

@@ -173,7 +173,7 @@ export const AuthDocs = () => {
                         <span className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">Response</span>
                       </div>
                       <div className="p-4 text-sm font-mono text-emerald-600 dark:text-emerald-400">
-                        {`{\n  "login_url": "https://auth.debuggers.com/..."\n}`}
+                        {`{\n  "login_url": "https://auth.debuggerstechnologies.com/..."\n}`}
                       </div>
                     </div>
                   </div>
@@ -266,7 +266,7 @@ export const AuthDocs = () => {
                       The JWT returned after successful authentication contains standard and custom claims describing the authenticated user.
                     </p>
                     <CodeEditor 
-                      code={`{\n  "iss": "DeB-Auth-Service",\n  "exp": 1672531200,\n  "iat": 1672527600,\n  "email": "user@example.com",\n  "name": "John Doe",\n  "profile_picture": "https://..."\n}`}
+                      code={`{\n  "iss": "DAuth-Service",\n  "exp": 1672531200,\n  "iat": 1672527600,\n  "email": "user@example.com",\n  "name": "John Doe",\n  "profile_picture": "https://..."\n}`}
                       language="json"
                       filename="decoded-payload.json"
                     />
@@ -277,10 +277,10 @@ export const AuthDocs = () => {
                       <h4 className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-wider mb-4 border-b border-[var(--border-glass)] pb-2">Standard Claims</h4>
                       <ul className="space-y-3">
                         <li className="flex items-start gap-3">
-                          <div className="mt-1 w-1.5 h-1.5 bg-indigo-500 rounded-full" />
+                          <div className="mt-1 w-1.5 h-1.5 bg-cyan-500 rounded-full" />
                           <div>
-                            <code className="text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-1.5 py-0.5 rounded text-xs font-bold mr-2">iss</code>
-                            <span className="text-[var(--text-muted)] text-sm">Token issuer (DeB-Auth-Service)</span>
+                            <code className="text-cyan-600 dark:text-cyan-400 bg-cyan-500/10 px-1.5 py-0.5 rounded text-xs font-bold mr-2">iss</code>
+                            <span className="text-[var(--text-muted)] text-sm">Token issuer (DAuth-Service)</span>
                           </div>
                         </li>
                         <li className="flex items-start gap-3">

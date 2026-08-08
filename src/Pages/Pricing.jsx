@@ -22,10 +22,10 @@ export const PricingPage = () => {
         className="w-full flex justify-center items-center flex-col text-center"
       >
         <h1 className="text-4xl max-sm:text-2xl font-extrabold text-slate-800 tracking-tight">
-          Pricing That Makes Sense. <span className="text-indigo-600">Free.</span>
+          Pricing That Makes Sense. <span className="text-[#00d2e5]">Free.</span>
         </h1>
         <p className="mt-4 text-slate-500 max-w-2xl text-lg">
-          Why pay per active user? DeB-Auth is completely free and open-source. Stop worrying about monthly MAU limits and expensive tiers.
+          Why pay per active user? DAuth is completely free and open-source. Stop worrying about monthly MAU limits and expensive tiers.
         </p>
       </motion.div>
 
@@ -40,9 +40,9 @@ export const PricingPage = () => {
               <thead>
                 <tr className="border-b border-slate-200">
                   <th className="py-6 px-6 font-semibold text-slate-500 w-1/4">Features</th>
-                  <th className="py-6 px-6 bg-indigo-50/50 w-1/4">
-                    <div className="font-bold text-2xl text-indigo-600">DeB-Auth</div>
-                    <div className="text-indigo-400 font-medium text-sm mt-1">$0 / Forever</div>
+                  <th className="py-6 px-6 bg-cyan-50/50 w-1/4">
+                    <div className="font-bold text-2xl text-[#00d2e5]">DAuth</div>
+                    <div className="text-cyan-600 font-medium text-sm mt-1">$0 / Forever</div>
                   </th>
                   <th className="py-6 px-6 w-1/4">
                     <div className="font-bold text-xl text-slate-700">Auth0</div>
@@ -57,7 +57,7 @@ export const PricingPage = () => {
               <tbody className="text-slate-600 text-sm">
                 <tr className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
                   <td className="py-4 px-6 font-medium text-slate-700">Monthly Active Users</td>
-                  <td className="py-4 px-6 bg-indigo-50/30 font-bold text-indigo-600">Unlimited</td>
+                  <td className="py-4 px-6 bg-cyan-50/30 font-bold text-[#00d2e5]">Unlimited</td>
                   <td className="py-4 px-6 text-slate-500">7,500 limit</td>
                   <td className="py-4 px-6 text-slate-500">10,000 limit</td>
                 </tr>

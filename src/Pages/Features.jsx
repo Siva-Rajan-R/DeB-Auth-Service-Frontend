@@ -26,7 +26,7 @@ export const FeaturesPage = () => {
         className="w-full flex justify-center items-center flex-col text-center mb-10"
       >
         <h1 className="text-4xl max-sm:text-2xl font-extrabold text-slate-800 tracking-tight">
-          Everything You Need. <span className="text-indigo-600">Nothing You Don't.</span>
+          Everything You Need. <span className="text-[#00d2e5]">Nothing You Don't.</span>
         </h1>
         <p className="mt-4 text-slate-500 max-w-2xl text-lg">
           We stripped out the complexity of traditional auth providers to give you a fast, secure, and developer-friendly experience.

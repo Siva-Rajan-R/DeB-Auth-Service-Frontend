@@ -114,20 +114,21 @@ export const NavBar = () => {
   };
 
   return (
-    <div className="w-full sticky top-0 z-[100] bg-blue-50/90 backdrop-blur-md rounded-b-3xl shadow-sm mb-4">
+    <div className="w-full sticky top-0 z-[100] bg-cyan-50/90 backdrop-blur-md rounded-b-3xl shadow-sm mb-4">
       <div className="flex justify-between items-center px-4 py-3 w-full" id="home">
-        {/* Title */}
-        <div className=''>
-          <h1 className="text-3xl text-indigo-600 font-extrabold max-sm:text-2xl tracking-tight">
-            DeB-Auth-System
+        {/* Title & Logo */}
+        <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
+          <img src="/dauth_logo.png" alt="DAuth Logo" className="h-10 w-auto object-contain drop-shadow-sm" />
+          <h1 className="text-3xl text-[#00d2e5] font-extrabold max-sm:text-2xl tracking-tight">
+            DAuth
           </h1>
         </div>
 
         {/* for navigation */}
-            <div className='bg-white/70 backdrop-blur-md shadow-sm border border-slate-200 w-100 h-15 rounded-2xl flex items-center justify-evenly max-sm:hidden max-lg:hidden'>
+            <div className='bg-white/80 backdrop-blur-md shadow-sm border border-cyan-100 w-100 h-15 rounded-2xl flex items-center justify-evenly max-sm:hidden max-lg:hidden'>
                 {
                     navigationTexts.map((nav,index)=>{
-                        return <a key={index} href={`#${nav.href}`} className={`font-semibold ${curNavName==nav.navName ? 'text-indigo-600 border-b-2 border-indigo-500' : 'text-slate-600 hover:text-indigo-500'} transition-colors cursor-pointer text-[16px]`} onClick={(event)=>handleNavClick(event, nav.navName)}>{nav.navName}</a>
+                        return <a key={index} href={`#${nav.href}`} className={`font-semibold ${curNavName==nav.navName ? 'text-[#00d2e5] border-b-2 border-[#00d2e5]' : 'text-slate-600 hover:text-[#00d2e5]'} transition-colors cursor-pointer text-[16px]`} onClick={(event)=>handleNavClick(event, nav.navName)}>{nav.navName}</a>
                     })
                 }
             </div>
@@ -139,19 +140,19 @@ export const NavBar = () => {
               {/* Profile */}
               <div 
                 ref={profileRef}
-                className="relative mr-3 w-12 h-12 rounded-full border-2 border-indigo-400 cursor-pointer flex justify-center items-center"
+                className="relative mr-3 w-12 h-12 rounded-full border-2 border-[#00d2e5] cursor-pointer flex justify-center items-center overflow-hidden shadow-sm"
               >
                 {isImgError === false ? (
                   <img
                     src={Cookies.get('user_profile')}
                     alt="profile"
-                    className="rounded-full"
+                    className="rounded-full w-full h-full object-cover"
                     onClick={() => setShowProfileCard(prev => !prev)}
                     onError={() => setImageError(true)}
                   />
                 ) : (
                   <h1
-                    className="font-bold text-2xl bg-gradient-to-r from-purple-200 via-purple-300 to-purple-400 bg-clip-text text-transparent"
+                    className="font-bold text-2xl bg-gradient-to-r from-cyan-400 via-teal-400 to-cyan-500 bg-clip-text text-transparent"
                     onClick={() => setShowProfileCard(prev => !prev)}
                   >
                     {Cookies.get('user_name').slice(0,2).toUpperCase()}
@@ -160,14 +161,14 @@ export const NavBar = () => {
 
                 {/* Dropdown */}
                 {showProfileCard && (
-                  <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-indigo-300 p-4 z-1000">
+                  <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-cyan-200 p-4 z-1000">
                     <p className="text-gray-700 font-semibold mb-3">
-                      👋 Hi, <span className="text-indigo-500">{Cookies.get('user_name')}</span>
+                      👋 Hi, <span className="text-[#00d2e5]">{Cookies.get('user_name')}</span>
                     </p>
                     <div className="flex flex-col gap-2">
                       <button
                         onClick={() => navigate('/dashboard')}
-                        className="text-left px-3 py-2 rounded-lg hover:bg-indigo-50 text-gray-600 font-medium"
+                        className="text-left px-3 py-2 rounded-lg hover:bg-cyan-50 text-gray-600 font-medium"
                       >
                         📊 Dashboard
                       </button>

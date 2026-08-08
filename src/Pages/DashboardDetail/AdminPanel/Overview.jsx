@@ -123,7 +123,7 @@ const HealthItem = ({ label, status, color }) => (
 const mockActivities = [
   {
     action: 'New role "Editor" created',
-    user: 'admin@debuggers.com',
+    user: 'admin@debuggerstechnologies.com',
     time: '10 mins ago',
     icon: <Shield size={16} />,
     iconBg: 'bg-purple-500/10',
@@ -131,7 +131,7 @@ const mockActivities = [
   },
   {
     action: 'User "Jane Doe" added to system',
-    user: 'admin@debuggers.com',
+    user: 'admin@debuggerstechnologies.com',
     time: '2 hours ago',
     icon: <UserCheck size={16} />,
     iconBg: 'bg-emerald-500/10',
@@ -147,7 +147,7 @@ const mockActivities = [
   },
   {
     action: 'SSO configuration updated',
-    user: 'superadmin@debuggers.com',
+    user: 'superadmin@debuggerstechnologies.com',
     time: '1 day ago',
     icon: <Globe size={16} />,
     iconBg: 'bg-indigo-500/10',
