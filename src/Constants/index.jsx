@@ -112,95 +112,128 @@ export const docsNavTexts=[
 
 export const codeExamples = {
     javascript: {
-      code: `// Step 1: Get login URL
-async function getLoginUrl(apiKey) {
-  const response = await fetch(\`/auth?apiKey=\${apiKey}\`);
-  const data = await response.json();
-  return data.loginUrl;
-}
-
-// Step 2: Handle redirect and get code from URL
-function getCodeFromUrl() {
-  const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get('code');
-}
-
-// Step 3: Exchange code for JWT token
-async function exchangeCodeForToken(code, clientSecret) {
-  const response = await fetch('/token', {
+      code: `// Step 1: Get Sign-in & Sign-up URLs with optional additional_infos
+async function getAuthUrls(apiKey, additionalInfos = {}) {
+  const response = await fetch('/auth', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      code: code,
+      apikey: apiKey,
+      additional_infos: additionalInfos // Stored securely and returned in JWT
+    })
+  });
+  const data = await response.json();
+  // Returns: { signin_url: "...", signup_url: "..." }
+  return data;
+}
+
+// Step 2: Extract token_id from redirect URL
+function getTokenIdFromUrl() {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get('token_id');
+}
+
+// Step 3: Swap token_id + client_secret for JWT Access Token
+async function exchangeTokenIdForJWT(tokenId, apiKey, clientSecret) {
+  const response = await fetch('/auth/authenticated-user', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      token_id: tokenId,
+      client_id: apiKey,
       client_secret: clientSecret
     })
   });
-  
   const data = await response.json();
-  return data.token; // JWT token
+  return data.token; // Returns final JWT token containing user profile & additional_infos
 }
 
-// Step 4: Use JWT token for authenticated requests
-function getUserInfo(token) {
-  return fetch('/user', {
-    headers: {
-      'Authorization': \`Bearer \${token}\`
-    }
-  });
+// 2FA TOTP Setup & Verification (Scoped per Product Client ID)
+async function setup2FA(clientId, clientSecret, userEmail) {
+  return await fetch('/auth/2fa/setup', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      client_id: clientId,
+      client_secret: clientSecret,
+      email: userEmail
+    })
+  }).then(r => r.json()); // Returns: { success: true, secret: "...", provisioning_uri: "...", qr_code_base64: "data:image/png;base64,..." }
+}
+
+async function verify2FA(clientId, clientSecret, userEmail, code) {
+  return await fetch('/auth/2fa/verify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      client_id: clientId,
+      client_secret: clientSecret,
+      email: userEmail,
+      code: code
+    })
+  }).then(r => r.json()); // Returns: { success: true, message: "Verification successful" }
 }`,
-      filename: 'auth.js',
+      filename: 'dauth-client.js',
       language: 'javascript'
     },
 
     python: {
       code: `import requests
-import json
 
-class AuthClient:
-    def __init__(self, api_key, client_secret):
+class DAuthClient:
+    def __init__(self, api_key: str, client_secret: str, base_url: str = "http://127.0.0.1:8000"):
         self.api_key = api_key
         self.client_secret = client_secret
-        self.base_url = "https://api.yourservice.com"
+        self.base_url = base_url.rstrip("/")
     
-    def get_login_url(self):
-        """Step 1: Get one-time login URL"""
-        response = requests.get(
-            f"{self.base_url}/auth",
-            params={"apiKey": self.api_key}
-        )
-        return response.json()["loginUrl"]
+    def get_auth_urls(self, additional_infos: dict = None) -> dict:
+        """Step 1: Get Sign-in & Sign-up URLs with optional additional_infos"""
+        payload = {"apikey": self.api_key}
+        if additional_infos:
+            payload["additional_infos"] = additional_infos
+        res = requests.post(f"{self.base_url}/auth", json=payload)
+        return res.json() # {"signin_url": "...", "signup_url": "..."}
     
-    def exchange_code_for_token(self, code):
-        """Step 3: Exchange authorization code for JWT token"""
-        response = requests.post(
-            f"{self.base_url}/token",
+    def exchange_token_id(self, token_id: str) -> dict:
+        """Step 3: Exchange token_id + client secret for JWT"""
+        res = requests.post(
+            f"{self.base_url}/auth/authenticated-user",
             json={
-                "code": code,
+                "token_id": token_id,
+                "client_id": self.api_key,
                 "client_secret": self.client_secret
             }
         )
-        return response.json()["token"]
-    
-    def get_user_info(self, token):
-        """Step 4: Get user info using JWT token"""
-        response = requests.get(
-            f"{self.base_url}/user",
-            headers={"Authorization": f"Bearer {token}"}
-        )
-        return response.json()
+        return res.json() # Returns {"token": "eyJhbG..."}
 
-# Usage example
-client = AuthClient("your_api_key", "your_client_secret")
-login_url = client.get_login_url()
-print(f"Login URL: {login_url}")
+    def setup_2fa(self, email: str):
+        """Initiate 2FA setup & generate QR Code data URL"""
+        return requests.post(
+            f"{self.base_url}/auth/2fa/setup",
+            json={
+                "client_id": self.api_key,
+                "client_secret": self.client_secret,
+                "email": email
+            }
+        ).json() # Returns {"secret": "...", "qr_code_base64": "data:image/png;base64,..."}
 
-# After user redirects with code
-code = "authorization_code_from_redirect"
-token = client.exchange_code_for_token(code)
-user_info = client.get_user_info(token)`,
-      filename: 'auth_client.py',
+    def verify_2fa(self, email: str, code: str):
+        """Verify 2FA TOTP code for product domain"""
+        return requests.post(
+            f"{self.base_url}/auth/2fa/verify",
+            json={
+                "client_id": self.api_key,
+                "client_secret": self.client_secret,
+                "email": email,
+                "code": code
+            }
+        ).json()
+
+# Usage Example
+client = DAuthClient(api_key="DeB-xxxxxxxx", client_secret="your_client_secret")
+urls = client.get_auth_urls(additional_infos={"role": "admin", "tenant": "acme"})
+print(f"Direct user to signin: {urls['signin_url']}")`,
+      filename: 'dauth_client.py',
       language: 'python'
     },
 
@@ -208,115 +241,117 @@ user_info = client.get_user_info(token)`,
       code: `import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-class AuthService {
+class DAuthService {
   final String apiKey;
   final String clientSecret;
-  final String baseUrl = 'https://api.yourservice.com';
-  
-  AuthService({required this.apiKey, required this.clientSecret});
-  
-  // Step 1: Get login URL
-  Future<String> getLoginUrl() async {
-    final response = await http.get(
-      Uri.parse('\$baseUrl/auth?apiKey=\$apiKey')
-    );
-    
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      return data['loginUrl'];
-    } else {
-      throw Exception('Failed to get login URL');
-    }
-  }
-  
-  // Step 3: Exchange code for JWT token
-  Future<String> exchangeCodeForToken(String code) async {
+  final String baseUrl;
+
+  DAuthService({
+    required this.apiKey,
+    required this.clientSecret,
+    this.baseUrl = 'http://127.0.0.1:8000',
+  });
+
+  /// Step 1: Get Sign-in & Sign-up URLs
+  Future<Map<String, dynamic>> getAuthUrls({Map<String, dynamic>? additionalInfos}) async {
     final response = await http.post(
-      Uri.parse('\$baseUrl/token'),
+      Uri.parse('$baseUrl/auth'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
-        'code': code,
-        'client_secret': clientSecret
+        'apikey': apiKey,
+        if (additionalInfos != null) 'additional_infos': additionalInfos,
       }),
     );
-    
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      return data['token'];
-    } else {
-      throw Exception('Failed to exchange code for token');
-    }
+    return jsonDecode(response.body);
   }
-  
-  // Step 4: Get user info with JWT token
-  Future<Map<String, dynamic>> getUserInfo(String token) async {
-    final response = await http.get(
-      Uri.parse('\$baseUrl/user'),
-      headers: {'Authorization': 'Bearer \$token'},
-    );
-    
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      throw Exception('Failed to get user info');
-    }
-  }
-}
 
-// Usage in Flutter
-void authenticateUser() async {
-  final authService = AuthService(
-    apiKey: 'your_api_key',
-    clientSecret: 'your_client_secret'
-  );
-  
-  try {
-    final loginUrl = await authService.getLoginUrl();
-    // Launch URL in webview
-    // After redirect, extract code from URL
-    final code = 'authorization_code_from_redirect';
-    final token = await authService.exchangeCodeForToken(code);
-    final userInfo = await authService.getUserInfo(token);
-    print('User: \$userInfo');
-  } catch (e) {
-    print('Authentication failed: \$e');
+  /// Step 3: Swap token_id + clientSecret for JWT Token
+  Future<Map<String, dynamic>> exchangeTokenId(String tokenId) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/auth/authenticated-user'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'token_id': tokenId,
+        'client_id': apiKey,
+        'client_secret': clientSecret,
+      }),
+    );
+    return jsonDecode(response.body);
+  }
+
+  /// 2FA Setup
+  Future<Map<String, dynamic>> setup2FA(String email) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/auth/2fa/setup'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'client_id': apiKey,
+        'client_secret': clientSecret,
+        'email': email,
+      }),
+    );
+    return jsonDecode(response.body);
+  }
+
+  /// 2FA Verification
+  Future<Map<String, dynamic>> verify2FA(String email, String code) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/auth/2fa/verify'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'client_id': apiKey,
+        'client_secret': clientSecret,
+        'email': email,
+        'code': code,
+      }),
+    );
+    return jsonDecode(response.body);
   }
 }`,
-      filename: 'auth_service.dart',
+      filename: 'dauth_service.dart',
       language: 'dart'
     },
 
     curl: {
-      code: `# Step 1: Get login URL
-curl -X GET "https://api.yourservice.com/auth?apiKey=your_api_key_here"
-
-# Response: 
-# {
-#   "loginUrl": "https://auth.yourservice.com/login/unique-session-id",
-#   "expiresIn": 300
-# }
-
-# Step 2: User signs in via the login URL (manual step)
-
-# Step 3: Exchange code for token
-curl -X POST "https://api.yourservice.com/token" \\
+      code: `# 1. Get Sign-in & Sign-up URLs with additional_infos
+curl -X POST "http://127.0.0.1:8000/auth" \\
   -H "Content-Type: application/json" \\
   -d '{
-    "code": "authorization_code_from_redirect",
+    "apikey": "DeB-pCRP-C07EthcUz8VjKL-4AUOpVhZBkEpZfqDFOmdhzk",
+    "additional_infos": {
+      "role": "admin",
+      "tenant_id": "tenant_987"
+    }
+  }'
+
+# 2. Swap token_id + Client ID + Client Secret for JWT Token
+curl -X POST "http://127.0.0.1:8000/auth/authenticated-user" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "token_id": "token_id_from_redirect",
+    "client_id": "DeB-pCRP-C07EthcUz8VjKL-4AUOpVhZBkEpZfqDFOmdhzk",
     "client_secret": "your_client_secret"
   }'
 
-# Response:
-# {
-#   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-#   "expiresIn": 3600,
-#   "tokenType": "Bearer"
-# }
+# 3. 2FA Setup (Generates secret & QR code image Base64)
+curl -X POST "http://127.0.0.1:8000/auth/2fa/setup" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "client_id": "DeB-pCRP-C07EthcUz8VjKL-4AUOpVhZBkEpZfqDFOmdhzk",
+    "client_secret": "your_client_secret",
+    "email": "user@example.com"
+  }'
 
-# Step 4: Use JWT token to get user info
-curl -X GET "https://api.yourservice.com/user" \\
-  -H "Authorization: Bearer your_jwt_token_here"`,
-      filename: 'auth_requests.sh',
+# 4. 2FA Verification
+curl -X POST "http://127.0.0.1:8000/auth/2fa/verify" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "client_id": "DeB-pCRP-C07EthcUz8VjKL-4AUOpVhZBkEpZfqDFOmdhzk",
+    "client_secret": "your_client_secret",
+    "email": "user@example.com",
+    "code": "123456"
+  }'`,
+      filename: 'dauth_requests.sh',
       language: 'bash'
     }
 };

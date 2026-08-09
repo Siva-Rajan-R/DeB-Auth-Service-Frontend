@@ -81,7 +81,7 @@ export const DashboardLayout = () => {
                 }}
                 className={`relative px-4 py-2 text-sm font-semibold rounded-lg transition-all ${
                   location.pathname === item.path
-                    ? 'bg-[#00d2e5] text-slate-950 font-bold shadow-sm'
+                    ? 'bg-slate-900 text-white font-bold shadow-sm'
                     : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-black/5 dark:hover:bg-white/5'
                 }`}
               >

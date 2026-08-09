@@ -24,25 +24,42 @@ export const NavBar = () => {
   const profileRef = useRef(null);
   const navigate = useNavigate();
 
-  const userName=params.get('name')
-  const userProfile=params.get('profile')
-  const accessToken=params.get('access_token')
-  const refreshToken=params.get('refresh_token')
+  const urlUserName = params.get('name');
+  const urlUserProfile = params.get('profile');
+  const urlUserEmail = params.get('email');
+  const accessToken = params.get('access_token');
+  const refreshToken = params.get('refresh_token');
 
-  console.log('is cookie initiated',Cookies.get('isInitiated'),params.size);
-  
-  if (userName!=null && userProfile!=null && accessToken!=null && refreshToken!=null && Cookies.get('isInitiated')=='true'){
-    Cookies.set('user_name',userName)
-    Cookies.set('user_profile',userProfile)
-    Cookies.set('access_token',accessToken)
-    Cookies.set('refresh_token',refreshToken)
-    Cookies.remove('isInitiated')
+  const getCleanName = (nameVal, emailVal) => {
+    if (nameVal && nameVal !== 'null' && nameVal !== 'undefined' && nameVal !== 'None' && nameVal.trim() !== '') {
+      if (nameVal.includes('@')) {
+        return nameVal.split('@')[0];
+      }
+      return nameVal.trim();
+    }
+    if (emailVal && emailVal !== 'null' && emailVal !== 'undefined' && emailVal !== 'None' && emailVal.trim() !== '') {
+      const parts = emailVal.split('@');
+      if (parts[0]) return parts[0];
+    }
+    return '';
+  };
+
+  const effectiveName = getCleanName(urlUserName, urlUserEmail);
+
+  if ((effectiveName || accessToken) && Cookies.get('isInitiated') === 'true'){
+    if (effectiveName) Cookies.set('user_name', effectiveName);
+    if (urlUserEmail) Cookies.set('user_email', urlUserEmail);
+    if (urlUserProfile && urlUserProfile !== 'null' && urlUserProfile !== 'undefined' && urlUserProfile !== 'None') {
+      Cookies.set('user_profile', urlUserProfile);
+    }
+    if (accessToken) Cookies.set('access_token', accessToken);
+    if (refreshToken) Cookies.set('refresh_token', refreshToken);
+    Cookies.remove('isInitiated');
   }
 
 
   const login = async ()=>{
       setLoading(true)
-      // await new Promise((r) => setTimeout(r, 10000));
       const res=await call({method:'GET',path:'/user/auth',withCred:false})
       if (res){
         Cookies.set('isInitiated',true)
@@ -61,6 +78,7 @@ export const NavBar = () => {
         console.log("Inside Logout");
       
         Cookies.remove('user_name')
+        Cookies.remove('user_email')
         Cookies.remove('user_profile')
         Cookies.remove('access_token')
         Cookies.remove('refresh_token')
@@ -70,10 +88,17 @@ export const NavBar = () => {
 
   // Intersection observer for nav highlight
   useEffect(() => {
-    console.log("your username from cookie : ",Cookies.get('user_name'));
+    const currentName = Cookies.get('user_name');
+    const currentEmail = Cookies.get('user_email');
 
-    if (Cookies.get('user_name')!=null && Cookies.get('user_profile') && Cookies.get('access_token')!=null && Cookies.get('refresh_token')){
-      setIsLoggedIn(true)
+    // Auto-clean bad cookie if set to 'None' or invalid
+    const cleaned = getCleanName(currentName, currentEmail);
+    if (cleaned && cleaned !== currentName) {
+      Cookies.set('user_name', cleaned);
+    }
+
+    if (Cookies.get('access_token') && Cookies.get('refresh_token')){
+      setIsLoggedIn(true);
     }
 
     if(params.size>0){
@@ -113,68 +138,102 @@ export const NavBar = () => {
     scrollToSection({sectionId:navName,canLowerCase:true, setActiveSection:setCurNavName})
   };
 
+  const cookieName = Cookies.get('user_name');
+  const cookieEmail = Cookies.get('user_email');
+  const displayName = getCleanName(cookieName, cookieEmail) || 'User';
+
+  const getInitials = (name) => {
+    if (!name || name === 'User') return 'U';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name.slice(0, 2).toUpperCase();
+  };
+
+  const storedProfile = Cookies.get('user_profile');
+  const hasValidProfileImg = storedProfile && storedProfile !== 'null' && storedProfile !== 'undefined' && storedProfile !== 'None' && storedProfile.trim() !== '';
+
   return (
-    <div className="w-full sticky top-0 z-[100] bg-cyan-50/90 backdrop-blur-md rounded-b-3xl shadow-sm mb-4">
-      <div className="flex justify-between items-center px-4 py-3 w-full" id="home">
+    <div className="w-full sticky top-3 z-[100] bg-white/80 backdrop-blur-xl rounded-2xl border border-slate-200/80 shadow-lg shadow-slate-200/40 mb-6">
+      <div className="flex justify-between items-center px-6 py-3.5 w-full" id="home">
         {/* Title & Logo */}
-        <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
-          <img src="/dauth_logo.png" alt="DAuth Logo" className="h-10 w-auto object-contain drop-shadow-sm" />
-          <h1 className="text-3xl text-[#00d2e5] font-extrabold max-sm:text-2xl tracking-tight">
+        <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/')}>
+          <img src="/dauth_logo.png" alt="DAuth Logo" className="h-9 w-auto object-contain drop-shadow-sm transition-transform group-hover:scale-105" />
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight">
             DAuth
           </h1>
         </div>
 
-        {/* for navigation */}
-            <div className='bg-white/80 backdrop-blur-md shadow-sm border border-cyan-100 w-100 h-15 rounded-2xl flex items-center justify-evenly max-sm:hidden max-lg:hidden'>
-                {
-                    navigationTexts.map((nav,index)=>{
-                        return <a key={index} href={`#${nav.href}`} className={`font-semibold ${curNavName==nav.navName ? 'text-[#00d2e5] border-b-2 border-[#00d2e5]' : 'text-slate-600 hover:text-[#00d2e5]'} transition-colors cursor-pointer text-[16px]`} onClick={(event)=>handleNavClick(event, nav.navName)}>{nav.navName}</a>
-                    })
-                }
-            </div>
+        {/* Navigation links */}
+        <div className='bg-slate-100/80 backdrop-blur-md border border-slate-200/80 h-11 px-6 rounded-full flex items-center gap-6 max-sm:hidden max-lg:hidden shadow-inner'>
+          {navigationTexts.map((nav, index) => {
+            const isActive = curNavName === nav.navName;
+            return (
+              <a
+                key={index}
+                href={`#${nav.href}`}
+                className={`font-semibold text-sm transition-all duration-300 ${
+                  isActive 
+                    ? 'text-indigo-600 font-extrabold border-b-2 border-indigo-600 pb-0.5' 
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+                onClick={(event) => handleNavClick(event, nav.navName)}
+              >
+                {nav.navName}
+              </a>
+            );
+          })}
+        </div>
 
         {/* Right side buttons */}
-        <div className=" w-100 h-15 rounded-2xl flex justify-evenly items-center max-sm:w-auto max-lg:w-fit max-sm:mx-5">
+        <div className="flex justify-end items-center gap-3 max-sm:mx-2">
           {isLoggedIn ? (
             <>
               {/* Profile */}
-              <div 
-                ref={profileRef}
-                className="relative mr-3 w-12 h-12 rounded-full border-2 border-[#00d2e5] cursor-pointer flex justify-center items-center overflow-hidden shadow-sm"
-              >
-                {isImgError === false ? (
-                  <img
-                    src={Cookies.get('user_profile')}
-                    alt="profile"
-                    className="rounded-full w-full h-full object-cover"
-                    onClick={() => setShowProfileCard(prev => !prev)}
-                    onError={() => setImageError(true)}
-                  />
-                ) : (
-                  <h1
-                    className="font-bold text-2xl bg-gradient-to-r from-cyan-400 via-teal-400 to-cyan-500 bg-clip-text text-transparent"
-                    onClick={() => setShowProfileCard(prev => !prev)}
-                  >
-                    {Cookies.get('user_name').slice(0,2).toUpperCase()}
-                  </h1>
-                )}
+              <div ref={profileRef} className="relative">
+                {/* Avatar Button */}
+                <div
+                  onClick={() => setShowProfileCard(prev => !prev)}
+                  className="w-10 h-10 rounded-full border border-slate-300 cursor-pointer flex justify-center items-center overflow-hidden shadow-sm hover:border-slate-400 transition-all select-none bg-slate-100"
+                  title={displayName}
+                >
+                  {hasValidProfileImg && !isImgError ? (
+                    <img
+                      src={storedProfile}
+                      alt="profile"
+                      className="w-full h-full object-cover"
+                      onError={() => setImageError(true)}
+                    />
+                  ) : (
+                    <span className="font-extrabold text-base text-slate-800">
+                      {getInitials(displayName)}
+                    </span>
+                  )}
+                </div>
 
-                {/* Dropdown */}
+                {/* Dropdown Menu */}
                 {showProfileCard && (
-                  <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-cyan-200 p-4 z-1000">
-                    <p className="text-gray-700 font-semibold mb-3">
-                      👋 Hi, <span className="text-[#00d2e5]">{Cookies.get('user_name')}</span>
+                  <div className="absolute top-full right-0 mt-3 w-56 bg-white rounded-2xl shadow-2xl border border-slate-200 p-4 z-[1000] backdrop-blur-2xl">
+                    <p className="text-slate-800 text-xs font-semibold mb-3 truncate">
+                      👋 Hi, <span className="text-indigo-700 font-extrabold">{displayName}</span>
                     </p>
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1.5">
                       <button
-                        onClick={() => navigate('/dashboard')}
-                        className="text-left px-3 py-2 rounded-lg hover:bg-cyan-50 text-gray-600 font-medium"
+                        onClick={() => {
+                          setShowProfileCard(false);
+                          navigate('/dashboard');
+                        }}
+                        className="text-left px-3 py-2 rounded-xl hover:bg-slate-100 text-slate-700 hover:text-slate-900 text-xs font-medium transition-colors flex items-center gap-2"
                       >
                         📊 Dashboard
                       </button>
                       <button
-                        onClick={() => logout()}
-                        className="text-left px-3 py-2 rounded-lg hover:bg-red-50 text-red-500 font-medium"
+                        onClick={() => {
+                          setShowProfileCard(false);
+                          logout();
+                        }}
+                        className="text-left px-3 py-2 rounded-xl hover:bg-red-50 text-red-600 hover:text-red-700 text-xs font-medium transition-colors flex items-center gap-2"
                       >
                         🚪 Logout
                       </button>
@@ -183,19 +242,28 @@ export const NavBar = () => {
                 )}
               </div>
 
-
               {/* Always show Get Started */}
               <IceBlueButton
                 btnName={'Get Started'}
-                btnClassName={'text-[18px] font-semibold'}
+                btnClassName={'text-sm font-bold'}
                 onclickFunc={() => { window.open('/auth-docs', '_blank') }}
                 btnDivClassName={"max-sm:hidden max-lg:hidden"}
               />
             </>
           ) : (
             <>
-              <IceBlueButton btnName={isLoading ? <Lottie animationData={Loading} className='w-20'/>:'Sign-In'} btnClassName={'text-[18px] max-sm:text-sm max-lg:text-sm font-semibold'} btnDivClassName={"max-sm:p-3"} onclickFunc={()=>login()}/>
-              <IceBlueButton btnName={'Get Started'} btnDivClassName={"max-sm:hidden max-lg:hidden"} btnClassName={'text-[18px] font-semibold'} onclickFunc={() => { window.open('/auth-docs', '_blank') }} />
+              <IceBlueButton 
+                btnName={isLoading ? <Lottie animationData={Loading} className='w-16'/> : 'Sign-In'} 
+                btnClassName={'text-sm font-bold'} 
+                btnDivClassName={"max-sm:p-2"} 
+                onclickFunc={() => login()}
+              />
+              <IceBlueButton 
+                btnName={'Get Started'} 
+                btnDivClassName={"max-sm:hidden max-lg:hidden"} 
+                btnClassName={'text-sm font-bold'} 
+                onclickFunc={() => { window.open('/auth-docs', '_blank') }} 
+              />
             </>
           )}
         </div>
@@ -203,3 +271,4 @@ export const NavBar = () => {
     </div>
   );
 };
+

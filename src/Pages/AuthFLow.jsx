@@ -18,17 +18,17 @@ export const AuthFLowPage = () => {
           transition={{ duration: 0.6 }}
           className="w-full flex justify-center items-center flex-col text-center"
         >
-          <h1 className="text-4xl max-sm:text-2xl font-extrabold text-slate-800 tracking-tight">
+          <h1 className="text-4xl max-sm:text-2xl font-black text-slate-900 tracking-tight">
             How It Works
           </h1>
-          <p className="mt-4 text-slate-500 max-w-2xl text-lg">
+          <p className="mt-4 text-slate-600 max-w-2xl text-base leading-relaxed font-normal">
             A seamless, highly secure authentication flow designed to be implemented in minutes.
           </p>
         </motion.div>
         {/* End Title */}
 
         {/* Sticky Scroll Container */}
-        <div className="w-full relative mt-20 flex flex-row max-lg:flex-col items-start gap-12 lg:gap-20">
+        <div className="w-full relative mt-16 flex flex-row max-lg:flex-col items-start gap-12 lg:gap-20">
           
           {/* Left Side: Sticky Lottie */}
           <div className="w-1/2 max-lg:w-full sticky top-32 h-[70vh] max-lg:h-auto max-lg:relative max-lg:top-0 flex justify-center items-center max-lg:mb-12">
@@ -39,17 +39,17 @@ export const AuthFLowPage = () => {
               transition={{ duration: 0.8 }}
               className="w-full h-full relative flex justify-center items-center"
             >
-              <div className="absolute inset-0 bg-cyan-200/20 blur-[80px] rounded-full z-0"></div>
-              <Lottie animationData={WorkFlowLottie} className="relative z-10 w-[120%] max-w-[600px] max-lg:w-full max-lg:max-w-md mix-blend-multiply drop-shadow-2xl" />
+              <div className="absolute inset-0 bg-cyan-200/30 blur-[90px] rounded-full z-0"></div>
+              <Lottie animationData={WorkFlowLottie} className="relative z-10 w-[120%] max-w-[600px] max-lg:w-full max-lg:max-w-md mix-blend-multiply drop-shadow-xl" />
             </motion.div>
           </div>
           
           {/* Right Side: Timeline Steps */}
           <div className="w-1/2 max-lg:w-full relative flex flex-col py-10 z-20">
             {/* Continuous vertical timeline line */}
-            <div className="absolute left-[27px] top-12 bottom-12 w-0.5 bg-gradient-to-b from-cyan-300 via-teal-400 to-cyan-100 max-lg:hidden z-0 rounded-full"></div>
+            <div className="absolute left-[27px] top-12 bottom-12 w-0.5 bg-gradient-to-b from-cyan-400 via-teal-400 to-cyan-200 max-lg:hidden z-0 rounded-full"></div>
 
-            <div className="flex flex-col gap-16">
+            <div className="flex flex-col gap-12">
               {authFLowSteps.map((step, index) => (
                 <StepCard key={index} step={step} index={index} total={authFLowSteps.length} />
               ))}
@@ -72,24 +72,24 @@ const StepCard = ({ step, index, total }) => {
       className="w-full relative flex flex-row max-lg:flex-col items-start gap-8 max-lg:gap-4 group"
     >
       {/* Icon/Number */}
-      <div className="relative z-10 flex shrink-0 justify-center items-center w-14 h-14 rounded-2xl bg-gradient-to-br from-[#00d2e5] to-teal-600 text-slate-950 font-black text-2xl shadow-lg shadow-cyan-400/30 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3">
+      <div className="relative z-10 flex shrink-0 justify-center items-center w-14 h-14 rounded-2xl bg-gradient-to-br from-[#00d2e5] to-teal-500 text-slate-950 font-black text-2xl shadow-lg shadow-cyan-400/30 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3">
         {index + 1}
       </div>
       
       {/* Card Content */}
-      <div className="flex-1 bg-white/90 backdrop-blur-md p-8 rounded-3xl border border-slate-200 shadow-xl shadow-slate-200/50 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 overflow-hidden relative">
+      <div className="flex-1 bg-white/90 backdrop-blur-xl p-7 rounded-3xl border border-slate-200/80 shadow-xl shadow-slate-200/50 hover:border-cyan-400/40 hover:-translate-y-1 transition-all duration-300 overflow-hidden relative">
         {/* Decorative background number */}
-        <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-cyan-50/50 rounded-full flex justify-center items-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
-          <span className="text-8xl font-black text-cyan-100/60">{index + 1}</span>
+        <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-cyan-50 rounded-full flex justify-center items-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+          <span className="text-8xl font-black text-cyan-200/50">{index + 1}</span>
         </div>
 
         <div className="relative z-10">
-          <h1 className="text-slate-800 font-extrabold text-2xl max-sm:text-xl tracking-tight mb-4 group-hover:text-[#00d2e5] transition-colors duration-300">
+          <h1 className="text-slate-900 font-extrabold text-xl max-sm:text-lg tracking-tight mb-3 group-hover:text-indigo-600 transition-colors duration-300">
             {step.title}
           </h1>
-          <h4 className="text-slate-500 whitespace-pre-line leading-relaxed text-base">
+          <p className="text-slate-600 whitespace-pre-line leading-relaxed text-sm font-normal">
             {step.subTitle}
-          </h4>
+          </p>
         </div>
       </div>
     </motion.div>

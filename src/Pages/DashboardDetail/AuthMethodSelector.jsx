@@ -26,7 +26,9 @@ const ICONS = {
 const SortableItem = ({ method, onToggle, enabledCount }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: method.id });
   const style = { transform: CSS.Transform.toString(transform), transition };
+  const isLocked = !!method.isLocked;
   const isLastEnabled = method.enabled && enabledCount <= 1;
+  const isDisabled = isLocked || isLastEnabled;
 
   return (
     <div
@@ -47,22 +49,29 @@ const SortableItem = ({ method, onToggle, enabledCount }) => {
       </div>
 
       <div className='flex-1 min-w-0'>
-        <span className='text-[var(--text-main)] font-bold text-sm block truncate'>{method.name}</span>
+        <div className='flex items-center gap-2'>
+          <span className='text-[var(--text-main)] font-bold text-sm truncate'>{method.name}</span>
+          {isLocked && (
+            <span className='px-2 py-0.5 bg-amber-500/10 border border-amber-500/20 text-amber-500 dark:text-amber-400 text-[10px] font-bold rounded-md flex items-center gap-1'>
+              <Lock size={10} /> Locked
+            </span>
+          )}
+        </div>
         <span className='text-[var(--text-dim)] text-[10px] font-bold uppercase tracking-widest'>
-          {method.enabled ? 'Enabled' : 'Disabled'}
+          {isLocked ? 'Locked (Coming Soon)' : (method.enabled ? 'Enabled' : 'Disabled')}
         </span>
       </div>
 
       <div className='flex items-center gap-3'>
-        {isLastEnabled && (
+        {isLastEnabled && !isLocked && (
           <div className='flex items-center gap-1.5 px-2 py-1 bg-amber-500/10 border border-amber-500/20 rounded-lg' title='At least one method required'>
             <Lock size={12} className='text-amber-400' />
-            <span className='text-amber-400 text-[10px] font-bold uppercase'>Locked</span>
+            <span className='text-amber-400 text-[10px] font-bold uppercase'>Required</span>
           </div>
         )}
 
-        <label className={`relative inline-flex items-center ${isLastEnabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}>
-          <input type='checkbox' className='sr-only peer' checked={method.enabled} onChange={() => onToggle(method.id)} disabled={isLastEnabled} />
+        <label className={`relative inline-flex items-center ${isDisabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}>
+          <input type='checkbox' className='sr-only peer' checked={isLocked ? false : method.enabled} onChange={() => onToggle(method.id)} disabled={isDisabled} />
           <div className="w-11 h-6 bg-slate-800 rounded-full peer peer-checked:bg-indigo-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5 shadow-inner" />
         </label>
       </div>

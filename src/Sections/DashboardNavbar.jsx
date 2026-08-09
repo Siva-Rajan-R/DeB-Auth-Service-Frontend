@@ -42,10 +42,10 @@ export const DashBoardNavBar = ({actions}) => {
           <div className='flex items-center gap-3 cursor-pointer' onClick={() => window.location.href="/"}>
             <img src="/dauth_logo.png" alt="DAuth Logo" className="h-8 w-auto object-contain" />
             <div className='flex flex-col'>
-              <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#00d2e5] to-teal-400 bg-clip-text text-transparent leading-tight">
+              <h1 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">
                 DAuth
               </h1>
-              <span className='text-[10px] uppercase tracking-[0.2em] text-cyan-500 font-bold'>Platform Control</span>
+              <span className='text-[10px] uppercase tracking-[0.2em] text-slate-500 font-bold'>Platform Control</span>
             </div>
           </div>
         </div>

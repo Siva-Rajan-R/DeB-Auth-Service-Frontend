@@ -14,13 +14,13 @@ import { AdminPanel } from './DashboardDetail/AdminPanel';
 import { KeysPanel } from './DashboardDetail/KeysPanel';
 import { TwoFactorPanel } from './DashboardDetail/TwoFactorPanel';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Paintbrush2, Users2, ShieldCheck, UserPlus2, Link2, UserCog, Check, Copy, AlertTriangle, Key, Eye, PencilLine, ShieldAlert } from 'lucide-react';
+import { Paintbrush2, Users2, ShieldCheck, UserPlus2, Link2, UserCog, Check, Copy, AlertTriangle, Key, Eye, PencilLine, ShieldAlert, Lock } from 'lucide-react';
 
 
 const TABS_SIGNIN = [
   { id: 'ui',      label: 'UI Style',  icon: <Paintbrush2 size={15} /> },
   { id: 'methods', label: 'Providers', icon: <Users2      size={15} /> },
-  { id: 'sso',     label: 'SSO',       icon: <ShieldCheck size={15} /> },
+  { id: 'sso',     label: 'SSO (Locked)', icon: <Lock size={15} /> },
   { id: '2fa',     label: '2-Factor',  icon: <ShieldAlert size={15} /> },
 ];
 
@@ -28,7 +28,7 @@ const TABS_SIGNUP = [
   { id: 'ui',      label: 'UI Style',  icon: <Paintbrush2 size={15} /> },
   { id: 'methods', label: 'Providers', icon: <Users2      size={15} /> },
   { id: 'fields',  label: 'Fields',    icon: <UserPlus2   size={15} /> },
-  { id: 'sso',     label: 'SSO',       icon: <ShieldCheck size={15} /> },
+  { id: 'sso',     label: 'SSO (Locked)', icon: <Lock size={15} /> },
   { id: '2fa',     label: '2-Factor',  icon: <ShieldAlert size={15} /> },
 ];
 

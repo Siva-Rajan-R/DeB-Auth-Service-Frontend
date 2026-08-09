@@ -51,8 +51,13 @@ export const TwoFactorPanel = () => {
           <div className='flex items-start gap-3 p-4 bg-cyan-500/5 border border-cyan-500/10 rounded-2xl'>
             <Info size={16} className='text-cyan-400 flex-shrink-0 mt-0.5' />
             <div className='text-xs text-[var(--text-muted)] leading-relaxed space-y-1.5'>
-              <p className='font-bold text-cyan-400 uppercase tracking-wider text-[10px]'>Active Security Mode</p>
-              <p>TOTP (Time-Based One-Time Password) is now integrated into your authentication system. Users will be prompted to link their Google Authenticator or Authy app during setup, and verify codes on subsequent sign-ins.</p>
+              <p className='font-bold text-cyan-400 uppercase tracking-wider text-[10px]'>Active Security & User Identification Notice</p>
+              <p>
+                TOTP (Time-Based One-Time Password) is now integrated into your authentication system.
+              </p>
+              <p className='text-[11px] text-[var(--text-main)] font-medium bg-cyan-500/10 p-2.5 rounded-xl border border-cyan-500/20 mt-1'>
+                <span className='font-bold text-cyan-300'>🔒 User Identification & Domain Isolation:</span> To properly identify each user, their user identifier (<code className='text-emerald-300 font-mono'>email</code> or <code className='text-emerald-300 font-mono'>mobile_number</code>) is stored with the corresponding product domain ID (<code className='text-emerald-300 font-mono'>client_id</code>). This guarantees a completely separate 2FA secret for each product domain, even when the same user accesses multiple applications under different domains.
+              </p>
             </div>
           </div>
 
@@ -73,7 +78,10 @@ export const TwoFactorPanel = () => {
                   </button>
                 </div>
                 <code className='text-[11px] text-cyan-400 font-mono block'>/auth/2fa/setup</code>
-                <p className='text-[10px] text-[var(--text-dim)]'>Generates TOTP secret and returns provisioning URI + base64 QR Code image.</p>
+                <p className='text-[10px] text-[var(--text-dim)]'>Generates domain-scoped TOTP secret and returns provisioning URI + Base64 QR Code image.</p>
+                <div className='bg-[var(--bg-card)] p-2 rounded-lg text-[10px] font-mono text-[var(--text-muted)] border border-white/5 mt-1'>
+                  Payload: &#123; "client_id": "...", "client_secret": "...", "email": "user@domain.com" /* or "mobile_number": "+1234567890" */ &#125;
+                </div>
               </div>
 
               {/* Endpoint 2 */}
@@ -88,7 +96,10 @@ export const TwoFactorPanel = () => {
                   </button>
                 </div>
                 <code className='text-[11px] text-cyan-400 font-mono block'>/auth/2fa/setup/verify</code>
-                <p className='text-[10px] text-[var(--text-dim)]'>Verifies the initial scanned code and permanently enables 2FA for the end user.</p>
+                <p className='text-[10px] text-[var(--text-dim)]'>Verifies initial code and permanently activates 2FA for this user & product domain.</p>
+                <div className='bg-[var(--bg-card)] p-2 rounded-lg text-[10px] font-mono text-[var(--text-muted)] border border-white/5 mt-1'>
+                  Payload: &#123; "client_id": "...", "client_secret": "...", "email": "user@domain.com", "code": "123456" &#125;
+                </div>
               </div>
 
               {/* Endpoint 3 */}
@@ -103,14 +114,17 @@ export const TwoFactorPanel = () => {
                   </button>
                 </div>
                 <code className='text-[11px] text-cyan-400 font-mono block'>/auth/2fa/verify</code>
-                <p className='text-[10px] text-[var(--text-dim)]'>Verifies time-based verification codes for subsequent application logins.</p>
+                <p className='text-[10px] text-[var(--text-dim)]'>Verifies time-based verification codes for subsequent application logins on this domain.</p>
+                <div className='bg-[var(--bg-card)] p-2 rounded-lg text-[10px] font-mono text-[var(--text-muted)] border border-white/5 mt-1'>
+                  Payload: &#123; "client_id": "...", "client_secret": "...", "email": "user@domain.com", "code": "123456" &#125;
+                </div>
               </div>
             </div>
           </div>
         </motion.div>
       ) : (
         <div className='text-xs text-[var(--text-dim)] leading-relaxed pl-1'>
-          Two-factor authentication is disabled. Enable this module to generate authenticator secrets and QR codes for user security.
+          Two-factor authentication is disabled. Enable this module to generate domain-scoped authenticator secrets and QR codes for user security.
         </div>
       )}
     </div>

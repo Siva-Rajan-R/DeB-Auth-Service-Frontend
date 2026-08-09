@@ -55,7 +55,7 @@ const DEFAULT_AUTH_METHODS = [
   { id: 'google',     name: 'Google',     enabled: false },
   { id: 'github',     name: 'GitHub',     enabled: false },
   { id: 'facebook',   name: 'Facebook',   enabled: false },
-  { id: 'microsoft',  name: 'Microsoft',  enabled: false },
+  { id: 'microsoft',  name: 'Microsoft',  enabled: false, isLocked: true },
   { id: 'email_otp',  name: 'Email OTP',  enabled: false },
   { id: 'mobile_otp', name: 'Mobile OTP', enabled: false },
 ];
@@ -77,12 +77,21 @@ export const useAuthConfigStore = create(
       // Hydrate entire store from a backend config object
       hydrateFromConfig: (apiConfig) => {
         const { project_name, ui, auth_methods, forgot_password_enabled, signup_fields, sso, redirect_urls, two_factor } = apiConfig;
+
         set({
           projectName: project_name || 'Untitled Project',
           uiConfig: { ...DEFAULT_UI_CONFIG, ...(ui || {}) },
           authMethods: (() => {
             const loaded = auth_methods || [];
-            const mapped = loaded.map((m) => ({ id: m.id, name: m.name || m.id, enabled: !!m.enabled }));
+            const mapped = loaded.map((m) => {
+              const isLocked = (m.id === 'microsoft') ? true : !!m.isLocked;
+              return { 
+                id: m.id, 
+                name: m.name || m.id, 
+                enabled: isLocked ? false : !!m.enabled,
+                isLocked 
+              };
+            });
             const oldOtpObj = mapped.find(m => m.id === 'otp');
             const oldOtpEnabled = oldOtpObj ? !!oldOtpObj.enabled : false;
             
@@ -92,7 +101,7 @@ export const useAuthConfigStore = create(
                 if (def.id === 'email_otp' && oldOtpEnabled) {
                   enabled = true;
                 }
-                mapped.push({ ...def, enabled });
+                mapped.push({ ...def, enabled: def.isLocked ? false : enabled });
               }
             });
             return mapped;
@@ -101,7 +110,7 @@ export const useAuthConfigStore = create(
           signupFields: signup_fields?.length
             ? signup_fields.map((f, i) => ({ id: f.id || `field-${i}`, ...f }))
             : DEFAULT_SIGNUP_FIELDS.map((f) => ({ ...f })),
-          sso: sso ? { enabled: !!sso.enabled, domains: (sso.domains || []).map((d, i) => typeof d === 'string' ? { id: `d-${i}`, domain: d } : d) } : { enabled: false, domains: [] },
+          sso: sso ? { enabled: false, isLocked: true, domains: (sso.domains || []).map((d, i) => typeof d === 'string' ? { id: `d-${i}`, domain: d } : d) } : { enabled: false, isLocked: true, domains: [] },
           redirectURLs: redirect_urls ? { ...DEFAULT_REDIRECT_URLS, ...redirect_urls } : { ...DEFAULT_REDIRECT_URLS },
           twoFactor: two_factor ? { enabled: !!two_factor.enabled } : { enabled: false },
           hasUnsavedChanges: false,
@@ -123,8 +132,9 @@ export const useAuthConfigStore = create(
       authMethods: DEFAULT_AUTH_METHODS.map((m) => ({ ...m })),
       toggleAuthMethod: (id) => {
         const methods = get().authMethods;
-        const enabledCount = methods.filter((m) => m.enabled).length;
         const target = methods.find((m) => m.id === id);
+        if (target?.isLocked) return;
+        const enabledCount = methods.filter((m) => m.enabled).length;
         if (target?.enabled && enabledCount <= 1) return;
         set((s) => ({
           authMethods: s.authMethods.map((m) =>
@@ -154,15 +164,15 @@ export const useAuthConfigStore = create(
         })),
       reorderSignupFields: (fields) => set({ signupFields: fields }),
 
-      sso: { enabled: false, domains: [] },
-      toggleSSO: () => set((s) => ({ sso: { ...s.sso, enabled: !s.sso.enabled } })),
+      sso: { enabled: false, isLocked: true, domains: [] },
+      toggleSSO: () => set((s) => ({ sso: { ...s.sso, enabled: s.sso.isLocked ? false : !s.sso.enabled } })),
       addSSODomain: (domain) =>
         set((s) => ({
-          sso: { ...s.sso, domains: [...s.sso.domains, { id: `d-${Date.now()}`, domain }] },
+          sso: { ...s.sso, domains: s.sso.isLocked ? s.sso.domains : [...s.sso.domains, { id: `d-${Date.now()}`, domain }] },
         })),
       removeSSODomain: (id) =>
         set((s) => ({
-          sso: { ...s.sso, domains: s.sso.domains.filter((d) => d.id !== id) },
+          sso: { ...s.sso, domains: s.sso.isLocked ? s.sso.domains : s.sso.domains.filter((d) => d.id !== id) },
         })),
 
       twoFactor: { enabled: false },
@@ -220,7 +230,7 @@ export const useAuthConfigStore = create(
           authMethods: DEFAULT_AUTH_METHODS.map((m) => ({ ...m })),
           forgotPasswordEnabled: true,
           signupFields: DEFAULT_SIGNUP_FIELDS.map((f) => ({ ...f })),
-          sso: { enabled: false, domains: [] },
+          sso: { enabled: false, isLocked: true, domains: [] },
           twoFactor: { enabled: false },
           redirectURLs: { ...DEFAULT_REDIRECT_URLS },
 
@@ -236,7 +246,7 @@ export const useAuthConfigStore = create(
           auth_methods: authMethods.map(({ id, name, enabled }) => ({ id, name, enabled })),
           forgot_password_enabled: forgotPasswordEnabled,
           signup_fields: signupFields.map(({ label, name, type, required }) => ({ label, name, type, required })),
-          sso: { enabled: sso.enabled, domains: sso.domains.map((d) => d.domain) },
+          sso: { enabled: false, is_locked: true, domains: sso.domains.map((d) => d.domain) },
           two_factor: { enabled: twoFactor.enabled },
           redirect_urls: { ...redirectURLs },
         };

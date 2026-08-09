@@ -128,9 +128,9 @@ const FButton = ({ children, primary, textColor, btnTextColor, buttonStyle, bord
 };
 
 // ─── Social provider buttons ──────────────────────────────────────────────────
-const SocialButton = ({ method, textColor, borderRadius, request_id }) => (
+const SocialButton = ({ method, textColor, borderRadius, auth_token }) => (
   <button
-    onClick={() => window.location.href = `${backend_url}/auth/${method.id}/login/${request_id}`}
+    onClick={() => window.location.href = `${backend_url}/auth/${method.id}/login/${auth_token}`}
     className='w-full flex items-center justify-center gap-3 border py-3 text-sm font-bold hover:bg-white/5 transition-all group/social'
     style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)', color: textColor, borderRadius }}
   >
@@ -141,10 +141,10 @@ const SocialButton = ({ method, textColor, borderRadius, request_id }) => (
   </button>
 );
 
-const SocialIcon = ({ method, borderRadius, request_id }) => (
+const SocialIcon = ({ method, borderRadius, auth_token }) => (
   <div
     title={PROVIDER_META[method.id]?.label}
-    onClick={() => window.location.href = `${backend_url}/auth/${method.id}/login/${request_id}`}
+    onClick={() => window.location.href = `${backend_url}/auth/${method.id}/login/${auth_token}`}
     className='w-12 h-12 border flex items-center justify-center text-xl cursor-pointer hover:bg-white/10 transition-all group/soc'
     style={{ backgroundColor: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.08)', color: PROVIDER_META[method.id]?.color, borderRadius }}
   >
@@ -152,19 +152,19 @@ const SocialIcon = ({ method, borderRadius, request_id }) => (
   </div>
 );
 
-const SocialMethods = ({ methods, socialLayout, textColor, borderRadius, request_id }) => {
+const SocialMethods = ({ methods, socialLayout, textColor, borderRadius, auth_token }) => {
   if (!methods.length) return null;
   if (socialLayout === 'grid') {
     return (
       <div className='flex justify-center gap-2.5 flex-wrap'>
-        {methods.map(m => <SocialIcon key={m.id} method={m} borderRadius={borderRadius} request_id={request_id} />)}
+        {methods.map(m => <SocialIcon key={m.id} method={m} borderRadius={borderRadius} auth_token={auth_token} />)}
       </div>
     );
   }
   return (
     <div className='space-y-2'>
       {methods.map(m => (
-        <SocialButton key={m.id} method={m} textColor={textColor} borderRadius={borderRadius} request_id={request_id} />
+        <SocialButton key={m.id} method={m} textColor={textColor} borderRadius={borderRadius} auth_token={auth_token} />
       ))}
     </div>
   );
@@ -453,14 +453,14 @@ const ForgotPasswordFlow = ({ request_id, onBack, primary, textColor, buttonStyl
 };
 
 // ─── Provider Selection Flow ──────────────────────────────────────────────────
-const ProviderSelectionFlow = ({ enabledMethods, socialLayout, textColor, btnTextColor, borderRadius, request_id, onSelectEmailOTP, onSelectMobileOTP, onSelectPassword }) => {
+const ProviderSelectionFlow = ({ enabledMethods, socialLayout, textColor, btnTextColor, borderRadius, auth_token, onSelectEmailOTP, onSelectMobileOTP, onSelectPassword }) => {
   const socialMethods = enabledMethods.filter(m => m.id !== 'password' && m.id !== 'email_otp' && m.id !== 'mobile_otp' && m.id !== 'otp');
   const hasEmailOTP = enabledMethods.some(m => m.id === 'email_otp' || m.id === 'otp');
   const hasMobileOTP = enabledMethods.some(m => m.id === 'mobile_otp');
 
   return (
     <div className='space-y-3'>
-      <SocialMethods methods={socialMethods} socialLayout={socialLayout} textColor={textColor} borderRadius={borderRadius} request_id={request_id} />
+      <SocialMethods methods={socialMethods} socialLayout={socialLayout} textColor={textColor} borderRadius={borderRadius} auth_token={auth_token} />
       {hasEmailOTP && hasMobileOTP ? (
         <div className='space-y-2'>
           <p className='text-xs font-bold text-center uppercase tracking-wider' style={{ color: `${textColor}50` }}>
@@ -857,7 +857,7 @@ export const LoginPortal = () => {
               key='select'
               enabledMethods={enabled_methods}
               socialLayout={social_layout}
-              request_id={request_id}
+              auth_token={configData?.auth_token}
               textColor={text_color}
               btnTextColor={btn_text_color}
               borderRadius={btnRadius}
