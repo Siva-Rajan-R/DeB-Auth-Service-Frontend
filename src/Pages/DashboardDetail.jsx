@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { MdSave } from 'react-icons/md';
 import { useSearchParams } from 'react-router-dom';
 import { useNetworkCalls } from '../Utils/NetworkCalls';
 import { useToastStore } from '../Store/useToastStore';
@@ -12,15 +13,18 @@ import { LivePreview } from './DashboardDetail/LivePreview';
 import { RedirectURLPanel } from './DashboardDetail/RedirectURLPanel';
 import { AdminPanel } from './DashboardDetail/AdminPanel';
 import { KeysPanel } from './DashboardDetail/KeysPanel';
+import { AnalyticsPanel } from './DashboardDetail/AnalyticsPanel';
 import { TwoFactorPanel } from './DashboardDetail/TwoFactorPanel';
+import { LocationAuthPanel } from './DashboardDetail/LocationAuthPanel';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Paintbrush2, Users2, ShieldCheck, UserPlus2, Link2, UserCog, Check, Copy, AlertTriangle, Key, Eye, PencilLine, ShieldAlert, Lock } from 'lucide-react';
+import { Paintbrush2, Users2, ShieldCheck, UserPlus2, Link2, UserCog, Check, Copy, AlertTriangle, Key, Eye, PencilLine, ShieldAlert, Lock, MapPin, Loader2, Activity } from 'lucide-react';
 
 
 const TABS_SIGNIN = [
   { id: 'ui',      label: 'UI Style',  icon: <Paintbrush2 size={15} /> },
   { id: 'methods', label: 'Providers', icon: <Users2      size={15} /> },
   { id: 'sso',     label: 'SSO (Locked)', icon: <Lock size={15} /> },
+  { id: 'location',label: 'Location (Geo)', icon: <MapPin size={15} /> },
   { id: '2fa',     label: '2-Factor',  icon: <ShieldAlert size={15} /> },
 ];
 
@@ -29,6 +33,7 @@ const TABS_SIGNUP = [
   { id: 'methods', label: 'Providers', icon: <Users2      size={15} /> },
   { id: 'fields',  label: 'Fields',    icon: <UserPlus2   size={15} /> },
   { id: 'sso',     label: 'SSO (Locked)', icon: <Lock size={15} /> },
+  { id: 'location',label: 'Location (Geo)', icon: <MapPin size={15} /> },
   { id: '2fa',     label: '2-Factor',  icon: <ShieldAlert size={15} /> },
 ];
 
@@ -39,7 +44,7 @@ const TABS_SHARED = [
 ];
 
 export const DashboardDetail = () => {
-  const { projectName, setProjectName, activeMode, setActiveMode, resetToDefaults, sso, getExportConfig, hydrateFromConfig } = useAuthConfigStore();
+  const { projectName, setProjectName, activeMode, setActiveMode, resetToDefaults, sso, getExportConfig, hydrateFromConfig, hasUnsavedChanges } = useAuthConfigStore();
   const [activeTab, setActiveTab] = useState('ui');
   const [searchParams, setSearchParams] = useSearchParams();
   const { call } = useNetworkCalls();
@@ -47,6 +52,7 @@ export const DashboardDetail = () => {
   const [newCredentials, setNewCredentials] = useState(null);
   const [copiedKey, setCopiedKey] = useState('');
   const [isLoadingConfig, setIsLoadingConfig] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Load existing config from backend on mount/apikey change
   useEffect(() => {
@@ -84,6 +90,7 @@ export const DashboardDetail = () => {
         state.signupFields !== prevState.signupFields ||
         state.sso !== prevState.sso ||
         state.twoFactor !== prevState.twoFactor ||
+        state.locationAuth !== prevState.locationAuth ||
         state.redirectURLs !== prevState.redirectURLs
       ) {
         if (!state.hasUnsavedChanges) {
@@ -94,11 +101,7 @@ export const DashboardDetail = () => {
     return unsub;
   }, []);
 
-  useEffect(() => {
-    const handleTriggerSave = () => handleSaveConfig();
-    window.addEventListener('trigger-save-config', handleTriggerSave);
-    return () => window.removeEventListener('trigger-save-config', handleTriggerSave);
-  });
+  // trigger-save-config listener removed since we now have a local button
 
   const handleCopy = (text, type) => {
     navigator.clipboard.writeText(text);
@@ -107,6 +110,7 @@ export const DashboardDetail = () => {
   };
 
   const handleSaveConfig = async () => {
+    setIsSaving(true);
     const config = getExportConfig();
     try {
       if (!apikey) {
@@ -130,6 +134,8 @@ export const DashboardDetail = () => {
       useAuthConfigStore.getState().setHasUnsavedChanges(false);
     } catch (error) {
       useToastStore.getState().addToast('Failed to save configuration', 'error');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -152,14 +158,14 @@ export const DashboardDetail = () => {
   return (
     <div className='w-full flex-1 min-h-0 flex flex-col md:flex-row bg-[var(--bg-deep)] overflow-hidden text-[var(--text-main)] relative'>
       {/* Decorative Background Glows */}
-      <div className='absolute top-[-10%] right-[-10%] w-[30%] h-[30%] bg-[var(--accent-indigo)]/5 blur-[120px] rounded-full pointer-events-none' />
+      <div className='absolute top-[-10%] right-[-10%] w-[30%] h-[30%] bg-[var(--accent-cyan)]/5 blur-[120px] rounded-full pointer-events-none' />
       <div className='absolute bottom-[-10%] left-[-10%] w-[30%] h-[30%] bg-[var(--accent-purple)]/5 blur-[120px] rounded-full pointer-events-none' />
 
       {/* Config loading overlay */}
       {isLoadingConfig && (
         <div className='absolute inset-0 z-50 flex items-center justify-center bg-[var(--bg-deep)]/80 backdrop-blur-sm'>
           <div className='flex flex-col items-center gap-3'>
-            <div className='w-10 h-10 border-4 border-[var(--accent-indigo)]/20 border-t-[var(--accent-indigo)] rounded-full animate-spin' />
+            <div className='w-10 h-10 border-4 border-[var(--accent-cyan)]/20 border-t-[var(--accent-cyan)] rounded-full animate-spin' />
             <p className='text-[var(--text-muted)] text-sm font-medium'>Loading configuration…</p>
           </div>
         </div>
@@ -176,7 +182,7 @@ export const DashboardDetail = () => {
                 type="text" 
                 value={projectName}
                 onChange={(e) => setProjectName(e.target.value)}
-                className='text-xl font-bold text-[var(--text-main)] bg-transparent border-b-2 border-transparent hover:border-[var(--border-glass)] focus:border-[var(--accent-indigo)] focus:outline-none transition-colors w-[250px] px-1 py-0.5 -ml-1'
+                className='text-xl font-bold text-[var(--text-main)] bg-transparent border-b-2 border-transparent hover:border-[var(--border-glass)] focus:border-[var(--accent-cyan)] focus:outline-none transition-colors w-[250px] px-1 py-0.5 -ml-1'
                 placeholder="Project Name"
               />
               <PencilLine size={14} className='text-[var(--text-muted)] opacity-0 group-hover/title:opacity-100 transition-opacity' />
@@ -185,53 +191,69 @@ export const DashboardDetail = () => {
               <button onClick={resetToDefaults} className='px-3 py-1.5 text-xs font-bold rounded-lg text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-black/5 dark:hover:bg-white/5 transition-all'>
                 Reset
               </button>
-              <button onClick={handleSaveConfig} className='px-4 py-1.5 text-xs font-bold rounded-lg bg-[var(--accent-indigo)] text-white shadow-md shadow-[var(--accent-indigo)]/20 hover:bg-[var(--accent-indigo)]/90 transition-all'>
-                Save Config
+              <button 
+                onClick={handleSaveConfig} 
+                disabled={isSaving}
+                className='flex items-center gap-2 px-4 py-1.5 text-xs font-bold rounded-lg bg-cyan-600 text-white shadow-md shadow-cyan-600/20 hover:bg-cyan-700 transition-all disabled:opacity-70 disabled:cursor-not-allowed'
+              >
+                {isSaving && <Loader2 size={14} className="animate-spin" />}
+                {isSaving ? 'Saving...' : 'Save Config'}
               </button>
             </div>
           </div>
 
-          <div className='flex items-center bg-[var(--bg-surface)] rounded-xl p-1 border border-[var(--border-glass)] w-fit mb-4'>
-            {['signin', 'signup'].map((mode) => (
+          {/* Sign In / Sign Up toggle + Analytics side by side */}
+          <div className='flex items-center gap-3 mb-4'>
+            <div className='flex items-center bg-[var(--bg-surface)] rounded-xl p-1 border border-[var(--border-glass)] w-fit'>
+              {['signin', 'signup'].map((mode) => (
+                <button
+                  key={mode}
+                  onClick={() => handleModeSwitch(mode)}
+                  className={`relative px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    activeMode === mode ? 'text-white' : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-deep)]'
+                  }`}
+                >
+                  {activeMode === mode && (
+                    <motion.span
+                      layoutId='mode-pill-detail'
+                      className='absolute inset-0 bg-cyan-600 rounded-lg shadow-sm'
+                      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                    />
+                  )}
+                  <span className='relative capitalize z-10'>{mode === 'signin' ? 'Sign In' : 'Sign Up'}</span>
+                </button>
+              ))}
+            </div>
+            {apikey && (
               <button
-                key={mode}
-                onClick={() => handleModeSwitch(mode)}
-                className={`relative px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                  activeMode === mode ? 'text-white' : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-                }`}
+                onClick={() => window.open(`/analytics?id=${apikey}&name=${encodeURIComponent(projectName)}`, '_blank')}
+                className='flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-all border border-emerald-200 shadow-sm'
               >
-                {activeMode === mode && (
-                  <motion.span
-                    layoutId='mode-pill-detail'
-                    className='absolute inset-0 bg-[var(--accent-indigo)] rounded-lg shadow-sm'
-                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                  />
-                )}
-                <span className='relative capitalize z-10'>{mode === 'signin' ? 'Sign In' : 'Sign Up'}</span>
+                <Activity size={14} />
+                Analytics
               </button>
-            ))}
+            )}
           </div>
 
-          {/* Premium Tab Bar */}
-          <div className='flex items-center gap-1 overflow-x-auto scrollbar-hide pb-1'>
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold rounded-xl transition-all whitespace-nowrap border ${
-                  activeTab === tab.id
-                    ? tab.id === 'admin'
-                      ? 'bg-purple-500/10 border-purple-500/30 text-purple-600 dark:text-purple-400'
-                      : tab.id === 'redirect'
-                      ? 'bg-indigo-500/10 border-indigo-500/30 text-[var(--accent-indigo)]'
-                      : 'bg-[var(--accent-indigo)]/10 border-[var(--accent-indigo)]/30 text-[var(--accent-indigo)]'
-                    : 'bg-transparent border-transparent text-[var(--text-dim)] hover:text-[var(--text-main)] hover:bg-black/5 dark:hover:bg-white/5'
-                }`}
-              >
-                <span className={activeTab === tab.id ? 'scale-110' : 'opacity-70'}>{tab.icon}</span>
-                {tab.label}
-              </button>
-            ))}
+          {/* Soft Neumorphic Tab Bar */}
+          <div className='flex items-center gap-2 overflow-x-auto p-2 bg-[#e2e8f0]/60 backdrop-blur-md rounded-2xl border border-white/80 shadow-[inset_-3px_-3px_7px_rgba(255,255,255,0.9),inset_3px_3px_7px_rgba(166,180,200,0.35)] scrollbar-hide'>
+            {tabs.map((tab) => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-2.5 px-4 py-2.5 text-xs font-extrabold rounded-xl transition-all duration-300 whitespace-nowrap active:scale-95 ${
+                    isActive
+                      ? 'bg-[#edf2f7] text-cyan-800 border border-white shadow-[-4px_-4px_10px_#ffffff,4px_4px_10px_rgba(166,180,200,0.45)] scale-[1.03]'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-[#edf2f7]/80 hover:shadow-[-2px_-2px_6px_#ffffff,2px_2px_6px_rgba(166,180,200,0.3)] border border-transparent'
+                  }`}
+                >
+                  <span className={isActive ? 'scale-110 text-cyan-600' : 'opacity-70'}>{tab.icon}</span>
+                  {tab.label}
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -252,12 +274,11 @@ export const DashboardDetail = () => {
               {activeTab === 'ui'       && <SignInCustomizer />}
               {activeTab === 'methods'  && <AuthMethodSelector />}
               {activeTab === 'sso'      && <SSOPanel onOpenAdmin={() => setIsAdminActive(true)} />}
+              {activeTab === 'location' && <LocationAuthPanel />}
               {activeTab === '2fa'      && <TwoFactorPanel />}
               {activeTab === 'fields'   && <SignUpBuilder />}
               {activeTab === 'redirect' && <RedirectURLPanel />}
               {activeTab === 'keys'     && <KeysPanel apikey={apikey} />}
-
-
             </motion.div>
           </AnimatePresence>
         </div>
@@ -273,7 +294,7 @@ export const DashboardDetail = () => {
           onClick={() => setShowMobilePreview(!showMobilePreview)}
           className={`md:hidden absolute right-6 z-50 overflow-hidden origin-bottom-right shadow-2xl ${
             showMobilePreview
-              ? 'bottom-24 w-14 h-14 flex items-center justify-center rounded-full bg-[var(--accent-indigo)] text-white hover:scale-105 active:scale-95 shadow-[var(--accent-indigo)]/30'
+              ? 'bottom-24 w-14 h-14 flex items-center justify-center rounded-full bg-[var(--accent-cyan)] text-white hover:scale-105 active:scale-95 shadow-[var(--accent-cyan)]/30'
               : 'bottom-24 w-[120px] h-[180px] rounded-2xl bg-[var(--bg-card)] shadow-[0_8px_30px_rgba(0,0,0,0.3)] cursor-grab active:cursor-grabbing'
           }`}
         >
@@ -389,7 +410,7 @@ export const DashboardDetail = () => {
                 <div className='space-y-1.5'>
                   <label className='text-xs font-bold text-[var(--text-dim)] uppercase tracking-wider ml-1'>API Key (Client ID)</label>
                   <div className='flex items-center gap-2 bg-[var(--bg-deep)] border border-[var(--border-glass)] rounded-xl p-3'>
-                    <code className='flex-1 text-sm text-[var(--accent-indigo)] truncate font-mono select-all'>{newCredentials.apikey}</code>
+                    <code className='flex-1 text-sm text-[var(--accent-cyan)] truncate font-mono select-all'>{newCredentials.apikey}</code>
                     <button onClick={() => handleCopy(newCredentials.apikey, 'apikey')} className='p-2 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 rounded-lg text-[var(--text-muted)] transition-colors'>
                       {copiedKey === 'apikey' ? <Check size={16} className='text-[var(--accent-emerald)]' /> : <Copy size={16} />}
                     </button>

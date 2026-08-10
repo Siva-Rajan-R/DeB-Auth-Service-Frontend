@@ -31,7 +31,7 @@ export const AuthFLowPage = () => {
         <div className="w-full relative mt-16 flex flex-row max-lg:flex-col items-start gap-12 lg:gap-20">
           
           {/* Left Side: Sticky Lottie */}
-          <div className="w-1/2 max-lg:w-full sticky top-32 h-[70vh] max-lg:h-auto max-lg:relative max-lg:top-0 flex justify-center items-center max-lg:mb-12">
+          <div className="w-1/2 max-lg:w-full sticky top-28 self-start h-[calc(100vh-160px)] max-lg:h-auto max-lg:relative max-lg:top-0 flex justify-center items-center max-lg:mb-12">
             <motion.div 
               initial={{ opacity: 0, scale: 0.8 }}
               whileInView={{ opacity: 1, scale: 1 }}
@@ -39,15 +39,15 @@ export const AuthFLowPage = () => {
               transition={{ duration: 0.8 }}
               className="w-full h-full relative flex justify-center items-center"
             >
-              <div className="absolute inset-0 bg-cyan-200/30 blur-[90px] rounded-full z-0"></div>
-              <Lottie animationData={WorkFlowLottie} className="relative z-10 w-[120%] max-w-[600px] max-lg:w-full max-lg:max-w-md mix-blend-multiply drop-shadow-xl" />
+              <div className="absolute inset-0 bg-cyan-200/40 blur-[90px] rounded-full z-0 pointer-events-none"></div>
+              <Lottie animationData={WorkFlowLottie} className="relative z-10 w-[110%] max-w-[550px] max-lg:w-full max-lg:max-w-md mix-blend-multiply drop-shadow-xl" />
             </motion.div>
           </div>
           
           {/* Right Side: Timeline Steps */}
-          <div className="w-1/2 max-lg:w-full relative flex flex-col py-10 z-20">
+          <div className="w-1/2 max-lg:w-full relative flex flex-col py-6 z-20">
             {/* Continuous vertical timeline line */}
-            <div className="absolute left-[27px] top-12 bottom-12 w-0.5 bg-gradient-to-b from-cyan-400 via-teal-400 to-cyan-200 max-lg:hidden z-0 rounded-full"></div>
+            <div className="absolute left-[27px] top-12 bottom-12 w-0.5 bg-gradient-to-b from-cyan-500 via-teal-500 to-cyan-300 max-lg:hidden z-0 rounded-full"></div>
 
             <div className="flex flex-col gap-12">
               {authFLowSteps.map((step, index) => (
@@ -84,7 +84,7 @@ const StepCard = ({ step, index, total }) => {
         </div>
 
         <div className="relative z-10">
-          <h1 className="text-slate-900 font-extrabold text-xl max-sm:text-lg tracking-tight mb-3 group-hover:text-indigo-600 transition-colors duration-300">
+          <h1 className="text-slate-900 font-extrabold text-xl max-sm:text-lg tracking-tight mb-3 group-hover:text-cyan-600 transition-colors duration-300">
             {step.title}
           </h1>
           <p className="text-slate-600 whitespace-pre-line leading-relaxed text-sm font-normal">

@@ -31,7 +31,7 @@ export const SSOPanel = ({ onOpenAdmin }) => {
     <div className='bg-[var(--bg-card)] backdrop-blur-xl border border-[var(--border-glass)] rounded-2xl p-6 space-y-6 shadow-xl'>
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-3'>
-          <div className='p-2 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/20'>
+          <div className='p-2 rounded-xl bg-cyan-50 text-cyan-600 border border-cyan-200'>
             <ShieldAlert size={18} />
           </div>
           <div>
@@ -42,7 +42,7 @@ export const SSOPanel = ({ onOpenAdmin }) => {
         
         {/* Active Toggle Switch / Lock Badge */}
         {sso.isLocked ? (
-          <div className='flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold select-none'>
+          <div className='flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-orange-50 border border-amber-500/30 text-orange-600 text-xs font-semibold select-none'>
             <Lock size={13} />
             <span>Locked</span>
           </div>
@@ -54,16 +54,16 @@ export const SSOPanel = ({ onOpenAdmin }) => {
               checked={sso.enabled} 
               onChange={toggleSSO} 
             />
-            <div className="w-11 h-6 bg-slate-800 rounded-full peer peer-checked:bg-indigo-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5 shadow-inner" />
+            <div className="w-11 h-6 bg-slate-800 rounded-full peer peer-checked:bg-cyan-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5 shadow-inner" />
           </label>
         )}
       </div>
 
       {sso.isLocked ? (
-        <div className='p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs leading-relaxed flex items-start gap-3'>
-          <Lock size={18} className='mt-0.5 shrink-0 text-amber-400' />
+        <div className='p-4 rounded-xl bg-orange-50 border border-orange-200 text-orange-800 text-xs leading-relaxed flex items-start gap-3'>
+          <Lock size={18} className='mt-0.5 shrink-0 text-orange-600' />
           <div>
-            <span className='font-bold text-amber-200 block mb-0.5'>SSO Integration Locked</span>
+            <span className='font-bold text-orange-900 block mb-0.5'>SSO Integration Locked</span>
             Single Sign-On (SSO) is currently locked by system policy. Cross-site wildcard domain authentication is disabled.
           </div>
         </div>
@@ -82,12 +82,12 @@ export const SSOPanel = ({ onOpenAdmin }) => {
                 onChange={(e) => { setInput(e.target.value); setError(''); }}
                 onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
                 placeholder='*.domain.com or app.com'
-                className={`w-full bg-[var(--bg-deep)] border ${error ? 'border-red-500/50' : 'border-[var(--border-glass)]'} rounded-xl px-4 py-2.5 text-[var(--text-main)] text-sm focus:outline-none focus:border-indigo-500/50 focus:bg-[var(--bg-card)] transition-all placeholder-[var(--text-dim)] font-medium`}
+                className={`w-full bg-[var(--bg-deep)] border ${error ? 'border-red-500/50' : 'border-[var(--border-glass)]'} rounded-xl px-4 py-2.5 text-[var(--text-main)] text-sm focus:outline-none focus:border-cyan-500/50 focus:bg-[var(--bg-card)] transition-all placeholder-[var(--text-dim)] font-medium`}
               />
             </div>
             <button
               onClick={handleAdd}
-              className='bg-indigo-500 hover:bg-indigo-400 text-slate-950 px-5 rounded-xl transition-all flex items-center gap-2 text-sm font-bold shadow-lg shadow-indigo-500/20 active:scale-95'
+              className='bg-cyan-500 hover:bg-cyan-400 text-slate-950 px-5 rounded-xl transition-all flex items-center gap-2 text-sm font-bold shadow-lg shadow-cyan-500/20 active:scale-95'
             >
               <Plus size={18} /> Add
             </button>
@@ -108,10 +108,10 @@ export const SSOPanel = ({ onOpenAdmin }) => {
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}
-                    className='flex items-center gap-2 bg-indigo-500/10 border border-indigo-400/20 text-indigo-300 text-xs px-3 py-2 rounded-xl group/domain'
+                    className='flex items-center gap-2 bg-cyan-50 border border-cyan-400/20 text-cyan-300 text-xs px-3 py-2 rounded-xl group/domain'
                   >
                     <span className='font-mono'>{d.domain}</span>
-                    <button onClick={() => removeSSODomain(d.id)} className='text-indigo-500/50 hover:text-red-400 transition-colors p-0.5'>
+                    <button onClick={() => removeSSODomain(d.id)} className='text-cyan-500/50 hover:text-red-400 transition-colors p-0.5'>
                       <Trash2 size={14} />
                     </button>
                   </motion.span>
@@ -130,7 +130,7 @@ export const SSOPanel = ({ onOpenAdmin }) => {
                 const id = new URLSearchParams(window.location.search).get('id');
                 window.open(`/admin-portal${id ? `?id=${id}` : ''}`, '_blank');
               }}
-              className='w-full py-2.5 rounded-xl bg-purple-600/15 border border-purple-500/35 hover:bg-purple-600/30 text-purple-300 hover:text-white transition-all text-xs font-bold shadow-lg shadow-purple-600/5 active:scale-[0.98]'
+              className='w-full py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white transition-all text-xs font-bold shadow-md shadow-purple-600/20 active:scale-[0.98]'
             >
               Open Admin Portal
             </button>

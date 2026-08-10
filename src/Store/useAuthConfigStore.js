@@ -5,9 +5,9 @@ const DEFAULT_UI_CONFIG = {
   // Existing
   screen_bg_color: '#f9fafb',
   login_card_bg_color: '#ffffff',
-  brand_logo: '',
-  brand_name: 'De-Buggers',
-  primary_color: '#4f46e5',
+  brand_logo: 'https://images.menukit.debuggers.co.in/dauth-logos/logo_1786212957.png',
+  brand_name: 'DAuth',
+  primary_color: '#00d2e5',
   text_color: '#111827',
   btn_text_color: '#ffffff',
   link_color: '#3b82f6',
@@ -76,7 +76,7 @@ export const useAuthConfigStore = create(
     (set, get) => ({
       // Hydrate entire store from a backend config object
       hydrateFromConfig: (apiConfig) => {
-        const { project_name, ui, auth_methods, forgot_password_enabled, signup_fields, sso, redirect_urls, two_factor } = apiConfig;
+        const { project_name, ui, auth_methods, forgot_password_enabled, signup_fields, sso, redirect_urls, two_factor, location_based_auth } = apiConfig;
 
         set({
           projectName: project_name || 'Untitled Project',
@@ -113,6 +113,7 @@ export const useAuthConfigStore = create(
           sso: sso ? { enabled: false, isLocked: true, domains: (sso.domains || []).map((d, i) => typeof d === 'string' ? { id: `d-${i}`, domain: d } : d) } : { enabled: false, isLocked: true, domains: [] },
           redirectURLs: redirect_urls ? { ...DEFAULT_REDIRECT_URLS, ...redirect_urls } : { ...DEFAULT_REDIRECT_URLS },
           twoFactor: two_factor ? { enabled: !!two_factor.enabled } : { enabled: false },
+          locationAuth: !!location_based_auth,
           hasUnsavedChanges: false,
         });
       },
@@ -178,6 +179,9 @@ export const useAuthConfigStore = create(
       twoFactor: { enabled: false },
       updateTwoFactor: (updates) => set((s) => ({ twoFactor: { ...s.twoFactor, ...updates } })),
 
+      locationAuth: false,
+      setLocationAuth: (val) => set({ locationAuth: val }),
+
 
       // Redirect URLs
       redirectURLs: { ...DEFAULT_REDIRECT_URLS },
@@ -232,6 +236,7 @@ export const useAuthConfigStore = create(
           signupFields: DEFAULT_SIGNUP_FIELDS.map((f) => ({ ...f })),
           sso: { enabled: false, isLocked: true, domains: [] },
           twoFactor: { enabled: false },
+          locationAuth: false,
           redirectURLs: { ...DEFAULT_REDIRECT_URLS },
 
           adminUsers: [],
@@ -239,7 +244,7 @@ export const useAuthConfigStore = create(
         }),
 
       getExportConfig: () => {
-        const { projectName, uiConfig, authMethods, forgotPasswordEnabled, signupFields, sso, redirectURLs, twoFactor } = get();
+        const { projectName, uiConfig, authMethods, forgotPasswordEnabled, signupFields, sso, redirectURLs, twoFactor, locationAuth } = get();
         return {
           project_name: projectName,
           ui: { ...uiConfig },
@@ -248,6 +253,7 @@ export const useAuthConfigStore = create(
           signup_fields: signupFields.map(({ label, name, type, required }) => ({ label, name, type, required })),
           sso: { enabled: false, is_locked: true, domains: sso.domains.map((d) => d.domain) },
           two_factor: { enabled: twoFactor.enabled },
+          location_based_auth: locationAuth,
           redirect_urls: { ...redirectURLs },
         };
       },

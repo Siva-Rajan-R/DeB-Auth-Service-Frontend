@@ -30,10 +30,10 @@ export const AuditLogs = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder='Search logs by action or user...' 
-            className='w-full bg-[var(--bg-deep)] border border-[var(--border-glass)] rounded-xl pl-10 pr-4 py-2.5 text-[var(--text-main)] text-sm focus:outline-none focus:border-indigo-500/50 shadow-inner placeholder-[var(--text-dim)]'
+            className='w-full bg-[var(--bg-deep)] border border-[var(--border-glass)] rounded-xl pl-10 pr-4 py-2.5 text-[var(--text-main)] text-sm focus:outline-none focus:border-cyan-500/50 shadow-inner placeholder-[var(--text-dim)]'
           />
         </div>
-        <button className='flex items-center gap-2 bg-[var(--bg-deep)] border border-[var(--border-glass)] hover:border-indigo-500/50 text-[var(--text-dim)] hover:text-indigo-400 px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-sm'>
+        <button className='flex items-center gap-2 bg-[var(--bg-deep)] border border-[var(--border-glass)] hover:border-cyan-500/50 text-[var(--text-dim)] hover:text-cyan-600 px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-sm'>
           <Filter size={14} /> Filter
         </button>
       </div>
@@ -71,7 +71,7 @@ export const AuditLogs = () => {
                       {log.ip}
                     </td>
                     <td className='p-4 pr-6 text-right whitespace-nowrap'>
-                      <button className='p-1.5 text-[var(--text-dim)] hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-colors'>
+                      <button className='p-1.5 text-[var(--text-dim)] hover:text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors'>
                         <FileText size={16} />
                       </button>
                     </td>
@@ -108,9 +108,9 @@ export const AuditLogs = () => {
 const getStatusColor = (status) => {
   switch (status) {
     case 'success': return 'text-emerald-500 bg-emerald-500';
-    case 'warning': return 'text-amber-500 bg-amber-500';
+    case 'warning': return 'text-orange-600 bg-amber-500';
     case 'error': return 'text-red-500 bg-red-500';
-    case 'info': return 'text-indigo-500 bg-indigo-500';
+    case 'info': return 'text-cyan-500 bg-cyan-500';
     default: return 'text-[var(--text-dim)] bg-[var(--text-dim)]';
   }
 };

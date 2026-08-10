@@ -49,7 +49,7 @@ export const UserTable = ({ onEdit }) => {
               {/* Name */}
               <td className='px-5 py-4'>
                 <div className='flex items-center gap-3'>
-                  <div className='w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0 shadow-lg shadow-purple-500/10'>
+                  <div className='w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0 shadow-lg shadow-purple-500/10'>
                     {user.name?.[0]?.toUpperCase() || '?'}
                   </div>
                   <span className='text-[var(--text-main)] font-bold whitespace-nowrap'>{user.name}</span>
@@ -66,7 +66,7 @@ export const UserTable = ({ onEdit }) => {
                     {user.products.map((p, i) => (
                       <span key={i} className='flex items-center gap-1.5 text-[10px] bg-[var(--bg-navbar)] border border-[var(--border-glass)] text-[var(--text-muted)] px-2.5 py-1 rounded-lg whitespace-nowrap shadow-sm'>
                         <span className='truncate max-w-[90px] font-medium' title={p.url}>{p.url || '—'}</span>
-                        <span className='text-indigo-500 font-bold'>· {getRoleName(p.roleId)}</span>
+                        <span className='text-cyan-500 font-bold'>· {getRoleName(p.roleId)}</span>
                       </span>
                     ))}
                   </div>
@@ -80,7 +80,7 @@ export const UserTable = ({ onEdit }) => {
                 {user.custom_fields?.signed_in_sites?.length > 0 ? (
                   <div className='flex flex-wrap gap-1.5 max-w-[200px]'>
                     {user.custom_fields.signed_in_sites.map((s, i) => (
-                      <span key={i} className='text-[10px] bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-2 py-1 rounded-lg whitespace-nowrap shadow-sm' title={`Last accessed: ${new Date(s.timestamp * 1000).toLocaleString()}`}>
+                      <span key={i} className='text-[10px] bg-emerald-50 border border-emerald-200 text-emerald-600 px-2 py-1 rounded-lg whitespace-nowrap shadow-sm' title={`Last accessed: ${new Date(s.timestamp * 1000).toLocaleString()}`}>
                         {s.url ? s.url.replace(/^https?:\/\//, '') : '—'}
                       </span>
                     ))}
@@ -101,7 +101,7 @@ export const UserTable = ({ onEdit }) => {
               {/* Status */}
               <td className='px-5 py-4'>
                 {user.status === 'active' || user.created_at ? (
-                  <span className='inline-flex items-center gap-1.5 text-[10px] font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-3 py-1.5 rounded-xl uppercase tracking-wider'>
+                  <span className='inline-flex items-center gap-1.5 text-[10px] font-bold bg-emerald-50 text-emerald-500 border border-emerald-200 px-3 py-1.5 rounded-xl uppercase tracking-wider'>
                     <span className='w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]' />
                     Active
                   </span>
@@ -136,7 +136,7 @@ export const UserTable = ({ onEdit }) => {
                   <div className='flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0'>
                     <button
                       onClick={() => onEdit(user)}
-                      className='p-2 rounded-xl text-[var(--text-dim)] hover:text-indigo-500 hover:bg-indigo-500/10 border border-transparent hover:border-indigo-500/20 transition-all shadow-sm active:scale-90'
+                      className='p-2 rounded-xl text-[var(--text-dim)] hover:text-cyan-500 hover:bg-cyan-50 border border-transparent hover:border-cyan-200 transition-all shadow-sm active:scale-90'
                       title='Edit user'
                     >
                       <Pencil size={15} />

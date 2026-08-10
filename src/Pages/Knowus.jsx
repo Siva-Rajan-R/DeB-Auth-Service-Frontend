@@ -38,7 +38,7 @@ export const KnowusPage = () => {
           style={{ x: xLeft }}
           className="ml-10 max-sm:ml-0 max-lg:ml-0 w-full border border-slate-200/80 rounded-3xl px-7 py-7 bg-white/80 backdrop-blur-xl shadow-lg shadow-slate-200/50"
         >
-          <h1 className="text-2xl max-sm:text-xl font-black text-indigo-700">Why Choose Us</h1>
+          <h1 className="text-2xl max-sm:text-xl font-black text-cyan-700">Why Choose Us</h1>
           <div className="ml-5 mt-5 max-sm:ml-3">
             <ul className="list-disc list-outside space-y-3.5 text-slate-600 text-sm">
               <li>
@@ -62,7 +62,7 @@ export const KnowusPage = () => {
           style={{ y: yCenter }}
           className="ml-10 max-sm:ml-0 max-lg:ml-0 w-full border border-slate-200/80 rounded-3xl px-7 py-7 bg-white/80 backdrop-blur-xl shadow-lg shadow-slate-200/50"
         >
-          <h1 className="text-2xl max-sm:text-xl font-black text-indigo-700">What Makes Us Different</h1>
+          <h1 className="text-2xl max-sm:text-xl font-black text-cyan-700">What Makes Us Different</h1>
           <div className="ml-5 mt-5 max-sm:ml-3">
             <ul className="list-disc list-outside space-y-3.5 text-slate-600 text-sm">
               <li>
@@ -86,7 +86,7 @@ export const KnowusPage = () => {
           style={{ x: xRight }}
           className="ml-10 max-sm:ml-0 max-lg:ml-0 w-full border border-slate-200/80 rounded-3xl px-7 py-7 bg-white/80 backdrop-blur-xl shadow-lg shadow-slate-200/50"
         >
-          <h1 className="text-2xl max-sm:text-xl font-black text-indigo-700">Our Promise</h1>
+          <h1 className="text-2xl max-sm:text-xl font-black text-cyan-700">Our Promise</h1>
           <div className="ml-5 mt-5 max-sm:ml-3">
             <ul className="list-disc list-outside space-y-3.5 text-slate-600 text-sm">
               <li>

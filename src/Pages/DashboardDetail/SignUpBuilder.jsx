@@ -14,34 +14,34 @@ const FIELD_TYPE_OPTIONS = [
 ];
 
 const selectStyles = {
-  control: (b) => ({
+  control: (b, s) => ({
     ...b, 
-    backgroundColor: 'rgba(15, 23, 42, 0.5)', 
-    borderColor: 'rgba(255, 255, 255, 0.05)', 
+    backgroundColor: 'var(--bg-deep)', 
+    borderColor: s.isFocused ? 'rgba(99, 102, 241, 0.5)' : 'var(--border-glass)', 
     borderRadius: '0.75rem',
     minHeight: '34px', 
     boxShadow: 'none', 
-    '&:hover': { borderColor: 'rgba(34, 211, 238, 0.3)' },
+    '&:hover': { borderColor: 'var(--border-active)' },
   }),
   menu: (b) => ({ 
     ...b, 
-    backgroundColor: '#0f172a', 
+    backgroundColor: 'var(--bg-card)', 
     borderRadius: '0.75rem', 
-    border: '1px solid rgba(255, 255, 255, 0.1)',
+    border: '1px solid var(--border-glass)',
     backdropFilter: 'blur(12px)',
     overflow: 'hidden',
   }),
   option: (b, s) => ({
     ...b, 
-    backgroundColor: s.isFocused ? 'rgba(34, 211, 238, 0.1)' : 'transparent',
-    color: s.isFocused ? 'white' : '#94a3b8', 
+    backgroundColor: s.isFocused ? 'var(--bg-hover)' : 'transparent',
+    color: 'var(--text-main)', 
     fontSize: '0.8125rem', 
     padding: '8px 12px',
     cursor: 'pointer',
   }),
-  singleValue: (b) => ({ ...b, color: '#f1f5f9', fontSize: '0.8125rem' }),
+  singleValue: (b) => ({ ...b, color: 'var(--text-main)', fontSize: '0.8125rem' }),
   indicatorSeparator: () => ({ display: 'none' }),
-  dropdownIndicator: (b) => ({ ...b, color: '#64748b', padding: '4px' }),
+  dropdownIndicator: (b) => ({ ...b, color: 'var(--text-dim)', padding: '4px' }),
 };
 
 const SortableField = ({ field }) => {
@@ -69,7 +69,7 @@ const SortableField = ({ field }) => {
           <input
             value={field.label}
             onChange={(e) => updateSignupField(field.id, { label: e.target.value })}
-            className='w-full bg-[var(--bg-deep)] border border-[var(--border-glass)] rounded-xl px-3 py-2 text-sm text-[var(--text-main)] focus:border-indigo-500/50 outline-none transition-all placeholder-[var(--text-dim)] font-medium'
+            className='w-full bg-[var(--bg-deep)] border border-[var(--border-glass)] rounded-xl px-3 py-2 text-sm text-[var(--text-main)] focus:border-cyan-500/50 outline-none transition-all placeholder-[var(--text-dim)] font-medium'
             placeholder='e.g. Phone Number'
           />
         </div>
@@ -78,7 +78,7 @@ const SortableField = ({ field }) => {
           <input
             value={field.name}
             onChange={(e) => updateSignupField(field.id, { name: e.target.value })}
-            className='w-full bg-[var(--bg-deep)] border border-[var(--border-glass)] rounded-xl px-3 py-2 text-sm text-[var(--text-main)] focus:border-indigo-500/50 outline-none font-mono transition-all placeholder-[var(--text-dim)]'
+            className='w-full bg-[var(--bg-deep)] border border-[var(--border-glass)] rounded-xl px-3 py-2 text-sm text-[var(--text-main)] focus:border-cyan-500/50 outline-none font-mono transition-all placeholder-[var(--text-dim)]'
             placeholder='e.g. phone_number'
           />
         </div>
@@ -146,7 +146,7 @@ export const SignUpBuilder = () => {
     <div className='bg-[var(--bg-card)] backdrop-blur-xl border border-[var(--border-glass)] rounded-2xl p-6 space-y-6 shadow-xl'>
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-3'>
-          <div className='p-2 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/20'>
+          <div className='p-2 rounded-xl bg-cyan-50 text-cyan-600 border border-cyan-200'>
             <UserPlus2 size={18} />
           </div>
           <div>
@@ -156,7 +156,7 @@ export const SignUpBuilder = () => {
         </div>
         <button
           onClick={addSignupField}
-          className='flex items-center gap-2 text-xs font-bold text-slate-950 bg-indigo-500 hover:bg-indigo-400 px-4 py-2 rounded-xl transition-all shadow-lg shadow-indigo-500/20 active:scale-95'
+          className='flex items-center gap-2 text-xs font-bold text-slate-950 bg-cyan-500 hover:bg-cyan-400 px-4 py-2 rounded-xl transition-all shadow-lg shadow-cyan-500/20 active:scale-95'
         >
           <Plus size={16} /> Add Field
         </button>

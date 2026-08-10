@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaGoogle, FaGithub, FaFacebook } from 'react-icons/fa';
@@ -9,15 +9,16 @@ import { Eye, EyeOff, Check, Lock } from 'lucide-react';
 import axios from 'axios';
 import { UAParser } from 'ua-parser-js';
 import { APP_CONFIG } from '../config';
+import { GoogleIcon, MicrosoftIcon } from '../Components/ProviderIcons';
 
 const backend_url = APP_CONFIG.BACKEND_URL;
 
 const PROVIDER_META = {
   password:  { icon: <RiLockPasswordLine />, label: 'Password',  color: '#22d3ee'  },
-  google:    { icon: <FaGoogle   />,         label: 'Google',    color: '#ea4335'  },
-  github:    { icon: <FaGithub   />,         label: 'GitHub',    color: '#e2e8f0'  },
+  google:    { icon: <GoogleIcon size={18} />,    label: 'Google',    color: '#ea4335'  },
+  github:    { icon: <FaGithub   />,         label: 'GitHub',    color: '#24292e'  },
   facebook:  { icon: <FaFacebook />,         label: 'Facebook',  color: '#1877f2'  },
-  microsoft: { icon: <BsMicrosoft />,        label: 'Microsoft', color: '#00a4ef'  },
+  microsoft: { icon: <MicrosoftIcon size={18} />, label: 'Microsoft', color: '#00a4ef'  },
   email_otp:  { icon: <MdOutlineSms />,       label: 'Email OTP',       color: '#22c55e'  },
   mobile_otp: { icon: <MdOutlineSms />,       label: 'Mobile OTP',      color: '#06b6d4'  },
   otp:       { icon: <MdOutlineSms />,       label: 'OTP',       color: '#22c55e'  },
@@ -96,7 +97,7 @@ const FInput = ({ label, name, type = 'text', placeholder, textColor, inputStyle
         />
         {locked && <LockedBadge color={primary || '#22d3ee'} />}
         {isPass && !locked && (
-          <button type="button" onClick={() => setShow(v => !v)} className='absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-indigo-400 transition-colors'>
+          <button type="button" onClick={() => setShow(v => !v)} className='absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-cyan-400 transition-colors'>
             {show ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>
         )}
@@ -597,37 +598,65 @@ export const LoginPortal = () => {
     setTimeout(() => { window.location.href = url; }, 2000);
   };
 
-  useEffect(() => {
+  const fetchConfig = useCallback(async (locationCoords = null) => {
     if (!request_id) { setError('Missing request_id in URL'); setLoading(false); return; }
-    const fetchConfig = async () => {
-      try {
-        const res = await axios.post(
-          `${backend_url}/api/auth/request/${request_id}/init`,
-          {
-            flow_type: flow_type || 'signin',
-            // Send prefill_email so the backend stores it as locked_email in Redis.
-            // Any subsequent OTP/password call with a different email will be rejected 403.
-            ...(prefillEmail ? { prefill_email: prefillEmail } : {}),
-            ...(prefillPhone ? { prefill_phone: prefillPhone } : {}),
-            ...(lockMethod ? { lock_method: lockMethod } : {}),
-          },
-          { withCredentials: true, headers: getDeviceFingerprintHeaders() }
-        );
-        if (res.data.redirect_url) { window.location.href = res.data.redirect_url; return; }
-        setConfigData(res.data);
-      } catch (err) {
-        const detail = err.response?.data?.detail;
-        if (detail && detail.redirect_url) {
-          setError(detail.message || 'Something went wrong, please try again.');
-          setTimeout(() => { window.location.href = detail.redirect_url; }, 3000);
-          return;
-        }
-        setError(typeof detail === 'string' ? detail : detail?.message || 'Failed to initialize authentication flow');
-      }
+    try {
+      const payload = {
+          flow_type: flow_type || 'signin',
+          ...(prefillEmail ? { prefill_email: prefillEmail } : {}),
+          ...(prefillPhone ? { prefill_phone: prefillPhone } : {}),
+          ...(lockMethod ? { lock_method: lockMethod } : {}),
+          ...(locationCoords || {})
+      };
+      const res = await axios.post(
+        `${backend_url}/api/auth/request/${request_id}/init`,
+        payload,
+        { withCredentials: true, headers: getDeviceFingerprintHeaders() }
+      );
+      if (res.data.redirect_url) { window.location.href = res.data.redirect_url; return; }
+      setConfigData(res.data);
+      setError(null);
       setLoading(false);
-    };
+    } catch (err) {
+      const detail = err.response?.data?.detail;
+      const msg = typeof detail === 'string' ? detail : detail?.message || 'Failed to initialize authentication flow';
+      
+      if (msg === "Location permissions are required for authentication in this app.") {
+        setLoading(true);
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              fetchConfig({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
+            },
+            (error) => {
+              if (error.code === 1) {
+                setError("Location access denied. Please allow location permissions in your browser's site settings (usually the lock icon in the URL bar) to authenticate.");
+              } else {
+                setError("Location access failed. This app requires location permissions to authenticate.");
+              }
+              setLoading(false);
+            }
+          );
+        } else {
+          setError("Geolocation is not supported by your browser.");
+          setLoading(false);
+        }
+        return;
+      }
+
+      if (detail && detail.redirect_url) {
+        setError(detail.message || 'Something went wrong, please try again.');
+        setTimeout(() => { window.location.href = detail.redirect_url; }, 3000);
+        return;
+      }
+      setError(msg);
+      setLoading(false);
+    }
+  }, [backend_url, flow_type, lockMethod, prefillEmail, prefillPhone, request_id]);
+
+  useEffect(() => {
     fetchConfig();
-  }, [request_id, flow_type]);
+  }, [fetchConfig]);
 
   // Auto-navigate to locked method once config is loaded
   useEffect(() => {
@@ -659,17 +688,50 @@ export const LoginPortal = () => {
   if (loading) {
     return (
       <div className='min-h-screen bg-slate-950 flex items-center justify-center'>
-        <div className='w-12 h-12 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin' />
+        <div className='w-12 h-12 border-4 border-cyan-500/20 border-t-indigo-500 rounded-full animate-spin' />
       </div>
     );
   }
 
   if (error) {
+    const isLocationError = error.includes("location permissions");
+
+    const handleRetryLocation = () => {
+      setError(null);
+      setLoading(true);
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            fetchConfig({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
+          },
+          (err) => {
+            if (err.code === 1) {
+              setError("Location access denied. Please allow location permissions in your browser's site settings (usually the lock icon in the URL bar) to authenticate.");
+            } else {
+              setError("Location access failed. This app requires location permissions to authenticate.");
+            }
+            setLoading(false);
+          }
+        );
+      } else {
+        setError("Geolocation is not supported by your browser.");
+        setLoading(false);
+      }
+    };
+
     return (
       <div className='min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4'>
-        <div className='bg-red-500/10 border border-red-500/20 rounded-2xl p-8 max-w-sm text-center'>
+        <div className='bg-red-500/10 border border-red-500/20 rounded-2xl p-8 max-w-sm text-center w-full'>
           <h2 className='text-red-400 font-bold text-xl mb-2'>Authentication Error</h2>
-          <p className='text-slate-400 text-sm'>{error}</p>
+          <p className={`text-slate-400 text-sm ${isLocationError ? 'mb-6' : ''}`}>{error}</p>
+          {isLocationError && (
+            <button 
+              onClick={handleRetryLocation}
+              className='bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-400 font-bold py-2.5 px-4 rounded-xl text-sm transition-all w-full'
+            >
+              Retry Location Access
+            </button>
+          )}
         </div>
       </div>
     );

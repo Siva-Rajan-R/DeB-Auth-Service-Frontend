@@ -67,7 +67,7 @@ export const DialogContents={
     'SecretsRemoveContent': (
         <div className="flex flex-col items-center justify-center space-y-4 px-6 py-4">
             {/* Icon */}
-            <div className="w-14 h-14 flex items-center justify-center rounded-full bg-gradient-to-r from-purple-300 to-purple-500 shadow-md shadow-purple-400">
+            <div className="w-14 h-14 flex items-center justify-center rounded-full bg-gradient-to-r from-purple-300 to-sky-400 shadow-md shadow-purple-400">
             <span className="text-white text-2xl">⚠️</span>
             </div>
 

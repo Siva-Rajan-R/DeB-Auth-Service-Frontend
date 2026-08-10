@@ -42,7 +42,7 @@ const StepIndicator = ({ current, labels }) => (
               {isDone ? '✓' : stepNum}
             </div>
             <span className={`text-[10px] mt-1.5 whitespace-nowrap transition-colors uppercase font-bold tracking-widest ${
-              isActive ? 'text-purple-400' : isDone ? 'text-emerald-400' : 'text-[var(--text-dim)]'
+              isActive ? 'text-purple-600' : isDone ? 'text-emerald-600' : 'text-[var(--text-dim)]'
             }`}>{label}</span>
           </div>
           {i < labels.length - 1 && (
@@ -245,7 +245,7 @@ export const AddUserModal = ({ editingUser, onClose }) => {
                       className={`flex-1 py-2.5 text-xs font-bold rounded-xl transition-all capitalize ${
                         formData.status === s
                           ? s === 'active'
-                            ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 shadow-lg shadow-emerald-500/5'
+                            ? 'bg-emerald-50 text-emerald-500 border border-emerald-200 shadow-lg shadow-emerald-500/5'
                             : 'bg-[var(--bg-surface)] text-[var(--text-muted)] border border-[var(--border-glass)]'
                           : 'text-[var(--text-dim)] hover:text-[var(--text-muted)] border border-transparent'
                       }`}
@@ -279,7 +279,7 @@ export const AddUserModal = ({ editingUser, onClose }) => {
               {formData.products.length === 0 ? (
                 <div className='flex flex-col items-center justify-center py-12 border-2 border-dashed border-[var(--border-glass)] rounded-[2rem] text-center bg-[var(--bg-deep)]/20'>
                   <p className='text-[var(--text-dim)] text-sm mb-3 font-medium'>No products added yet</p>
-                  <button onClick={addProductRow} className='text-purple-400 text-xs font-bold hover:text-purple-300 transition-colors'>+ Add first product</button>
+                  <button onClick={addProductRow} className='text-purple-600 text-xs font-bold hover:text-purple-300 transition-colors'>+ Add first product</button>
                 </div>
               ) : (
                 <div className='space-y-4'>
@@ -326,7 +326,7 @@ export const AddUserModal = ({ editingUser, onClose }) => {
 
               {/* Basic info */}
               <div className='bg-[var(--bg-surface)] border border-[var(--border-glass)] rounded-2xl p-5 space-y-4 shadow-sm'>
-                <h4 className='text-indigo-400 text-[10px] font-bold uppercase tracking-widest'>Basic Profile</h4>
+                <h4 className='text-cyan-600 text-[10px] font-bold uppercase tracking-widest'>Basic Profile</h4>
                 <div className='grid grid-cols-2 gap-4'>
                   <ReviewRow label='Name'   value={formData.name} />
                   <ReviewRow label='Email'  value={formData.email} />
@@ -337,7 +337,7 @@ export const AddUserModal = ({ editingUser, onClose }) => {
 
               {/* Products */}
               <div className='bg-[var(--bg-surface)] border border-[var(--border-glass)] rounded-2xl p-5 space-y-4 shadow-sm'>
-                <h4 className='text-purple-400 text-[10px] font-bold uppercase tracking-widest'>Product Access ({formData.products.length})</h4>
+                <h4 className='text-purple-600 text-[10px] font-bold uppercase tracking-widest'>Product Access ({formData.products.length})</h4>
                 {formData.products.length === 0 ? (
                   <p className='text-[var(--text-dim)] text-xs italic font-medium'>No products assigned.</p>
                 ) : (
@@ -347,7 +347,7 @@ export const AddUserModal = ({ editingUser, onClose }) => {
                       return (
                         <div key={i} className='flex items-center justify-between text-sm bg-[var(--bg-deep)]/40 p-2.5 rounded-xl border border-[var(--border-glass)]'>
                           <span className='text-[var(--text-muted)] truncate max-w-[280px] font-medium' title={p.url}>{p.url || '—'}</span>
-                          <span className='text-purple-400 font-bold text-[10px] uppercase tracking-widest bg-purple-500/10 px-2 py-1 rounded-lg'>{roleName}</span>
+                          <span className='text-purple-600 font-bold text-[10px] uppercase tracking-widest bg-purple-50 px-2 py-1 rounded-lg'>{roleName}</span>
                         </div>
                       );
                     })}

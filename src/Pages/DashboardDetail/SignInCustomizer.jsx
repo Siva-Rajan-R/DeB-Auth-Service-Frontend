@@ -16,14 +16,14 @@ const ColorRow = ({ label, storeKey }) => {
   return (
     <div className='flex items-center justify-between py-2 group/color'>
       <span className='text-[var(--text-muted)] text-[13px] font-medium group-hover/color:text-[var(--text-main)] transition-colors'>{label}</span>
-      <div className='flex items-center gap-3 bg-[var(--bg-surface)] border border-[var(--border-glass)] rounded-xl px-3 py-1.5 cursor-pointer hover:border-indigo-500/30 hover:bg-[var(--bg-card)] transition-all shadow-sm'>
+      <div className='flex items-center gap-3 bg-[var(--bg-surface)] border border-[var(--border-glass)] rounded-xl px-3 py-1.5 cursor-pointer hover:border-cyan-500/30 hover:bg-[var(--bg-card)] transition-all shadow-sm'>
         <input
           type='color'
           value={uiConfig[storeKey]?.startsWith('rgba') ? '#ffffff' : (uiConfig[storeKey] || '#ffffff')}
           onChange={(e) => updateUIConfig(storeKey, e.target.value)}
           className='w-5 h-5 rounded-lg cursor-pointer border-0 bg-transparent p-0 flex-shrink-0'
         />
-        <span className='text-[var(--text-dim)] text-[11px] font-mono uppercase tracking-widest w-[80px] truncate group-hover/color:text-indigo-400 transition-colors'>
+        <span className='text-[var(--text-dim)] text-[11px] font-mono uppercase tracking-widest w-[80px] truncate group-hover/color:text-cyan-600 transition-colors'>
           {uiConfig[storeKey]}
         </span>
       </div>
@@ -44,8 +44,8 @@ const OptionGroup = ({ label, options, storeKey }) => {
             onClick={() => updateUIConfig(storeKey, opt.value)}
             className={`flex-1 py-2 text-[11px] font-bold rounded-lg transition-all ${
               uiConfig[storeKey] === opt.value
-                ? 'bg-indigo-500 text-slate-950 shadow-[0_0_15px_rgba(34,211,238,0.2)]'
-                : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-white/5'
+                ? 'bg-cyan-600 text-white shadow-sm'
+                : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-deep)]'
             }`}
           >
             {opt.label}
@@ -63,7 +63,7 @@ const SliderRow = ({ label, storeKey, min, max, unit = '' }) => {
     <div className='space-y-3'>
       <div className='flex justify-between items-center'>
         <label className='text-[var(--text-dim)] text-[10px] font-bold uppercase tracking-widest'>{label}</label>
-        <span className='px-2.5 py-1 bg-indigo-500/10 border border-indigo-500/20 text-indigo-500 text-[10px] font-bold rounded-lg shadow-sm'>
+        <span className='px-2.5 py-1 bg-cyan-50 border border-cyan-200 text-cyan-500 text-[10px] font-bold rounded-lg shadow-sm'>
           {uiConfig[storeKey]}{unit}
         </span>
       </div>
@@ -83,7 +83,7 @@ const SliderRow = ({ label, storeKey, min, max, unit = '' }) => {
 const Section = ({ title, icon, sectionKey, openSections, toggleSection, children }) => (
   <div className={`rounded-2xl border transition-all duration-300 overflow-hidden ${
     openSections[sectionKey] 
-      ? 'bg-[var(--bg-card)] border-[var(--border-active)] shadow-xl shadow-indigo-500/5' 
+      ? 'bg-[var(--bg-card)] border-[var(--border-active)] shadow-xl shadow-cyan-500/5' 
       : 'bg-transparent border-[var(--border-glass)] hover:border-[var(--border-active)] hover:bg-[var(--bg-surface)]'
   }`}>
     <button
@@ -93,7 +93,7 @@ const Section = ({ title, icon, sectionKey, openSections, toggleSection, childre
       <div className='flex items-center gap-3'>
         <div className={`p-2.5 rounded-xl transition-all shadow-sm ${
           openSections[sectionKey] 
-            ? 'bg-indigo-500/10 text-indigo-500 border border-indigo-500/20' 
+            ? 'bg-cyan-50 text-cyan-500 border border-cyan-200' 
             : 'bg-[var(--bg-surface)] text-[var(--text-dim)] group-hover/sec:text-[var(--text-main)] border border-[var(--border-glass)]'
         }`}>
           {icon || <LayoutTemplate size={20} />}
@@ -105,7 +105,7 @@ const Section = ({ title, icon, sectionKey, openSections, toggleSection, childre
         </h3>
       </div>
       <div className={`transition-transform duration-500 ${openSections[sectionKey] ? 'rotate-180' : ''}`}>
-        <ChevronDown size={18} className={openSections[sectionKey] ? 'text-indigo-500' : 'text-[var(--text-dim)]'} />
+        <ChevronDown size={18} className={openSections[sectionKey] ? 'text-cyan-500' : 'text-[var(--text-dim)]'} />
       </div>
     </button>
     <AnimatePresence>
@@ -151,6 +151,9 @@ const LogoUploader = () => {
 
     const formData = new FormData();
     formData.append('file', file);
+    if (uiConfig.brand_logo) {
+      formData.append('old_logo_url', uiConfig.brand_logo);
+    }
 
     setUploading(true);
     try {
@@ -184,7 +187,7 @@ const LogoUploader = () => {
     <div className='space-y-2.5 pt-1'>
       <label className='text-[var(--text-dim)] text-[10px] font-bold uppercase tracking-widest block'>Or Upload File</label>
       <div className='flex items-center gap-3'>
-        <label className='flex items-center gap-2 px-4 py-2 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 hover:bg-indigo-500/20 hover:text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm active:scale-95 flex-shrink-0'>
+        <label className='flex items-center gap-2 px-4 py-2 bg-cyan-50 border border-cyan-200 text-cyan-600 hover:bg-cyan-50 hover:text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm active:scale-95 flex-shrink-0'>
           <Upload size={14} />
           <span>{uploading ? 'Uploading...' : 'Choose Image'}</span>
           <input
@@ -204,7 +207,7 @@ const LogoUploader = () => {
         <p className='text-red-400 text-[10px] font-bold mt-1.5 pl-1 leading-relaxed'>{error}</p>
       )}
       {success && (
-        <p className='text-emerald-400 text-[10px] font-bold mt-1.5 pl-1 flex items-center gap-1'><Check size={11} /> Logo uploaded & applied successfully!</p>
+        <p className='text-emerald-600 text-[10px] font-bold mt-1.5 pl-1 flex items-center gap-1'><Check size={11} /> Logo uploaded & applied successfully!</p>
       )}
     </div>
   );
@@ -216,12 +219,12 @@ const selectStyles = {
   control: (b, s) => ({
     ...b, 
     backgroundColor: 'var(--bg-deep)', 
-    borderColor: s.isFocused ? 'var(--accent-indigo)' : 'var(--border-glass)', 
+    borderColor: s.isFocused ? 'var(--accent-cyan)' : 'var(--border-glass)', 
     borderRadius: '0.75rem',
     minHeight: '42px', 
     boxShadow: 'none', 
     transition: 'all 0.2s ease',
-    '&:hover': { borderColor: 'var(--accent-indigo)' },
+    '&:hover': { borderColor: 'var(--accent-cyan)' },
   }),
   menu: (b) => ({ 
     ...b, 
@@ -235,14 +238,14 @@ const selectStyles = {
   }),
   option: (b, s) => ({
     ...b, 
-    backgroundColor: s.isSelected ? 'var(--accent-indigo)' : s.isFocused ? 'rgba(34, 211, 238, 0.1)' : 'transparent',
+    backgroundColor: s.isSelected ? 'var(--accent-cyan)' : s.isFocused ? 'rgba(34, 211, 238, 0.1)' : 'transparent',
     color: s.isSelected ? '#000000' : 'var(--text-main)', 
     fontSize: '0.8125rem', 
     fontWeight: '700',
     cursor: 'pointer',
     padding: '10px 14px',
     borderRadius: '0.5rem',
-    '&:active': { backgroundColor: 'var(--accent-indigo)' },
+    '&:active': { backgroundColor: 'var(--accent-cyan)' },
   }),
   singleValue: (b) => ({ ...b, color: 'var(--text-main)', fontSize: '0.8125rem', fontWeight: '700' }),
   input: (b) => ({ ...b, color: 'var(--text-main)' }),
@@ -368,10 +371,6 @@ const QuickThemes = () => {
 
   return (
     <div className='space-y-3'>
-      <div className='flex items-center gap-2'>
-        <Sparkles size={12} className='text-amber-400' />
-        <span className='text-[var(--text-dim)] text-[10px] font-bold uppercase tracking-widest'>One-click presets</span>
-      </div>
       <div className='grid grid-cols-4 gap-2'>
         {PRESET_THEMES.map((theme) => (
           <button
@@ -442,9 +441,9 @@ export const SignInCustomizer = () => {
     <div className='space-y-4'>
 
       {/* 0. Quick Themes */}
-      <div className='rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4 space-y-3'>
+      <div className='rounded-2xl border border-orange-200 bg-amber-500/5 p-4 space-y-3'>
         <div className='flex items-center gap-2 mb-1'>
-          <Sparkles size={14} className='text-amber-400' />
+          <Sparkles size={14} className='text-orange-600' />
           <h3 className='text-sm font-bold text-[var(--text-main)]'>Quick Themes</h3>
         </div>
         <QuickThemes />
@@ -459,7 +458,7 @@ export const SignInCustomizer = () => {
               type='text'
               value={uiConfig.brand_name}
               onChange={(e) => updateUIConfig('brand_name', e.target.value)}
-              className='w-full bg-[var(--bg-deep)] border border-[var(--border-glass)] rounded-xl px-4 py-3 text-[var(--text-main)] text-sm focus:outline-none focus:border-indigo-500/50 focus:bg-[var(--bg-surface)] transition-all placeholder-[var(--text-dim)] font-bold shadow-inner'
+              className='w-full bg-[var(--bg-deep)] border border-[var(--border-glass)] rounded-xl px-4 py-3 text-[var(--text-main)] text-sm focus:outline-none focus:border-cyan-500/50 focus:bg-[var(--bg-surface)] transition-all placeholder-[var(--text-dim)] font-bold shadow-inner'
               placeholder='Your Brand Name'
             />
           </div>
@@ -469,7 +468,7 @@ export const SignInCustomizer = () => {
               type='text'
               value={uiConfig.brand_logo || ''}
               onChange={(e) => updateUIConfig('brand_logo', e.target.value)}
-              className='w-full bg-[var(--bg-deep)] border border-[var(--border-glass)] rounded-xl px-4 py-3 text-[var(--text-main)] text-sm focus:outline-none focus:border-indigo-500/50 focus:bg-[var(--bg-surface)] transition-all placeholder-[var(--text-dim)] font-bold shadow-inner'
+              className='w-full bg-[var(--bg-deep)] border border-[var(--border-glass)] rounded-xl px-4 py-3 text-[var(--text-main)] text-sm focus:outline-none focus:border-cyan-500/50 focus:bg-[var(--bg-surface)] transition-all placeholder-[var(--text-dim)] font-bold shadow-inner'
               placeholder='https://example.com/logo.png'
             />
           </div>
@@ -607,7 +606,7 @@ export const SignInCustomizer = () => {
             onChange={(e) => updateUIConfig('custom_css', e.target.value)}
             rows={7}
             placeholder={'/* Your custom CSS */\n.auth-card { ... }'}
-            className='w-full bg-[var(--bg-deep)] border border-[var(--border-glass)] rounded-[1.5rem] px-5 py-4 text-indigo-500/90 text-xs font-mono focus:outline-none focus:border-indigo-500/40 focus:bg-[var(--bg-surface)] transition-all resize-none placeholder-[var(--text-dim)] custom-scrollbar shadow-inner'
+            className='w-full bg-[var(--bg-deep)] border border-[var(--border-glass)] rounded-[1.5rem] px-5 py-4 text-cyan-500/90 text-xs font-mono focus:outline-none focus:border-cyan-500/40 focus:bg-[var(--bg-surface)] transition-all resize-none placeholder-[var(--text-dim)] custom-scrollbar shadow-inner'
           />
         </div>
       </Section>

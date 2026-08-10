@@ -22,11 +22,11 @@ export const Hero = ({ scrollYProgress }) => {
     const scaleLottie = useTransform(scrollYProgress, [0, 0.2], [1, 1.05]);
   
   return (
-    <div className="relative h-100 flex flex-col justify-center items-center rounded-3xl mx-3 mt-20 max-sm:mt-8 max-lg:mt-12 border border-slate-200/80 bg-white/60 backdrop-blur-xl overflow-hidden shadow-xl shadow-slate-200/50">
+    <div className="relative h-100 flex flex-col justify-center items-center mx-3 mt-20 max-sm:mt-8 max-lg:mt-12 overflow-hidden">
 
         <motion.div style={{ y: yText, opacity: opacityText }} className='w-full max-w-4xl text-center z-[90] px-4 relative'>
             <h1 className='text-[64px] max-sm:text-3xl max-lg:text-4xl max-sm:mb-2 max-lg:mb-2 text-slate-900 font-black tracking-tight leading-none drop-shadow-sm'>
-                Lock, Load, <span className="text-indigo-600">Login</span>
+                Lock, Load, <span className="text-cyan-600">Login</span>
             </h1>
             <h1 className='text-[72px] max-sm:text-2xl max-lg:text-3xl max-sm:mb-2 max-lg:mb-2 font-black text-slate-800 tracking-tight leading-none mt-2'>
                 Auth That Plays Hard

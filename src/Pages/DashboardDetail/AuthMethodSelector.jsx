@@ -6,20 +6,20 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { GripVertical, Lock, Users2, KeyRound, ShieldCheck } from 'lucide-react';
 import { FaGoogle, FaGithub, FaFacebook } from 'react-icons/fa';
 import { BsMicrosoft } from 'react-icons/bs';
-import { MdOutlineSms } from 'react-icons/md';
+import { MdOutlineSms, MdWarning } from 'react-icons/md';
 import { RiLockPasswordLine } from 'react-icons/ri';
 
 
 const ICONS = {
-  password:  <RiLockPasswordLine size={20} className='text-indigo-400'   />,
+  password:  <RiLockPasswordLine size={20} className='text-cyan-600'   />,
   google:    <FaGoogle    size={18} className='text-[#ea4335]'    />,
   github:    <FaGithub    size={18} className='text-white'  />,
   facebook:  <FaFacebook  size={20} className='text-[#1877f2]'   />,
   microsoft: <BsMicrosoft size={18} className='text-[#00a4ef]'    />,
-  email_otp:  <MdOutlineSms size={20} className='text-emerald-400' />,
-  mobile_otp: <MdOutlineSms size={20} className='text-cyan-400' />,
-  otp:       <MdOutlineSms size={20} className='text-emerald-400' />,
-  totp:      <ShieldCheck size={20} className='text-cyan-400' />,
+  email_otp:  <MdOutlineSms size={20} className='text-emerald-600' />,
+  mobile_otp: <MdOutlineSms size={20} className='text-cyan-600' />,
+  otp:       <MdOutlineSms size={20} className='text-emerald-600' />,
+  totp:      <ShieldCheck size={20} className='text-cyan-600' />,
 };
 
 
@@ -52,7 +52,7 @@ const SortableItem = ({ method, onToggle, enabledCount }) => {
         <div className='flex items-center gap-2'>
           <span className='text-[var(--text-main)] font-bold text-sm truncate'>{method.name}</span>
           {isLocked && (
-            <span className='px-2 py-0.5 bg-amber-500/10 border border-amber-500/20 text-amber-500 dark:text-amber-400 text-[10px] font-bold rounded-md flex items-center gap-1'>
+            <span className='px-2 py-0.5 bg-orange-50 border border-orange-200 text-orange-600 dark:text-orange-600 text-[10px] font-bold rounded-md flex items-center gap-1'>
               <Lock size={10} /> Locked
             </span>
           )}
@@ -64,15 +64,15 @@ const SortableItem = ({ method, onToggle, enabledCount }) => {
 
       <div className='flex items-center gap-3'>
         {isLastEnabled && !isLocked && (
-          <div className='flex items-center gap-1.5 px-2 py-1 bg-amber-500/10 border border-amber-500/20 rounded-lg' title='At least one method required'>
-            <Lock size={12} className='text-amber-400' />
-            <span className='text-amber-400 text-[10px] font-bold uppercase'>Required</span>
+          <div className='flex items-center gap-1.5 px-2 py-1 bg-orange-50 border border-orange-200 rounded-lg' title='At least one method required'>
+            <Lock size={12} className='text-orange-600' />
+            <span className='text-orange-600 text-[10px] font-bold uppercase'>Required</span>
           </div>
         )}
 
         <label className={`relative inline-flex items-center ${isDisabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}>
           <input type='checkbox' className='sr-only peer' checked={isLocked ? false : method.enabled} onChange={() => onToggle(method.id)} disabled={isDisabled} />
-          <div className="w-11 h-6 bg-slate-800 rounded-full peer peer-checked:bg-indigo-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5 shadow-inner" />
+          <div className="w-11 h-6 bg-slate-800 rounded-full peer peer-checked:bg-cyan-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5 shadow-inner" />
         </label>
       </div>
     </div>
@@ -169,7 +169,7 @@ export const AuthMethodSelector = () => {
     <div className='bg-[var(--bg-card)] backdrop-blur-xl border border-[var(--border-glass)] rounded-2xl p-6 space-y-6 shadow-xl'>
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-3'>
-          <div className='p-2 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/20'>
+          <div className='p-2 rounded-xl bg-cyan-50 text-cyan-600 border border-cyan-200'>
             <Users2 size={18} />
           </div>
           <div>
@@ -177,9 +177,9 @@ export const AuthMethodSelector = () => {
             <p className='text-[var(--text-muted)] text-[11px] font-medium'>Manage how users sign into your app</p>
           </div>
         </div>
-        <div className='flex items-center gap-2 px-3 py-1 bg-indigo-400/10 border border-indigo-500/20 rounded-xl'>
-          <span className='w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse' />
-          <span className='text-indigo-400 text-[10px] font-bold uppercase tracking-widest'>
+        <div className='flex items-center gap-2 px-3 py-1 bg-cyan-400/10 border border-cyan-200 rounded-xl'>
+          <span className='w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse' />
+          <span className='text-cyan-600 text-[10px] font-bold uppercase tracking-widest'>
             {displayEnabledCount} active
           </span>
         </div>
@@ -201,7 +201,7 @@ export const AuthMethodSelector = () => {
                       exit={{ opacity: 0, height: 0 }}
                       className='ml-10 mt-2 flex items-center gap-3 bg-[var(--bg-surface)] border border-[var(--border-glass)] rounded-xl p-3'
                     >
-                      <div className='p-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20'>
+                      <div className='p-1.5 rounded-lg bg-orange-50 text-orange-600 border border-orange-200'>
                         <KeyRound size={14} />
                       </div>
                       <div className='flex-1 min-w-0'>
@@ -227,7 +227,7 @@ export const AuthMethodSelector = () => {
                         exit={{ opacity: 0, height: 0 }}
                         className='flex items-center gap-3 bg-[var(--bg-surface)] border border-[var(--border-glass)] rounded-xl p-3'
                       >
-                        <div className='p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'>
+                        <div className='p-1.5 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-200'>
                           <MdOutlineSms size={14} />
                         </div>
                         <div className='flex-1 min-w-0'>
@@ -256,29 +256,37 @@ export const AuthMethodSelector = () => {
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
-                        className='flex items-center gap-3 bg-[var(--bg-surface)] border border-[var(--border-glass)] rounded-xl p-3'
+                        className='flex flex-col gap-2 bg-[var(--bg-surface)] border border-[var(--border-glass)] rounded-xl p-3'
                       >
-                        <div className='p-1.5 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'>
-                          <MdOutlineSms size={14} />
+                        <div className='flex items-center gap-3'>
+                          <div className='p-1.5 rounded-lg bg-cyan-50 text-cyan-600 border border-cyan-200'>
+                            <MdOutlineSms size={14} />
+                          </div>
+                          <div className='flex-1 min-w-0'>
+                            <span className='text-[var(--text-main)] font-bold text-xs block'>Mobile OTP</span>
+                            <span className='text-[var(--text-dim)] text-[9px] font-bold uppercase tracking-widest'>
+                              {mobileOtpEnabled ? 'Enabled' : 'Disabled'}
+                            </span>
+                          </div>
+                          <label className='relative inline-flex items-center cursor-pointer'>
+                            <input 
+                              type='checkbox' 
+                              className='sr-only peer' 
+                              checked={mobileOtpEnabled} 
+                              onChange={() => {
+                                if (mobileOtpEnabled && !emailOtpEnabled) return; // Keep at least one enabled
+                                if (mobileOtp) toggleAuthMethod('mobile_otp');
+                              }} 
+                            />
+                            <div className="w-9 h-5 bg-slate-800 rounded-full peer peer-checked:bg-cyan-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4 shadow-inner" />
+                          </label>
                         </div>
-                        <div className='flex-1 min-w-0'>
-                          <span className='text-[var(--text-main)] font-bold text-xs block'>Mobile OTP</span>
-                          <span className='text-[var(--text-dim)] text-[9px] font-bold uppercase tracking-widest'>
-                            {mobileOtpEnabled ? 'Enabled' : 'Disabled'}
-                          </span>
-                        </div>
-                        <label className='relative inline-flex items-center cursor-pointer'>
-                          <input 
-                            type='checkbox' 
-                            className='sr-only peer' 
-                            checked={mobileOtpEnabled} 
-                            onChange={() => {
-                              if (mobileOtpEnabled && !emailOtpEnabled) return; // Keep at least one enabled
-                              if (mobileOtp) toggleAuthMethod('mobile_otp');
-                            }} 
-                          />
-                          <div className="w-9 h-5 bg-slate-800 rounded-full peer peer-checked:bg-cyan-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4 shadow-inner" />
-                        </label>
+                        {mobileOtpEnabled && (
+                          <div className="bg-amber-50 border border-amber-200 text-amber-700 px-2 py-1.5 rounded-lg flex items-center gap-1.5 animate-fade-in shadow-sm">
+                            <MdWarning size={12} className="shrink-0" />
+                            <span className="text-[10px] font-bold tracking-wide">Charged separately: ₹0.40 / OTP</span>
+                          </div>
+                        )}
                       </motion.div>
                     </div>
                   )}

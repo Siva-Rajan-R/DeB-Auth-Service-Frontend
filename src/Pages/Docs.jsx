@@ -3,7 +3,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark, prism } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { codeExamples } from '../Constants/index';
 import { motion } from 'framer-motion';
-import { Lock, ShieldAlert, Key, Clock, ShieldCheck, RefreshCw, Copy, Check, Server, Code2, KeyRound, ArrowDown } from 'lucide-react';
+import { Lock, ShieldAlert, Key, Clock, ShieldCheck, RefreshCw, Copy, Check, Server, Code2, KeyRound, ArrowDown, Link2, ExternalLink } from 'lucide-react';
 import { useAuthConfigStore } from '../Store/useAuthConfigStore';
 import { APP_CONFIG } from '../config';
 
@@ -19,7 +19,14 @@ export const AuthDocs = () => {
       label: 'Endpoints',
       icon: Server,
       subItems: [
-        { id: 'endpoints-base', label: 'Base Auth' },
+        {
+          id: 'base-auth-group',
+          label: 'Base Auth',
+          subItems: [
+            { id: 'endpoints-base', label: 'Base Endpoints' },
+            { id: 'endpoints-autofill', label: 'Autofill & Lock URLs' }
+          ]
+        },
         { id: 'endpoints-2fa', label: '2-Factor Auth' }
       ]
     },
@@ -94,7 +101,7 @@ export const AuthDocs = () => {
   return (
     <div className="w-full h-screen flex relative overflow-hidden bg-[var(--bg-deep)] text-[var(--text-main)] transition-colors duration-300">
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-[-10%] right-[-5%] w-[40%] h-[40%] bg-[var(--accent-indigo)]/10 blur-[120px] rounded-full" />
+        <div className="absolute top-[-10%] right-[-5%] w-[40%] h-[40%] bg-[var(--accent-cyan)]/10 blur-[120px] rounded-full" />
         <div className="absolute bottom-[-10%] left-[-10%] w-[30%] h-[30%] bg-[var(--accent-purple)]/10 blur-[120px] rounded-full" />
       </div>
 
@@ -104,11 +111,11 @@ export const AuthDocs = () => {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--accent-indigo)]/10 border border-[var(--accent-indigo)]/20 text-[var(--accent-indigo)]"
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--accent-cyan)]/10 border border-[var(--accent-cyan)]/20 text-[var(--accent-cyan)]"
           >
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
             </span>
             <span className="text-[10px] font-bold uppercase tracking-widest">Docs v2.0</span>
           </motion.div>
@@ -123,17 +130,51 @@ export const AuthDocs = () => {
                     <span className="text-xs font-bold uppercase tracking-wider">{item.label}</span>
                   </div>
                   {item.subItems.map((sub) => {
+                    if (sub.subItems) {
+                      return (
+                        <div key={sub.id} className="mb-1 mt-2">
+                          <div className="flex items-center gap-2 px-4 py-1 text-[var(--text-muted)] opacity-80 pl-[42px]">
+                            <span className="text-[10px] font-bold uppercase tracking-widest">{sub.label}</span>
+                          </div>
+
+                          {/* Tree Branch Container */}
+                          <div className="relative ml-[48px] mt-0.5 border-l border-[var(--border-glass)] space-y-0.5 py-0.5">
+                            {sub.subItems.map((child, index) => {
+                              const isChildActive = activeSection === child.id;
+
+                              return (
+                                <div key={child.id} className="relative flex items-center group">
+                                  {/* Horizontal Branch Line */}
+                                  <div className={`absolute left-0 top-1/2 w-3 h-px bg-[var(--border-glass)] transition-colors ${isChildActive ? 'bg-cyan-400/50' : 'group-hover:bg-[var(--text-dim)]'}`}></div>
+
+                                  <button
+                                    onClick={() => setActiveSection(child.id)}
+                                    className={`w-full flex items-center px-3 py-1.5 ml-3 rounded-lg transition-all text-[11px] ${isChildActive
+                                      ? 'bg-[var(--accent-cyan)]/10 text-[var(--accent-cyan)] font-bold'
+                                      : 'text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[var(--text-main)] font-medium'
+                                      }`}
+                                  >
+                                    <span>{child.label}</span>
+                                  </button>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    }
+
                     const isActive = activeSection === sub.id;
                     return (
                       <button
                         key={sub.id}
                         onClick={() => setActiveSection(sub.id)}
-                        className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all pl-11 ${isActive
-                            ? 'bg-[var(--accent-indigo)] text-white shadow-md shadow-indigo-500/20'
-                            : 'text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[var(--text-main)]'
+                        className={`w-full flex items-center gap-3 px-4 py-2 rounded-xl transition-all pl-11 ${isActive
+                          ? 'bg-[var(--accent-cyan)] text-white shadow-md shadow-cyan-500/20'
+                          : 'text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[var(--text-main)]'
                           }`}
                       >
-                        <span className="text-sm font-bold">{sub.label}</span>
+                        <span className="text-[13px] font-bold">{sub.label}</span>
                       </button>
                     );
                   })}
@@ -147,8 +188,8 @@ export const AuthDocs = () => {
                 key={item.id}
                 onClick={() => setActiveSection(item.id)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive
-                    ? 'bg-[var(--accent-indigo)] text-white shadow-md shadow-indigo-500/20'
-                    : 'text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[var(--text-main)]'
+                  ? 'bg-[var(--accent-cyan)] text-white shadow-md shadow-cyan-500/20'
+                  : 'text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[var(--text-main)]'
                   }`}
               >
                 <item.icon size={18} strokeWidth={isActive ? 2.5 : 2} />
@@ -167,7 +208,7 @@ export const AuthDocs = () => {
         <div className="max-w-4xl mx-auto px-6 lg:px-10 py-8">
           <header className="mb-8">
             <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-3">
-              Authentication <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-indigo)] to-[var(--accent-purple)]">Made Simple</span>
+              Authentication <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-cyan)] to-[var(--accent-purple)]">Made Simple</span>
             </h1>
             <p className="text-base text-[var(--text-muted)]">
               Secure OAuth 2.0 Implementation with JWT Tokens. Assign API Key & Client Secret once, get seamless authentication across all your apps.
@@ -178,17 +219,17 @@ export const AuthDocs = () => {
           {(activeSection === 'endpoints-base' || activeSection === 'endpoints-2fa') && (
             <div className="bg-[var(--bg-surface)] backdrop-blur-xl border border-[var(--border-glass)] p-5 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xl mb-8">
               <div className="flex items-center gap-4">
-                <div className="p-3 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold border border-indigo-500/20">
+                <div className="p-3 rounded-xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 font-bold border border-cyan-500/20">
                   <Server size={24} />
                 </div>
                 <div>
                   <span className="text-[var(--text-dim)] text-xs font-bold uppercase tracking-wider block mb-0.5">DAuth Base API URL</span>
-                  <code className="text-indigo-600 dark:text-indigo-400 font-mono font-extrabold text-lg">{APP_CONFIG.BACKEND_URL}</code>
+                  <code className="text-cyan-600 dark:text-cyan-400 font-mono font-extrabold text-lg">{APP_CONFIG.BACKEND_URL}</code>
                 </div>
               </div>
               <button
                 onClick={() => copyToClipboard(APP_CONFIG.BACKEND_URL, 'base_url')}
-                className="px-4 py-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 rounded-xl text-xs font-bold transition-colors border border-indigo-500/20 flex items-center gap-2 self-stretch md:self-auto justify-center"
+                className="px-4 py-2 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-300 rounded-xl text-xs font-bold transition-colors border border-cyan-500/20 flex items-center gap-2 self-stretch md:self-auto justify-center"
               >
                 {copiedCode === 'base_url' ? (
                   <>
@@ -220,7 +261,7 @@ export const AuthDocs = () => {
 
                 <div className="flex flex-col gap-2 max-w-3xl mx-auto w-full relative">
                   {/* Flow Line (optional background connector) */}
-                  <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[var(--accent-indigo)] via-[var(--accent-purple)] to-emerald-500 opacity-20 -translate-x-1/2 hidden md:block"></div>
+                  <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[var(--accent-cyan)] via-[var(--accent-purple)] to-emerald-500 opacity-20 -translate-x-1/2 hidden md:block"></div>
 
                   {/* STEP 1: GET SIGNIN & SIGNUP URLS WITH ADDITIONAL INFOS */}
                   <div className="bg-[var(--bg-surface)] w-full backdrop-blur-xl border border-[var(--border-glass)] rounded-2xl p-5 shadow-xl flex flex-col space-y-4 relative z-10">
@@ -229,11 +270,11 @@ export const AuthDocs = () => {
                         <span className="bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-3 py-1 rounded-lg text-xs font-bold tracking-wide">POST</span>
                         <code className="text-[var(--text-main)] font-mono font-bold bg-black/5 dark:bg-white/5 px-2 py-0.5 rounded">/auth</code>
                       </div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-500 bg-indigo-500/10 px-2 py-1 rounded-md border border-indigo-500/20">Step 1: Get Sign-in & Sign-up URLs</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-500 bg-cyan-500/10 px-2 py-1 rounded-md border border-cyan-500/20">Step 1: Get Sign-in & Sign-up URLs</span>
                     </div>
 
                     <p className="text-[var(--text-muted)] text-sm leading-relaxed">
-                      Send your registered <code className="text-indigo-500 font-bold">apikey</code>. Optionally attach custom application metadata in <code className="text-indigo-500 font-bold">additional_infos</code> (e.g. user roles, tenant IDs, custom metadata). DAuth stores this securely in session and returns it inside the final JWT payload after sign-in.
+                      Send your registered <code className="text-cyan-500 font-bold">apikey</code>. Optionally attach custom application metadata in <code className="text-cyan-500 font-bold">additional_infos</code> (e.g. user roles, tenant IDs, custom metadata). DAuth stores this securely in session and returns it inside the final JWT payload after sign-in.
                     </p>
 
                     <div className="flex flex-col gap-6">
@@ -270,13 +311,13 @@ export const AuthDocs = () => {
                           </thead>
                           <tbody className="divide-y divide-[var(--border-glass)] text-[var(--text-muted)]">
                             <tr>
-                              <td className="py-2.5 px-3 font-mono font-bold text-indigo-600 dark:text-indigo-400">apikey</td>
+                              <td className="py-2.5 px-3 font-mono font-bold text-cyan-600 dark:text-cyan-400">apikey</td>
                               <td className="py-2.5 px-3 font-mono">string</td>
                               <td className="py-2.5 px-3"><span className="px-2 py-0.5 bg-red-500/10 text-red-500 border border-red-500/20 text-[9px] font-bold rounded-md uppercase">Mandatory</span></td>
                               <td className="py-2.5 px-3">Product client API Key registered in your dashboard.</td>
                             </tr>
                             <tr>
-                              <td className="py-2.5 px-3 font-mono font-bold text-indigo-600 dark:text-indigo-400">additional_infos</td>
+                              <td className="py-2.5 px-3 font-mono font-bold text-cyan-600 dark:text-cyan-400">additional_infos</td>
                               <td className="py-2.5 px-3 font-mono">object</td>
                               <td className="py-2.5 px-3"><span className="px-2 py-0.5 bg-blue-500/10 text-blue-500 border border-blue-500/20 text-[9px] font-bold rounded-md uppercase">Optional</span></td>
                               <td className="py-2.5 px-3"><strong>Declared for your purpose.</strong> Custom key-value app metadata (e.g. role, tenant_id) securely attached & returned in final JWT token.</td>
@@ -288,11 +329,11 @@ export const AuthDocs = () => {
                   </div>
 
                   {/* FLOW ARROW 1 */}
-                  <div className="flex flex-col items-center justify-center py-2 text-[var(--accent-indigo)] relative z-10 md:hidden">
-                    <div className="w-0.5 h-6 bg-gradient-to-b from-[var(--accent-indigo)] to-transparent opacity-50 mb-1"></div>
+                  <div className="flex flex-col items-center justify-center py-2 text-[var(--accent-cyan)] relative z-10 md:hidden">
+                    <div className="w-0.5 h-6 bg-gradient-to-b from-[var(--accent-cyan)] to-transparent opacity-50 mb-1"></div>
                     <ArrowDown size={24} className="animate-bounce" />
                   </div>
-                  <div className="hidden md:flex flex-col items-center justify-center text-[var(--accent-indigo)] relative z-10 w-14 h-14 bg-[var(--bg-deep)] rounded-full border border-[var(--border-glass)] my-4 shadow-lg shadow-indigo-500/20">
+                  <div className="hidden md:flex flex-col items-center justify-center text-[var(--accent-cyan)] relative z-10 w-14 h-14 bg-[var(--bg-deep)] rounded-full border border-[var(--border-glass)] my-4 shadow-lg shadow-cyan-500/20">
                     <ArrowDown size={24} className="animate-bounce" />
                   </div>
 
@@ -303,24 +344,24 @@ export const AuthDocs = () => {
                         <span className="bg-blue-500/10 text-blue-500 border border-blue-500/20 px-3 py-1 rounded-lg text-xs font-bold tracking-wide">REDIRECT</span>
                         <code className="text-[var(--text-main)] font-mono font-bold bg-black/5 dark:bg-white/5 px-2 py-0.5 rounded">Redirect URL</code>
                       </div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-500 bg-indigo-500/10 px-2 py-1 rounded-md border border-indigo-500/20">Step 2: User Sign-In & Redirect</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-500 bg-cyan-500/10 px-2 py-1 rounded-md border border-cyan-500/20">Step 2: User Sign-In & Redirect</span>
                     </div>
                     <p className="text-[var(--text-muted)] text-sm leading-relaxed">
-                      Direct user to <code className="text-indigo-500 font-bold">signin_url</code> or <code className="text-indigo-500 font-bold">signup_url</code>. Once user completes authentication, DAuth redirects back to your registered success URL with a temporary <code className="text-indigo-500 font-bold">token_id</code>.
+                      Direct user to <code className="text-cyan-500 font-bold">signin_url</code> or <code className="text-cyan-500 font-bold">signup_url</code>. Once user completes authentication, DAuth redirects back to your registered success URL with a temporary <code className="text-cyan-500 font-bold">token_id</code>.
                     </p>
                     <CodeEditor
                       code={`https://yourdomain.com/your-redirect-url?token_id=e7b41b90c0_a812f9k`}
                       language="bash"
                       filename="redirect_url_format.txt"
                     />
-                    <div className="p-3 bg-indigo-500/5 rounded-xl border border-indigo-500/20 text-xs text-[var(--text-muted)] leading-relaxed">
-                      💡 <strong>Note:</strong> Extract the <code className="text-indigo-500 font-bold">token_id</code> parameter from the URL query string in your redirect handler.
+                    <div className="p-3 bg-cyan-500/5 rounded-xl border border-cyan-500/20 text-xs text-[var(--text-muted)] leading-relaxed">
+                      💡 <strong>Note:</strong> Extract the <code className="text-cyan-500 font-bold">token_id</code> parameter from the URL query string in your redirect handler.
                     </div>
                   </div>
 
                   {/* FLOW ARROW 2 */}
                   <div className="flex flex-col items-center justify-center py-2 text-emerald-500 relative z-10 md:hidden">
-                    <div className="w-0.5 h-6 bg-gradient-to-b from-[var(--accent-indigo)] to-emerald-500 opacity-50 mb-1"></div>
+                    <div className="w-0.5 h-6 bg-gradient-to-b from-[var(--accent-cyan)] to-emerald-500 opacity-50 mb-1"></div>
                     <ArrowDown size={24} className="animate-bounce" />
                   </div>
                   <div className="hidden md:flex flex-col items-center justify-center text-emerald-500 relative z-10 w-14 h-14 bg-[var(--bg-deep)] rounded-full border border-[var(--border-glass)] my-4 shadow-lg shadow-emerald-500/20">
@@ -337,7 +378,7 @@ export const AuthDocs = () => {
                       <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-md border border-emerald-500/20">Step 3: Exchange token_id for JWT</span>
                     </div>
                     <p className="text-[var(--text-muted)] text-sm leading-relaxed">
-                      Send <code className="text-indigo-500 font-bold">token_id</code>, <code className="text-indigo-500 font-bold">client_id</code> (your API key), and <code className="text-indigo-500 font-bold">client_secret</code> to receive the final signed JWT token.
+                      Send <code className="text-cyan-500 font-bold">token_id</code>, <code className="text-cyan-500 font-bold">client_id</code> (your API key), and <code className="text-cyan-500 font-bold">client_secret</code> to receive the final signed JWT token.
                     </p>
 
                     <div className="space-y-4">
@@ -368,19 +409,19 @@ export const AuthDocs = () => {
                           </thead>
                           <tbody className="divide-y divide-[var(--border-glass)] text-[var(--text-muted)]">
                             <tr>
-                              <td className="py-2 px-2 font-mono font-bold text-indigo-600 dark:text-indigo-400">token_id</td>
+                              <td className="py-2 px-2 font-mono font-bold text-cyan-600 dark:text-cyan-400">token_id</td>
                               <td className="py-2 px-2 font-mono">string</td>
                               <td className="py-2 px-2"><span className="px-1.5 py-0.5 bg-red-500/10 text-red-500 border border-red-500/20 text-[9px] font-bold rounded-md uppercase">Mandatory</span></td>
                               <td className="py-2 px-2">Authorization token ID extracted from redirect URL query param.</td>
                             </tr>
                             <tr>
-                              <td className="py-2 px-2 font-mono font-bold text-indigo-600 dark:text-indigo-400">client_id</td>
+                              <td className="py-2 px-2 font-mono font-bold text-cyan-600 dark:text-cyan-400">client_id</td>
                               <td className="py-2 px-2 font-mono">string</td>
                               <td className="py-2 px-2"><span className="px-1.5 py-0.5 bg-red-500/10 text-red-500 border border-red-500/20 text-[9px] font-bold rounded-md uppercase">Mandatory</span></td>
                               <td className="py-2 px-2">Your registered product client API Key.</td>
                             </tr>
                             <tr>
-                              <td className="py-2 px-2 font-mono font-bold text-indigo-600 dark:text-indigo-400">client_secret</td>
+                              <td className="py-2 px-2 font-mono font-bold text-cyan-600 dark:text-cyan-400">client_secret</td>
                               <td className="py-2 px-2 font-mono">string</td>
                               <td className="py-2 px-2"><span className="px-1.5 py-0.5 bg-red-500/10 text-red-500 border border-red-500/20 text-[9px] font-bold rounded-md uppercase">Mandatory</span></td>
                               <td className="py-2 px-2">Your registered confidential Client Secret key.</td>
@@ -395,6 +436,53 @@ export const AuthDocs = () => {
               </section>
             )}
 
+            {activeSection === 'endpoints-autofill' && (
+              <section id="endpoints-autofill" className="relative animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-3 rounded-xl bg-purple-500/10 text-purple-500 border border-purple-500/20">
+                    <Link2 size={24} />
+                  </div>
+                  <div>
+                    <h2 className="text-xl md:text-2xl font-bold">Autofill & Lock URLs</h2>
+                    <p className="text-sm text-[var(--text-dim)]">Generate secure, pre-filled authentication links to reduce onboarding friction.</p>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-2 max-w-3xl mx-auto w-full relative">
+                  <div className="bg-[var(--bg-surface)] w-full backdrop-blur-xl border border-[var(--border-glass)] rounded-2xl p-5 shadow-xl flex flex-col space-y-4 relative z-10">
+                    <div className="flex items-center justify-between border-b border-[var(--border-glass)] pb-4">
+                      <div className="flex items-center gap-3">
+                        <span className="bg-purple-500/10 text-purple-500 border border-purple-500/20 px-3 py-1 rounded-lg text-xs font-bold tracking-wide">FEATURE</span>
+                        <h3 className="text-lg font-bold text-[var(--text-main)]">Autofill & Lock URLs</h3>
+                      </div>
+                    </div>
+                    <p className="text-[var(--text-muted)] text-sm leading-relaxed">
+                      Generate secure, pre-filled authentication links to drastically reduce onboarding friction. When users click the link, their information is already filled in and strictly locked, enforcing the auth flow you defined.
+                    </p>
+
+                    <div className="space-y-4 mt-2">
+                      <h4 className="text-sm font-bold text-[var(--text-main)]">URL Parameters:</h4>
+                      <ul className="list-disc pl-5 space-y-2 text-sm text-[var(--text-muted)]">
+                        <li><code className="text-cyan-500 font-bold">prefill_email</code> / <code className="text-cyan-500 font-bold">prefill_phone</code>: The value to pre-populate.</li>
+                        <li><code className="text-cyan-500 font-bold">lock_method</code>: <code className="text-[var(--text-main)] font-mono bg-black/5 dark:bg-white/5 px-1 rounded">otp</code> or <code className="text-[var(--text-main)] font-mono bg-black/5 dark:bg-white/5 px-1 rounded">password</code>. Prevents the user from altering the prefilled field.</li>
+                      </ul>
+                    </div>
+
+                    <div className="flex flex-col gap-6">
+                      <div className="space-y-2">
+                        <span className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider block">Example Magic Link</span>
+                        <CodeEditor
+                          code={`http://localhost:5173/auth/REQUEST_ID/signin?prefill_email=user@example.com&lock_method=otp`}
+                          language="text"
+                          filename="magic_link.txt"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            )}
+
             {activeSection === 'endpoints-2fa' && (
               <section id="endpoints-2fa" className="relative animate-in fade-in slide-in-from-bottom-4 duration-500">
                 {/* 2FA SECTION HEADER */}
@@ -404,13 +492,13 @@ export const AuthDocs = () => {
                     <h2 className="text-xl md:text-2xl font-bold">Two-Factor Authentication (2FA / TOTP) Endpoints</h2>
                   </div>
                   <p className="text-[var(--text-muted)] text-sm">
-                    Domain-Scoped 2FA TOTP secret management per product domain (<code className="text-indigo-500 font-bold">client_id</code>). Identifies users by <code className="text-indigo-500 font-bold">email</code> or <code className="text-indigo-500 font-bold">mobile_number</code>.
+                    Domain-Scoped 2FA TOTP secret management per product domain (<code className="text-cyan-500 font-bold">client_id</code>). Identifies users by <code className="text-cyan-500 font-bold">email</code> or <code className="text-cyan-500 font-bold">mobile_number</code>.
                   </p>
                 </div>
 
                 <div className="flex flex-col gap-2 max-w-3xl mx-auto w-full relative">
                   {/* Flow Line */}
-                  <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-emerald-500 via-indigo-500 to-purple-500 opacity-20 -translate-x-1/2 hidden md:block"></div>
+                  <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-emerald-500 via-cyan-500 to-sky-400 opacity-20 -translate-x-1/2 hidden md:block"></div>
 
                   {/* 2FA ENDPOINT 1: SETUP */}
                   <div className="bg-[var(--bg-surface)] w-full backdrop-blur-xl border border-[var(--border-glass)] rounded-2xl p-5 shadow-xl flex flex-col space-y-4 relative z-10">
@@ -448,7 +536,7 @@ export const AuthDocs = () => {
 
                   {/* FLOW ARROW 1 */}
                   <div className="flex flex-col items-center justify-center py-2 text-emerald-500 relative z-10 md:hidden">
-                    <div className="w-0.5 h-6 bg-gradient-to-b from-emerald-500 to-indigo-500 opacity-50 mb-1"></div>
+                    <div className="w-0.5 h-6 bg-gradient-to-b from-emerald-500 to-cyan-500 opacity-50 mb-1"></div>
                     <ArrowDown size={24} className="animate-bounce" />
                   </div>
                   <div className="hidden md:flex flex-col items-center justify-center text-emerald-500 relative z-10 w-14 h-14 bg-[var(--bg-deep)] rounded-full border border-[var(--border-glass)] my-4 shadow-lg shadow-emerald-500/20">
@@ -460,10 +548,10 @@ export const AuthDocs = () => {
                     <div className="flex items-center justify-between border-b border-[var(--border-glass)] pb-4">
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-3">
-                          <span className="bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 px-2.5 py-1 rounded-lg text-xs font-bold font-mono">POST</span>
+                          <span className="bg-cyan-500/10 text-cyan-500 border border-cyan-500/20 px-2.5 py-1 rounded-lg text-xs font-bold font-mono">POST</span>
                           <code className="text-[var(--text-main)] font-mono font-bold text-lg">/auth/2fa/setup/verify</code>
                         </div>
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-500 bg-indigo-500/10 px-2.5 py-1 rounded-md border border-indigo-500/20 self-start mt-2">2. Confirm & Enable 2FA</span>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-500 bg-cyan-500/10 px-2.5 py-1 rounded-md border border-cyan-500/20 self-start mt-2">2. Confirm & Enable 2FA</span>
                       </div>
                     </div>
                     <p className="text-[var(--text-muted)] text-sm leading-relaxed">
@@ -490,11 +578,11 @@ export const AuthDocs = () => {
                   </div>
 
                   {/* FLOW ARROW 2 */}
-                  <div className="flex flex-col items-center justify-center py-2 text-indigo-500 relative z-10 md:hidden">
-                    <div className="w-0.5 h-6 bg-gradient-to-b from-indigo-500 to-purple-500 opacity-50 mb-1"></div>
+                  <div className="flex flex-col items-center justify-center py-2 text-cyan-500 relative z-10 md:hidden">
+                    <div className="w-0.5 h-6 bg-gradient-to-b from-cyan-500 to-sky-400 opacity-50 mb-1"></div>
                     <ArrowDown size={24} className="animate-bounce" />
                   </div>
-                  <div className="hidden md:flex flex-col items-center justify-center text-indigo-500 relative z-10 w-14 h-14 bg-[var(--bg-deep)] rounded-full border border-[var(--border-glass)] my-4 shadow-lg shadow-indigo-500/20">
+                  <div className="hidden md:flex flex-col items-center justify-center text-cyan-500 relative z-10 w-14 h-14 bg-[var(--bg-deep)] rounded-full border border-[var(--border-glass)] my-4 shadow-lg shadow-cyan-500/20">
                     <ArrowDown size={24} className="animate-bounce" />
                   </div>
 
@@ -547,31 +635,31 @@ export const AuthDocs = () => {
                           </thead>
                           <tbody className="divide-y divide-[var(--border-glass)] text-[var(--text-muted)]">
                             <tr className="hover:bg-white/5 transition-colors">
-                              <td className="py-3 px-4 font-mono font-bold text-indigo-400">client_id</td>
+                              <td className="py-3 px-4 font-mono font-bold text-cyan-400">client_id</td>
                               <td className="py-3 px-4 font-mono text-xs">string</td>
                               <td className="py-3 px-4"><span className="px-2 py-1 bg-red-500/10 text-red-500 border border-red-500/20 text-[10px] font-bold rounded-md uppercase">Mandatory</span></td>
                               <td className="py-3 px-4 text-xs">Product client API Key. Scopes TOTP secret to this product domain.</td>
                             </tr>
                             <tr className="hover:bg-white/5 transition-colors">
-                              <td className="py-3 px-4 font-mono font-bold text-indigo-400">client_secret</td>
+                              <td className="py-3 px-4 font-mono font-bold text-cyan-400">client_secret</td>
                               <td className="py-3 px-4 font-mono text-xs">string</td>
                               <td className="py-3 px-4"><span className="px-2 py-1 bg-red-500/10 text-red-500 border border-red-500/20 text-[10px] font-bold rounded-md uppercase">Mandatory</span></td>
                               <td className="py-3 px-4 text-xs">Your registered product client secret key.</td>
                             </tr>
                             <tr className="hover:bg-white/5 transition-colors">
-                              <td className="py-3 px-4 font-mono font-bold text-indigo-400">email</td>
+                              <td className="py-3 px-4 font-mono font-bold text-cyan-400">email</td>
                               <td className="py-3 px-4 font-mono text-xs">string</td>
                               <td className="py-3 px-4"><span className="px-2 py-1 bg-amber-500/10 text-amber-500 border border-amber-500/20 text-[10px] font-bold rounded-md uppercase">Conditional*</span></td>
-                              <td className="py-3 px-4 text-xs">User email address (*Either <code className="text-indigo-400 font-bold bg-indigo-500/10 px-1 rounded">email</code> or <code className="text-indigo-400 font-bold bg-indigo-500/10 px-1 rounded">mobile_number</code> must be provided).</td>
+                              <td className="py-3 px-4 text-xs">User email address (*Either <code className="text-cyan-400 font-bold bg-cyan-500/10 px-1 rounded">email</code> or <code className="text-cyan-400 font-bold bg-cyan-500/10 px-1 rounded">mobile_number</code> must be provided).</td>
                             </tr>
                             <tr className="hover:bg-white/5 transition-colors">
-                              <td className="py-3 px-4 font-mono font-bold text-indigo-400">mobile_number</td>
+                              <td className="py-3 px-4 font-mono font-bold text-cyan-400">mobile_number</td>
                               <td className="py-3 px-4 font-mono text-xs">string</td>
                               <td className="py-3 px-4"><span className="px-2 py-1 bg-amber-500/10 text-amber-500 border border-amber-500/20 text-[10px] font-bold rounded-md uppercase">Conditional*</span></td>
-                              <td className="py-3 px-4 text-xs">User phone number (*Either <code className="text-indigo-400 font-bold bg-indigo-500/10 px-1 rounded">email</code> or <code className="text-indigo-400 font-bold bg-indigo-500/10 px-1 rounded">mobile_number</code> must be provided).</td>
+                              <td className="py-3 px-4 text-xs">User phone number (*Either <code className="text-cyan-400 font-bold bg-cyan-500/10 px-1 rounded">email</code> or <code className="text-cyan-400 font-bold bg-cyan-500/10 px-1 rounded">mobile_number</code> must be provided).</td>
                             </tr>
                             <tr className="hover:bg-white/5 transition-colors">
-                              <td className="py-3 px-4 font-mono font-bold text-indigo-400">code</td>
+                              <td className="py-3 px-4 font-mono font-bold text-cyan-400">code</td>
                               <td className="py-3 px-4 font-mono text-xs">string</td>
                               <td className="py-3 px-4"><span className="px-2 py-1 bg-red-500/10 text-red-500 border border-red-500/20 text-[10px] font-bold rounded-md uppercase">Mandatory</span></td>
                               <td className="py-3 px-4 text-xs">6-digit time-based verification code generated by Google Authenticator / Authy app (Required on /setup/verify and /verify).</td>
@@ -603,13 +691,13 @@ export const AuthDocs = () => {
                       <button
                         key={lang}
                         className={`px-6 py-4 font-bold capitalize border-b-2 transition-all flex-shrink-0 flex items-center gap-3 ${activeTab === lang
-                            ? 'border-[var(--accent-indigo)] text-[var(--accent-indigo)] bg-[var(--bg-deep)]'
-                            : 'border-transparent text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[var(--text-main)]'
+                          ? 'border-[var(--accent-cyan)] text-[var(--accent-cyan)] bg-[var(--bg-deep)]'
+                          : 'border-transparent text-[var(--text-muted)] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[var(--text-main)]'
                           }`}
                         onClick={() => setActiveTab(lang)}
                       >
                         <span>{lang}</span>
-                        <span className={`text-[10px] px-2 py-0.5 rounded-md ${activeTab === lang ? 'bg-indigo-500/20' : 'bg-black/10 dark:bg-white/10'}`}>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-md ${activeTab === lang ? 'bg-cyan-500/20' : 'bg-black/10 dark:bg-white/10'}`}>
                           {filename.split('.').pop()}
                         </span>
                       </button>
@@ -659,14 +747,14 @@ export const AuthDocs = () => {
                     {/* WITH ADDITIONAL INFOS & CUSTOM FIELDS */}
                     <div className="space-y-4">
                       <div className="flex items-center gap-2">
-                        <span className="px-2.5 py-1 bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-xs font-bold rounded-lg">Extended JWT Payload</span>
+                        <span className="px-2.5 py-1 bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 text-xs font-bold rounded-lg">Extended JWT Payload</span>
                         <h3 className="text-lg font-bold">With additional_infos & custom_fields</h3>
                       </div>
                       <p className="text-[var(--text-muted)] text-sm">
-                        Decoded JWT payload returning custom app metadata passed during <code className="text-indigo-500 font-bold">/auth</code> along with user signup fields.
+                        Decoded JWT payload returning custom app metadata passed during <code className="text-cyan-500 font-bold">/auth</code> along with user signup fields.
                       </p>
                       <CodeEditor
-                        code={`{\n  "email": "john.doe@acme.com",\n  "mobile_number": "+19876543210",\n  "name": "John Doe",\n  "profile_picture": "https://example.com/avatar.png",\n  "auth_provider": "password",\n  "custom_fields": {\n    "fullname": "John Doe",\n    "phone": "+19876543210"\n  },\n  "additional_infos": {\n    "role": "admin",\n    "tenant_id": "org_acme_corp",\n    "custom_user_id": "usr_abc123"\n  },\n  "prefilled": false,\n  "lock_method": null,\n  "ip": "127.0.0.1",\n  "browser": "Mozilla/5.0...",\n  "exp": 1786218915\n}`}
+                        code={`{\n  "email": "john.doe@acme.com",\n  "mobile_number": "+19876543210",\n  "name": "John Doe",\n  "profile_picture": "https://example.com/avatar.png",\n  "auth_provider": "password",\n  "custom_fields": {\n    "fullname": "John Doe",\n    "phone": "+19876543210"\n  },\n  "additional_infos": {\n    "role": "admin",\n    "tenant_id": "org_acme_corp",\n    "custom_user_id": "usr_abc123"\n  },\n  "location": {\n    "lat": 9.848474,\n    "lng": 78.094087\n  },\n  "prefilled": false,\n  "lock_method": null,\n  "ip": "127.0.0.1",\n  "browser": "Mozilla/5.0...",\n  "exp": 1786218915\n}`}
                         language="json"
                         filename="extended-jwt-decoded.json"
                       />
@@ -677,16 +765,20 @@ export const AuthDocs = () => {
                     <h4 className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-wider mb-4">Claim Descriptions</h4>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                       <div className="bg-[var(--bg-card)] p-4 rounded-xl border border-[var(--border-glass)]">
-                        <code className="text-indigo-600 dark:text-indigo-400 font-bold">additional_infos</code>
-                        <p className="text-[var(--text-muted)] text-xs mt-1">Custom key-value metadata provided by your application when requesting <code className="text-indigo-500">POST /auth</code>.</p>
+                        <code className="text-cyan-600 dark:text-cyan-400 font-bold">additional_infos</code>
+                        <p className="text-[var(--text-muted)] text-xs mt-1">Custom key-value metadata provided by your application when requesting <code className="text-cyan-500">POST /auth</code>.</p>
                       </div>
                       <div className="bg-[var(--bg-card)] p-4 rounded-xl border border-[var(--border-glass)]">
-                        <code className="text-indigo-600 dark:text-indigo-400 font-bold">custom_fields</code>
+                        <code className="text-cyan-600 dark:text-cyan-400 font-bold">custom_fields</code>
                         <p className="text-[var(--text-muted)] text-xs mt-1">Form attributes collected from end-users during sign up (e.g. phone, full name).</p>
                       </div>
                       <div className="bg-[var(--bg-card)] p-4 rounded-xl border border-[var(--border-glass)]">
-                        <code className="text-indigo-600 dark:text-indigo-400 font-bold">auth_provider & profile</code>
+                        <code className="text-cyan-600 dark:text-cyan-400 font-bold">auth_provider & profile</code>
                         <p className="text-[var(--text-muted)] text-xs mt-1">Authentication provider used (google, github, password, email_otp) and verified user profile attributes.</p>
+                      </div>
+                      <div className="bg-[var(--bg-card)] p-4 rounded-xl border border-[var(--border-glass)]">
+                        <code className="text-cyan-600 dark:text-cyan-400 font-bold">location</code>
+                        <p className="text-[var(--text-muted)] text-xs mt-1">Geographic coordinates (latitude and longitude) captured during sign-in if Location Auth is enabled.</p>
                       </div>
                     </div>
                   </div>
@@ -712,7 +804,7 @@ export const AuthDocs = () => {
                     { icon: ShieldAlert, color: 'text-red-500', bg: 'bg-red-500/10', title: "Secret Protection", desc: "Never expose your client_secret in client-side code like React or Vue." },
                     { icon: Key, color: 'text-amber-500', bg: 'bg-amber-500/10', title: "Environment Variables", desc: "Store API keys securely in .env files, not in your version control." },
                     { icon: Clock, color: 'text-emerald-500', bg: 'bg-emerald-500/10', title: "Token Expiration", desc: "Our JWTs expire in 1 hour. Implement proper refresh mechanisms." },
-                    { icon: Check, color: 'text-indigo-500', bg: 'bg-indigo-500/10', title: "Server Validation", desc: "Always validate JWT signatures on your backend for protected routes." },
+                    { icon: Check, color: 'text-cyan-500', bg: 'bg-cyan-500/10', title: "Server Validation", desc: "Always validate JWT signatures on your backend for protected routes." },
                     { icon: RefreshCw, color: 'text-purple-500', bg: 'bg-purple-500/10', title: "Key Rotation", desc: "Regularly rotate your Client Secret from the dashboard if compromised." }
                   ].map((item, i) => (
                     <div key={i} className="bg-[var(--bg-surface)] backdrop-blur-xl border border-[var(--border-glass)] p-6 rounded-2xl shadow-lg hover:-translate-y-1 transition-transform duration-300">

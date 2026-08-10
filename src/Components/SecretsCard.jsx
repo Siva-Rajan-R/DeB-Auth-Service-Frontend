@@ -81,25 +81,25 @@ export const SecretsCard = ({ credIndex, apikey = "", clientSecret = "", canChan
 
 
     return (
-        <div className='w-full max-w-4xl mx-auto bg-gray-900/50 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-indigo-400/30 shadow-2xl shadow-indigo-400/20'>
+        <div className='w-full max-w-4xl mx-auto bg-gray-900/50 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-cyan-400/30 shadow-2xl shadow-cyan-400/20'>
             {/* Header Section */}
             <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3'>
-                <h1 className='font-bold text-2xl sm:text-3xl bg-gradient-to-r from-indigo-300 via-indigo-400 to-indigo-500 bg-clip-text text-transparent'>
+                <h1 className='font-bold text-2xl sm:text-3xl bg-gradient-to-r from-cyan-300 via-cyan-400 to-cyan-500 bg-clip-text text-transparent'>
                     {`Credentials #${credIndex + 1}`}
                 </h1>
                 {canShowSave && (
                     <IceBlueButton
                         btnName={isSaving ? "Saving..." : 'Save Changes'}
-                        btnClassName={"text-sm sm:text-base font-semibold text-indigo-400 px-4 py-2"}
+                        btnClassName={"text-sm sm:text-base font-semibold text-cyan-400 px-4 py-2"}
                         onclickFunc={() => updateConfigurations()}
                     />
                 )}
             </div>
 
             {/* Mobile Preview Only */}
-            <div className="lg:hidden bg-black/30 rounded-xl overflow-hidden mb-6 border border-indigo-400/20">
-                <div className="bg-indigo-400/10 py-2 px-4 border-b border-indigo-400/20">
-                    <h3 className="text-indigo-300 font-semibold text-sm">Login Preview</h3>
+            <div className="lg:hidden bg-black/30 rounded-xl overflow-hidden mb-6 border border-cyan-400/20">
+                <div className="bg-cyan-400/10 py-2 px-4 border-b border-cyan-400/20">
+                    <h3 className="text-cyan-300 font-semibold text-sm">Login Preview</h3>
                 </div>
                 <div className="w-full h-100">
                     <iframe
@@ -153,7 +153,7 @@ export const SecretsCard = ({ credIndex, apikey = "", clientSecret = "", canChan
 
                         {/* Auth Methods */}
                         <div className='mt-6'>
-                            <h3 className='font-bold text-lg sm:text-xl bg-gradient-to-r from-indigo-300 to-indigo-400 bg-clip-text text-transparent mb-3'>
+                            <h3 className='font-bold text-lg sm:text-xl bg-gradient-to-r from-cyan-300 to-cyan-400 bg-clip-text text-transparent mb-3'>
                                 Authentication Methods
                             </h3>
                             <div className='grid grid-cols-2 sm:grid-cols-2 gap-2'>
@@ -173,17 +173,17 @@ export const SecretsCard = ({ credIndex, apikey = "", clientSecret = "", canChan
                     </div>
 
                     {/* Secrets Card */}
-                    <div className='bg-black/20 rounded-xl p-4 sm:p-5 border border-indigo-400/30'>
-                        <h2 className='font-bold text-xl sm:text-2xl bg-gradient-to-r from-indigo-300 to-indigo-400 bg-clip-text text-transparent mb-4 flex items-center gap-2'>
-                            <div className="w-2 h-2 bg-indigo-400 rounded-full"></div>
+                    <div className='bg-black/20 rounded-xl p-4 sm:p-5 border border-cyan-400/30'>
+                        <h2 className='font-bold text-xl sm:text-2xl bg-gradient-to-r from-cyan-300 to-cyan-400 bg-clip-text text-transparent mb-4 flex items-center gap-2'>
+                            <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
                             API Secrets
                         </h2>
 
                         <div className='space-y-4'>
                             <div className='space-y-2'>
-                                <label className='text-indigo-300 font-medium text-sm'>API Key</label>
+                                <label className='text-cyan-300 font-medium text-sm'>API Key</label>
                                 <SecretsInputBox
-                                    icon={<Copy size={16} className='text-indigo-400 cursor-pointer hover:text-indigo-300 transition-colors' />}
+                                    icon={<Copy size={16} className='text-cyan-400 cursor-pointer hover:text-cyan-300 transition-colors' />}
                                     iconFunc={() => copyToClipboard(apikey)}
                                     inputTxt={apikey}
                                     className="w-full"
@@ -191,9 +191,9 @@ export const SecretsCard = ({ credIndex, apikey = "", clientSecret = "", canChan
                             </div>
 
                             <div className='space-y-2'>
-                                <label className='text-indigo-300 font-medium text-sm'>Client Secret</label>
+                                <label className='text-cyan-300 font-medium text-sm'>Client Secret</label>
                                 <SecretsInputBox
-                                    icon={<Copy size={16} className='text-indigo-400 cursor-pointer hover:text-indigo-300 transition-colors' />}
+                                    icon={<Copy size={16} className='text-cyan-400 cursor-pointer hover:text-cyan-300 transition-colors' />}
                                     iconFunc={() => copyToClipboard(clientSecret)}
                                     inputTxt={clientSecret}
                                     className="w-full"
@@ -221,9 +221,9 @@ export const SecretsCard = ({ credIndex, apikey = "", clientSecret = "", canChan
 
                 {/* Right Column - Desktop Preview */}
                 <div className="hidden lg:block">
-                    <div className="bg-black/30 rounded-xl overflow-hidden border border-indigo-400/20 h-full">
-                        <div className="bg-indigo-400/10 py-3 px-4 border-b border-indigo-400/20">
-                            <h3 className="text-indigo-300 font-semibold">Live Login Preview</h3>
+                    <div className="bg-black/30 rounded-xl overflow-hidden border border-cyan-400/20 h-full">
+                        <div className="bg-cyan-400/10 py-3 px-4 border-b border-cyan-400/20">
+                            <h3 className="text-cyan-300 font-semibold">Live Login Preview</h3>
                         </div>
                         <div className="w-full h-[500px]">
                             <iframe
@@ -239,14 +239,14 @@ export const SecretsCard = ({ credIndex, apikey = "", clientSecret = "", canChan
 
             {/* Generate New API Key */}
             <div
-                className='bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-400/30 rounded-xl p-4 cursor-pointer hover:from-indigo-500/15 hover:to-purple-500/15 transition-all group'
+                className='bg-gradient-to-r from-cyan-500/10 to-sky-400/10 border border-cyan-400/30 rounded-xl p-4 cursor-pointer hover:from-cyan-500/15 hover:to-sky-400/15 transition-all group'
                 onClick={() => setOpenDialog(true)}
             >
                 <div className="flex items-center justify-center gap-3">
-                    <div className="w-8 h-8 bg-indigo-400/20 rounded-full flex items-center justify-center group-hover:bg-indigo-400/30 transition-colors">
-                        <div className="w-4 h-4 bg-indigo-400 rounded-full"></div>
+                    <div className="w-8 h-8 bg-cyan-400/20 rounded-full flex items-center justify-center group-hover:bg-cyan-400/30 transition-colors">
+                        <div className="w-4 h-4 bg-cyan-400 rounded-full"></div>
                     </div>
-                    <span className='text-indigo-300 font-semibold text-lg'>Generate New API Key</span>
+                    <span className='text-cyan-300 font-semibold text-lg'>Generate New API Key</span>
                 </div>
             </div>
 

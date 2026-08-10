@@ -55,7 +55,7 @@ export const ResetPassword = () => {
   };
 
   return (
-    <div className='min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-slate-50 via-indigo-50/30 to-slate-100 relative overflow-hidden'>
+    <div className='min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-slate-50 via-cyan-50/30 to-slate-100 relative overflow-hidden'>
       {/* Decorative background */}
       <div className='absolute inset-0 pointer-events-none'
         style={{ backgroundImage: 'radial-gradient(circle, rgba(79,70,229,0.04) 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
@@ -84,7 +84,7 @@ export const ResetPassword = () => {
         ) : (
           <>
             <div className='flex flex-col items-center mb-7 text-center'>
-              <div className='w-14 h-14 flex items-center justify-center mb-4 rounded-2xl bg-indigo-100 text-indigo-600 border border-indigo-200/50'>
+              <div className='w-14 h-14 flex items-center justify-center mb-4 rounded-2xl bg-cyan-100 text-cyan-600 border border-cyan-200/50'>
                 <Lock size={24} />
               </div>
               <h1 className='font-bold text-xl tracking-tight text-slate-900'>Reset Password</h1>
@@ -108,9 +108,9 @@ export const ResetPassword = () => {
                     placeholder='••••••••'
                     value={formData.new_password}
                     onChange={handleChange}
-                    className='w-full px-4 py-3 text-sm outline-none border border-slate-200 rounded-xl bg-white text-slate-900 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all'
+                    className='w-full px-4 py-3 text-sm outline-none border border-slate-200 rounded-xl bg-white text-slate-900 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100 transition-all'
                   />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className='absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-500 transition-colors'>
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className='absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-cyan-500 transition-colors'>
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
@@ -125,9 +125,9 @@ export const ResetPassword = () => {
                     placeholder='••••••••'
                     value={formData.confirm_password}
                     onChange={handleChange}
-                    className='w-full px-4 py-3 text-sm outline-none border border-slate-200 rounded-xl bg-white text-slate-900 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all'
+                    className='w-full px-4 py-3 text-sm outline-none border border-slate-200 rounded-xl bg-white text-slate-900 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100 transition-all'
                   />
-                  <button type="button" onClick={() => setShowConfirm(!showConfirm)} className='absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-500 transition-colors'>
+                  <button type="button" onClick={() => setShowConfirm(!showConfirm)} className='absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-cyan-500 transition-colors'>
                     {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>

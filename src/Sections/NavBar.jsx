@@ -175,7 +175,7 @@ export const NavBar = () => {
                 href={`#${nav.href}`}
                 className={`font-semibold text-sm transition-all duration-300 ${
                   isActive 
-                    ? 'text-indigo-600 font-extrabold border-b-2 border-indigo-600 pb-0.5' 
+                    ? 'text-cyan-600 font-extrabold border-b-2 border-cyan-600 pb-0.5' 
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
                 onClick={(event) => handleNavClick(event, nav.navName)}
@@ -216,7 +216,7 @@ export const NavBar = () => {
                 {showProfileCard && (
                   <div className="absolute top-full right-0 mt-3 w-56 bg-white rounded-2xl shadow-2xl border border-slate-200 p-4 z-[1000] backdrop-blur-2xl">
                     <p className="text-slate-800 text-xs font-semibold mb-3 truncate">
-                      👋 Hi, <span className="text-indigo-700 font-extrabold">{displayName}</span>
+                      👋 Hi, <span className="text-cyan-700 font-extrabold">{displayName}</span>
                     </p>
                     <div className="flex flex-col gap-1.5">
                       <button

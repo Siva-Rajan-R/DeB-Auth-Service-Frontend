@@ -32,11 +32,11 @@ export const DashBoardNavBar = ({actions}) => {
         <div className='flex justify-center items-center gap-x-4'>
           <div 
             onClick={()=>{window.location.href="/"}}
-            className='p-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-indigo-500/50 transition-all cursor-pointer group'
+            className='p-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-cyan-500/50 transition-all cursor-pointer group'
           >
             <MdOutlineKeyboardBackspace 
               size={24} 
-              className='text-slate-400 group-hover:text-indigo-400 transition-colors' 
+              className='text-slate-400 group-hover:text-cyan-400 transition-colors' 
             />
           </div>
           <div className='flex items-center gap-3 cursor-pointer' onClick={() => window.location.href="/"}>
@@ -55,7 +55,7 @@ export const DashBoardNavBar = ({actions}) => {
             <button
               key={i}
               onClick={e.onClick}
-              className='px-5 py-2.5 rounded-xl bg-indigo-500 text-slate-950 text-sm font-bold hover:bg-indigo-400 hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] transition-all active:scale-95'
+              className='px-5 py-2.5 rounded-xl bg-cyan-500 text-slate-950 text-sm font-bold hover:bg-cyan-400 hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] transition-all active:scale-95'
             >
               {e.btnName}
             </button>

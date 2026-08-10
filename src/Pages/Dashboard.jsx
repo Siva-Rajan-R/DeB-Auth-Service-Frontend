@@ -51,7 +51,7 @@ export const DashboardPage = () => {
       onScroll={(e) => window.dispatchEvent(new CustomEvent('page-scroll', { detail: e.target.scrollTop }))}
     >
       {/* Decorative Background Elements */}
-      <div className='absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[var(--accent-indigo)]/10 blur-[120px] rounded-full pointer-events-none' />
+      <div className='absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[var(--accent-cyan)]/10 blur-[120px] rounded-full pointer-events-none' />
       
       <div className='flex-1 px-4 md:px-12 py-8 md:py-12 relative z-10'>
         {/* Header Section */}
@@ -63,7 +63,7 @@ export const DashboardPage = () => {
             className='max-w-4xl'
           >
             <h1 className='text-3xl md:text-5xl font-extrabold text-[var(--text-main)] tracking-tight'>
-              Auth <span className='text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-indigo)] to-[var(--accent-purple)]'>Projects</span>
+              Auth <span className='text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-cyan)] to-[var(--accent-purple)]'>Projects</span>
             </h1>
           </motion.div>
         </div>
@@ -72,7 +72,7 @@ export const DashboardPage = () => {
           <div className='flex flex-col items-center justify-center h-64 gap-4'>
             <div className='relative w-16 h-16'>
               <div className='absolute inset-0 border-4 border-[var(--border-glass)] rounded-full' />
-              <div className='absolute inset-0 border-4 border-[var(--accent-indigo)] border-t-transparent rounded-full animate-spin' />
+              <div className='absolute inset-0 border-4 border-[var(--accent-cyan)] border-t-transparent rounded-full animate-spin' />
             </div>
             <p className='text-[var(--text-dim)] font-medium animate-pulse'>Loading projects...</p>
           </div>
@@ -89,7 +89,8 @@ export const DashboardPage = () => {
             {secrets.map((item, index) => (
               <div key={item.apikey || index} className="h-full">
                 <DashboardCards
-                  title={item.configurations?.project_name || item.configurations?.branding || `Project #${index + 1}`}
+                  title={item.configurations?.project_name || `Project #${index + 1}`}
+                  logoUrl={item.configurations?.ui?.brand_logo || item.configurations?.brand_logo || item.configurations?.logo_url || null}
                   authMethods={item.configurations?.auth_methods || []}
                   ssoEnabled={item.configurations?.sso?.enabled || false}
                   onEdit={() => handleEdit(item.apikey)}

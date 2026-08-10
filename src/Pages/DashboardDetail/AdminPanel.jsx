@@ -44,7 +44,7 @@ export const AdminPanel = () => {
       <div className='w-56 flex-none border-r border-[var(--border-glass)] bg-[var(--bg-card)]/40 flex flex-col'>
         <div className='p-5 border-b border-[var(--border-glass)]'>
           <div className='flex items-center gap-2.5'>
-            <div className='w-7 h-7 rounded-lg bg-purple-500/10 border border-purple-500/25 flex items-center justify-center text-purple-400'>
+            <div className='w-7 h-7 rounded-lg bg-purple-50 border border-purple-500/25 flex items-center justify-center text-purple-600'>
               <Shield size={14} />
             </div>
             <span className='text-[var(--text-main)] font-extrabold text-xs tracking-wider uppercase'>Admin Center</span>
@@ -58,14 +58,14 @@ export const AdminPanel = () => {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[11px] font-bold tracking-wide transition-all w-full text-left relative ${
                 activeTab === tab.id
-                  ? 'bg-purple-500/10 text-purple-300 border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.05)]'
+                  ? 'bg-purple-50 text-purple-300 border border-purple-200 shadow-[0_0_15px_rgba(168,85,247,0.05)]'
                   : 'text-[var(--text-dim)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface)] border border-transparent'
               }`}
             >
               {activeTab === tab.id && (
                 <span className='absolute left-0 top-1/3 bottom-1/3 w-0.5 bg-purple-500 rounded-full' />
               )}
-              <span className={activeTab === tab.id ? 'text-purple-400' : ''}>{tab.icon}</span>
+              <span className={activeTab === tab.id ? 'text-purple-600' : ''}>{tab.icon}</span>
               {tab.label}
             </button>
           ))}

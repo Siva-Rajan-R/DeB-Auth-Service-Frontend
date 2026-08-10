@@ -27,7 +27,7 @@ export const CreateRoleModal = ({ onCreated, onClose }) => {
         {/* Header */}
         <div className='flex items-center justify-between px-5 py-4 border-b border-[var(--border-glass)] bg-[var(--bg-navbar)] rounded-t-2xl'>
           <h3 className='text-[var(--text-main)] font-semibold text-sm flex items-center gap-2'>
-            <Plus size={15} className='text-purple-400' />
+            <Plus size={15} className='text-purple-600' />
             Create New Role
           </h3>
           <button onClick={onClose} className='text-[var(--text-dim)] hover:text-[var(--text-main)] transition-colors'>

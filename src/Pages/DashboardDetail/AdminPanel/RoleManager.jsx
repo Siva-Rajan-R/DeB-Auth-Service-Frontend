@@ -42,7 +42,7 @@ export const RoleManager = () => {
           {defaultRoles.map((role) => (
             <div key={role.id} className='flex items-center justify-between bg-[var(--bg-surface)] border border-[var(--border-glass)] rounded-2xl px-5 py-3.5 shadow-sm'>
               <div className='flex items-center gap-3'>
-                <div className='p-1.5 rounded-lg bg-indigo-500/10 text-indigo-400'>
+                <div className='p-1.5 rounded-lg bg-cyan-50 text-cyan-600'>
                   <ShieldCheck size={14} />
                 </div>
                 <div>
@@ -70,10 +70,10 @@ export const RoleManager = () => {
                       value={editValue}
                       onChange={(e) => setEditValue(e.target.value)}
                       onKeyDown={(e) => { if (e.key === 'Enter') confirmEdit(); if (e.key === 'Escape') setEditingId(null); }}
-                      className='flex-1 bg-[var(--bg-deep)] border border-indigo-500/50 rounded-xl px-4 py-2 text-[var(--text-main)] text-sm focus:outline-none focus:border-indigo-500 shadow-inner'
+                      className='flex-1 bg-[var(--bg-deep)] border border-cyan-500/50 rounded-xl px-4 py-2 text-[var(--text-main)] text-sm focus:outline-none focus:border-cyan-500 shadow-inner'
                     />
                     <div className='flex items-center gap-1.5'>
-                      <button onClick={confirmEdit} className='text-emerald-500 hover:bg-emerald-500/10 transition-all p-2 rounded-xl'>
+                      <button onClick={confirmEdit} className='text-emerald-500 hover:bg-emerald-50 transition-all p-2 rounded-xl'>
                         <Check size={16} />
                       </button>
                       <button onClick={() => setEditingId(null)} className='text-[var(--text-dim)] hover:bg-white/5 transition-all p-2 rounded-xl'>
@@ -101,7 +101,7 @@ export const RoleManager = () => {
                       <span className='text-[var(--text-main)] text-sm font-bold'>{role.name}</span>
                     </div>
                     <div className='flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0'>
-                      <button onClick={() => startEdit(role)} className='text-[var(--text-dim)] hover:text-indigo-400 transition-all p-2 rounded-xl hover:bg-indigo-400/10 border border-transparent hover:border-indigo-400/20'>
+                      <button onClick={() => startEdit(role)} className='text-[var(--text-dim)] hover:text-cyan-600 transition-all p-2 rounded-xl hover:bg-cyan-400/10 border border-transparent hover:border-cyan-400/20'>
                         <Pencil size={14} />
                       </button>
                       <button onClick={() => setConfirmDeleteId(role.id)} className='text-[var(--text-dim)] hover:text-red-400 transition-all p-2 rounded-xl hover:bg-red-400/10 border border-transparent hover:border-red-400/20'>

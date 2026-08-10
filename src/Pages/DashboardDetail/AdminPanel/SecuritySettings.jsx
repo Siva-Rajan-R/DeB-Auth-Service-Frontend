@@ -21,7 +21,7 @@ export const SecuritySettings = () => {
       {/* API Keys */}
       <div className='bg-[var(--bg-card)] border border-[var(--border-glass)] rounded-2xl p-6 shadow-sm space-y-4'>
         <div className='flex items-center gap-3 border-b border-[var(--border-glass)] pb-4'>
-          <div className='p-2 bg-amber-500/10 text-amber-500 rounded-xl'>
+          <div className='p-2 bg-orange-50 text-orange-600 rounded-xl'>
             <Key size={18} />
           </div>
           <div>
@@ -37,7 +37,7 @@ export const SecuritySettings = () => {
               <span className='truncate'>{apiKey}</span>
               <button 
                 onClick={handleCopy}
-                className='text-[var(--text-dim)] hover:text-indigo-400 transition-colors p-1'
+                className='text-[var(--text-dim)] hover:text-cyan-600 transition-colors p-1'
                 title='Copy API Key'
               >
                 {copied ? <Check size={16} className='text-emerald-500' /> : <Copy size={16} />}
@@ -47,7 +47,7 @@ export const SecuritySettings = () => {
               Roll Key
             </button>
           </div>
-          <p className='text-amber-500/80 text-[11px] font-medium mt-2 flex items-center gap-1.5 bg-amber-500/5 px-3 py-2 rounded-lg border border-amber-500/10 w-fit'>
+          <p className='text-orange-600/80 text-[11px] font-medium mt-2 flex items-center gap-1.5 bg-amber-500/5 px-3 py-2 rounded-lg border border-amber-500/10 w-fit'>
             <ShieldAlert size={12} /> Do not expose this key in client-side code.
           </p>
         </div>
@@ -56,7 +56,7 @@ export const SecuritySettings = () => {
       {/* Security Policies */}
       <div className='bg-[var(--bg-card)] border border-[var(--border-glass)] rounded-2xl p-6 shadow-sm space-y-5'>
         <div className='flex items-center gap-3 border-b border-[var(--border-glass)] pb-4'>
-          <div className='p-2 bg-purple-500/10 text-purple-500 rounded-xl'>
+          <div className='p-2 bg-purple-50 text-purple-500 rounded-xl'>
             <Lock size={18} />
           </div>
           <div>
@@ -82,7 +82,7 @@ export const SecuritySettings = () => {
       {/* Session Management */}
       <div className='bg-[var(--bg-card)] border border-[var(--border-glass)] rounded-2xl p-6 shadow-sm space-y-5'>
         <div className='flex items-center gap-3 border-b border-[var(--border-glass)] pb-4'>
-          <div className='p-2 bg-indigo-500/10 text-indigo-500 rounded-xl'>
+          <div className='p-2 bg-cyan-50 text-cyan-500 rounded-xl'>
             <Clock size={18} />
           </div>
           <div>
@@ -93,7 +93,7 @@ export const SecuritySettings = () => {
 
         <div className='pt-2'>
           <label className='text-[var(--text-dim)] text-[10px] font-bold uppercase tracking-widest block mb-2'>Session Timeout</label>
-          <select className='w-full max-w-xs bg-[var(--bg-deep)] border border-[var(--border-glass)] rounded-xl px-4 py-2.5 text-[var(--text-main)] text-sm focus:outline-none focus:border-indigo-500/50 shadow-inner appearance-none custom-select-arrow'>
+          <select className='w-full max-w-xs bg-[var(--bg-deep)] border border-[var(--border-glass)] rounded-xl px-4 py-2.5 text-[var(--text-main)] text-sm focus:outline-none focus:border-cyan-500/50 shadow-inner appearance-none custom-select-arrow'>
             <option value='15m'>15 Minutes</option>
             <option value='1h'>1 Hour</option>
             <option value='24h' selected>24 Hours</option>
@@ -117,7 +117,7 @@ const PolicyToggle = ({ title, description, defaultChecked }) => {
       </div>
       <button 
         onClick={() => setChecked(!checked)}
-        className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 ease-in-out border-2 border-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 ${checked ? 'bg-indigo-500 shadow-[0_0_10px_rgba(34,211,238,0.3)]' : 'bg-[var(--bg-deep)] border-[var(--border-glass)]'}`}
+        className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 ease-in-out border-2 border-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50 ${checked ? 'bg-cyan-500 shadow-[0_0_10px_rgba(34,211,238,0.3)]' : 'bg-[var(--bg-deep)] border-[var(--border-glass)]'}`}
       >
         <span className='sr-only'>Toggle {title}</span>
         <span

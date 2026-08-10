@@ -59,7 +59,7 @@ const FInput = ({ label, type = 'text', placeholder, textColor, inputStyle, inpu
           }}
         />
         {isPass && (
-          <button onClick={() => setShow(v => !v)} className='absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-indigo-400 transition-colors'>
+          <button onClick={() => setShow(v => !v)} className='absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-cyan-600 transition-colors'>
             {show ? <EyeOff size={14} /> : <Eye size={14} />}
           </button>
         )}
@@ -239,7 +239,7 @@ const ProviderSelectionFlow = ({ enabledMethods, socialLayout, textColor, btnTex
                 </button>
                 <button onClick={() => setStep('mobile_otp')} className='flex-1 flex items-center justify-center gap-2 border py-2.5 text-xs font-bold hover:opacity-80 transition-all'
                   style={{ backgroundColor: 'rgba(6,182,212,0.08)', borderColor: 'rgba(6,182,212,0.2)', color: btnTextColor || textColor, borderRadius }}>
-                  <span className='text-cyan-400 text-sm'><MdOutlineSms /></span>
+                  <span className='text-cyan-600 text-sm'><MdOutlineSms /></span>
                   Mobile
                 </button>
               </div>
@@ -253,7 +253,7 @@ const ProviderSelectionFlow = ({ enabledMethods, socialLayout, textColor, btnTex
           ) : hasMobileOTP ? (
             <button onClick={() => setStep('mobile_otp')} className='w-full flex items-center justify-center gap-2.5 border py-3 text-sm font-bold hover:opacity-80 transition-all'
               style={{ backgroundColor: 'rgba(6,182,212,0.08)', borderColor: 'rgba(6,182,212,0.2)', color: btnTextColor || textColor, borderRadius }}>
-              <span className='text-cyan-400 text-lg'><MdOutlineSms /></span>
+              <span className='text-cyan-600 text-lg'><MdOutlineSms /></span>
               Continue with OTP
             </button>
           ) : null}
@@ -325,7 +325,7 @@ const SignupFlow = ({ enabledMethods, signupFields, primary, textColor, buttonSt
                   </button>
                   <button onClick={() => setAuthDone(true)} className='flex-1 flex items-center justify-center gap-2 border py-2.5 text-xs font-bold hover:opacity-80 transition-all'
                     style={{ backgroundColor: 'rgba(6,182,212,0.08)', borderColor: 'rgba(6,182,212,0.2)', color: textColor, borderRadius }}>
-                    <span className='text-cyan-400 text-sm'><MdOutlineSms /></span>
+                    <span className='text-cyan-600 text-sm'><MdOutlineSms /></span>
                     Mobile
                   </button>
                 </div>
@@ -339,7 +339,7 @@ const SignupFlow = ({ enabledMethods, signupFields, primary, textColor, buttonSt
             ) : hasMobileOTP ? (
               <button onClick={() => setAuthDone(true)} className='w-full flex items-center justify-center gap-2.5 border py-2.5 text-sm font-bold hover:opacity-80 transition-all'
                 style={{ backgroundColor: 'rgba(6,182,212,0.08)', borderColor: 'rgba(6,182,212,0.2)', color: textColor, borderRadius }}>
-                <span className='text-cyan-400'><MdOutlineSms /></span>
+                <span className='text-cyan-600'><MdOutlineSms /></span>
                 Continue with OTP
               </button>
             ) : null}

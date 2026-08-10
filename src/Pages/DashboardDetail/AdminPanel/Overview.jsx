@@ -32,7 +32,7 @@ export const Overview = () => {
           trend='+5%'
           trendUp={true}
           colorClass='text-emerald-500'
-          bgClass='bg-emerald-500/10'
+          bgClass='bg-emerald-50'
         />
         <MetricCard
           icon={<Shield />}
@@ -41,7 +41,7 @@ export const Overview = () => {
           trend='Stable'
           trendUp={true}
           colorClass='text-purple-500'
-          bgClass='bg-purple-500/10'
+          bgClass='bg-purple-50'
         />
         <MetricCard
           icon={<Globe />}
@@ -49,8 +49,8 @@ export const Overview = () => {
           value={ssoDomains}
           trend={sso.enabled ? 'Active' : 'Disabled'}
           trendUp={sso.enabled}
-          colorClass={sso.enabled ? 'text-indigo-500' : 'text-[var(--text-dim)]'}
-          bgClass={sso.enabled ? 'bg-indigo-500/10' : 'bg-[var(--bg-deep)]'}
+          colorClass={sso.enabled ? 'text-cyan-500' : 'text-[var(--text-dim)]'}
+          bgClass={sso.enabled ? 'bg-cyan-50' : 'bg-[var(--bg-deep)]'}
         />
       </div>
 
@@ -99,7 +99,7 @@ const MetricCard = ({ icon, title, value, trend, trendUp, colorClass, bgClass })
       <div className={`p-2.5 rounded-xl ${bgClass} ${colorClass}`}>
         {icon}
       </div>
-      <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-lg ${trendUp ? 'bg-emerald-500/10 text-emerald-500' : 'bg-[var(--bg-deep)] text-[var(--text-dim)]'}`}>
+      <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-lg ${trendUp ? 'bg-emerald-50 text-emerald-500' : 'bg-[var(--bg-deep)] text-[var(--text-dim)]'}`}>
         {trend}
       </span>
     </div>
@@ -126,7 +126,7 @@ const mockActivities = [
     user: 'admin@debuggerstechnologies.com',
     time: '10 mins ago',
     icon: <Shield size={16} />,
-    iconBg: 'bg-purple-500/10',
+    iconBg: 'bg-purple-50',
     iconColor: 'text-purple-500',
   },
   {
@@ -134,7 +134,7 @@ const mockActivities = [
     user: 'admin@debuggerstechnologies.com',
     time: '2 hours ago',
     icon: <UserCheck size={16} />,
-    iconBg: 'bg-emerald-500/10',
+    iconBg: 'bg-emerald-50',
     iconColor: 'text-emerald-500',
   },
   {
@@ -142,15 +142,15 @@ const mockActivities = [
     user: 'System',
     time: '5 hours ago',
     icon: <ShieldAlert size={16} />,
-    iconBg: 'bg-amber-500/10',
-    iconColor: 'text-amber-500',
+    iconBg: 'bg-orange-50',
+    iconColor: 'text-orange-600',
   },
   {
     action: 'SSO configuration updated',
     user: 'superadmin@debuggerstechnologies.com',
     time: '1 day ago',
     icon: <Globe size={16} />,
-    iconBg: 'bg-indigo-500/10',
-    iconColor: 'text-indigo-500',
+    iconBg: 'bg-cyan-50',
+    iconColor: 'text-cyan-500',
   },
 ];
