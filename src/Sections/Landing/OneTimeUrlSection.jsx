@@ -22,7 +22,7 @@ export const OneTimeUrlSection = () => {
   ];
 
   return (
-    <section id="onetime-urls" className="py-24 bg-[#f8fafc] relative border-t border-slate-200/80">
+    <section id="onetime-urls" className="py-24 bg-[#f8fafc] relative">
       <div className="max-w-7xl mx-auto px-6">
         
         {/* Section Header */}
@@ -31,7 +31,7 @@ export const OneTimeUrlSection = () => {
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-100 border border-cyan-200 text-cyan-800 text-xs font-semibold"
+            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-100 -cyan-200 text-cyan-800 text-xs font-semibold"
           >
             <Lock size={14} /> Zero Trust Architecture
           </motion.div>
@@ -61,12 +61,12 @@ export const OneTimeUrlSection = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="bg-white border border-slate-200 rounded-3xl p-8 mb-16 shadow-lg overflow-x-auto"
+          className="rounded-3xl p-8 mb-16 neu-flat overflow-x-auto"
         >
           <div className="flex items-center justify-between min-w-[800px] gap-2">
             {flowSteps.map((s, idx) => (
               <div key={s.step} className="flex items-center gap-2 flex-1">
-                <div className="flex flex-col items-center text-center p-3 rounded-2xl bg-slate-50 border border-slate-200 hover:border-cyan-400 transition-colors w-full">
+                <div className="flex flex-col items-center text-center p-3 rounded-2xl hover:-cyan-400 transition-colors w-full">
                   <span className="text-[10px] font-mono text-cyan-700 font-bold mb-1">{s.step}</span>
                   <span className="text-xs font-bold text-slate-900 tracking-tight">{s.name}</span>
                   <span className="text-[10px] text-slate-500 font-mono mt-0.5">{s.sub}</span>
@@ -88,9 +88,9 @@ export const OneTimeUrlSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.05 }}
-              className="p-6 rounded-2xl bg-white border border-slate-200 hover:border-cyan-400/40 transition-all shadow-sm flex items-start gap-4"
+              className="p-6 rounded-2xl hover:-cyan-400/40 transition-all neu-flat flex items-start gap-4"
             >
-              <div className="p-2.5 bg-cyan-50 border border-cyan-200 rounded-xl text-cyan-600">
+              <div className="p-2.5 bg-cyan-50 -cyan-200 rounded-xl text-cyan-600">
                 <ShieldCheck size={20} />
               </div>
               <div>

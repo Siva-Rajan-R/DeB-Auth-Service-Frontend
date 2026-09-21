@@ -86,7 +86,7 @@ export const InvoicesPage = () => {
                   className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6"
                 >
                   <div className="flex gap-4 items-start">
-                    <div className={`p-3 rounded-xl flex-shrink-0 ${activeTab === 'pending' ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'}`}>
+                    <div className={`p-3 rounded-xl flex-shrink-0 ${activeTab === 'pending' ? 'bg-amber-50 text-amber-600' : 'bg-blue-50 text-blue-600'}`}>
                       <FileText size={24} />
                     </div>
                     <div>

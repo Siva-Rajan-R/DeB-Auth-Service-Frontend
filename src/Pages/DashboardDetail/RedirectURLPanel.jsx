@@ -1,40 +1,57 @@
 import { useState } from 'react';
 import { useAuthConfigStore } from '../../Store/useAuthConfigStore';
-import { Link2, CheckCircle2, XCircle, Info, Copy, Check, Lock, Smartphone, Mail, ExternalLink } from 'lucide-react';
+import { Link2, CheckCircle2, XCircle, ShieldCheck, Info, Copy, Check, Lock, Smartphone, Mail, ExternalLink, Code2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { APP_CONFIG } from '../../config';
 
 const FRONTEND_URL = APP_CONFIG.FRONTEND_URL;
 
-const URL_FIELDS = [
+const SIGNIN_FIELDS = [
   {
     key: 'signin_success',
     label: 'Sign In — Success',
     hint: 'Redirect here after a successful sign-in',
-    icon: <CheckCircle2 size={13} className='text-emerald-600 flex-shrink-0' />,
-    accent: 'emerald',
+    icon: <CheckCircle2 size={13} className='text-blue-600 flex-shrink-0' />,
+    placeholder: 'http://127.0.0.1:8900/api/auth/callback',
   },
   {
     key: 'signin_failure',
     label: 'Sign In — Failure',
-    hint: 'Redirect here after a failed sign-in attempt',
+    hint: 'Redirect here after a failed sign-in attempt (e.g. invalid credentials, verification rejected)',
     icon: <XCircle size={13} className='text-red-600 flex-shrink-0' />,
-    accent: 'red',
+    placeholder: 'http://127.0.0.1:8900/api/auth/callback',
   },
+  {
+    key: 'signin_verification',
+    label: 'Sign In — Verification / Checking URL (Webhook)',
+    hint: 'Called on submit to verify credentials against your database. Must return 2xx to succeed, or 4xx/5xx with { message, status_code } to reject and route to Failure URL.',
+    icon: <ShieldCheck size={13} className='text-cyan-600 flex-shrink-0' />,
+    placeholder: 'http://127.0.0.1:8900/api/auth/verify-signin',
+  },
+];
+
+const SIGNUP_FIELDS = [
   {
     key: 'signup_success',
     label: 'Sign Up — Success',
     hint: 'Redirect here after a successful registration',
-    icon: <CheckCircle2 size={13} className='text-emerald-600 flex-shrink-0' />,
-    accent: 'emerald',
+    icon: <CheckCircle2 size={13} className='text-blue-600 flex-shrink-0' />,
+    placeholder: 'http://127.0.0.1:8900/api/auth/callback',
   },
   {
     key: 'signup_failure',
     label: 'Sign Up — Failure',
-    hint: 'Redirect here after a failed registration',
+    hint: 'Redirect here after a failed registration attempt',
     icon: <XCircle size={13} className='text-red-600 flex-shrink-0' />,
-    accent: 'red',
+    placeholder: 'http://127.0.0.1:8900/api/auth/callback',
+  },
+  {
+    key: 'signup_verification',
+    label: 'Sign Up — Verification / Checking URL (Webhook)',
+    hint: 'Called on submit to verify registration eligibility. Must return 2xx to succeed, or 4xx/5xx with error message to reject and route to Failure URL.',
+    icon: <ShieldCheck size={13} className='text-cyan-600 flex-shrink-0' />,
+    placeholder: 'http://127.0.0.1:8900/api/auth/verify-signup',
   },
 ];
 
@@ -44,7 +61,6 @@ const AutofillURLBuilder = () => {
   const [prefillType, setPrefillType] = useState('email'); // 'email' | 'phone'
   const [method, setMethod] = useState('otp'); // 'otp' | 'password'
   const [flowType, setFlowType] = useState('signin');
-  const [showInfo, setShowInfo] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const baseAuthURL = `${FRONTEND_URL}/auth/REQUEST_ID/${flowType}`;
@@ -153,27 +169,28 @@ const AutofillURLBuilder = () => {
         {/* Generated URL preview */}
         <div className='space-y-1.5'>
           <div className='flex items-center gap-1.5'>
-            <label className='text-[10px] font-bold text-[var(--text-dim)] uppercase tracking-widest'>Generated Redirect URL</label>
-            <span className='text-[9px] px-1.5 py-0.5 rounded-full bg-amber-500/15 border border-orange-200 text-orange-600 font-bold'>Replace REQUEST_ID</span>
+            <label className='text-[10px] font-extrabold text-slate-700 uppercase tracking-widest'>Generated Redirect URL</label>
+            <span className='text-[9px] px-2 py-0.5 rounded-full bg-orange-100 border border-orange-300 text-orange-700 font-extrabold'>Replace REQUEST_ID</span>
           </div>
-          <div className='flex items-center gap-2 bg-[var(--bg-deep)] border border-cyan-200 rounded-xl p-3'>
-            <code className='flex-1 text-[11px] text-cyan-600 font-mono break-all leading-relaxed'>
+          <div className='flex items-center gap-2 bg-[var(--bg-surface)] border border-cyan-300 rounded-xl p-3 shadow-sm'>
+            <code className='flex-1 text-xs text-slate-900 font-mono font-bold break-all leading-relaxed select-all'>
               {fullURL}
             </code>
             <button
               onClick={handleCopy}
-              className='p-2 bg-cyan-50 hover:bg-cyan-50 rounded-lg text-cyan-600 transition-colors border border-cyan-200 flex-shrink-0'
+              className='p-2.5 bg-cyan-600 hover:bg-cyan-700 rounded-lg text-white transition-colors border border-cyan-500 shadow-sm flex-shrink-0 flex items-center justify-center'
+              title="Copy URL"
             >
-              {copied ? <Check size={14} className='text-emerald-600' /> : <Copy size={14} />}
+              {copied ? <Check size={14} className='text-white' /> : <Copy size={14} className='text-white' />}
             </button>
           </div>
         </div>
 
         {/* Behaviour note */}
-        <div className='flex items-start gap-2.5 p-3 rounded-xl bg-blue-50 border border-blue-200 shadow-sm'>
-          <Lock size={14} className='text-blue-500 flex-shrink-0 mt-0.5' />
-          <p className='text-[11px] text-blue-800 leading-relaxed'>
-            When the user opens this link, the {prefillType} field is <strong className='text-blue-900'>pre-filled & locked</strong>.{' '}
+        <div className='flex items-start gap-2.5 p-3.5 rounded-xl bg-cyan-50/80 border border-cyan-200 shadow-sm'>
+          <Lock size={15} className='text-cyan-700 flex-shrink-0 mt-0.5' />
+          <p className='text-xs text-slate-800 leading-relaxed font-medium'>
+            When the user opens this link, the {prefillType} field is <strong className='text-slate-950 font-bold'>pre-filled & locked</strong>.{' '}
             {method === 'otp'
               ? 'An OTP is automatically dispatched on page load — they only need to enter the code.'
               : 'They only need to enter their password.'}
@@ -187,15 +204,21 @@ const AutofillURLBuilder = () => {
 // ─── Main RedirectURLPanel ────────────────────────────────────────────────────
 export const RedirectURLPanel = () => {
   const { redirectURLs, updateRedirectURL, activeMode } = useAuthConfigStore();
+  const [showWebhookGuide, setShowWebhookGuide] = useState(false);
 
   return (
     <div className='space-y-6'>
       {/* Header info */}
       <div className='flex items-start gap-3 bg-cyan-50 border border-cyan-200 rounded-2xl p-4'>
         <Link2 size={18} className='text-cyan-600 flex-shrink-0 mt-0.5' />
-        <p className='text-cyan-800 text-xs leading-relaxed font-medium'>
-          Configure where users are redirected after authentication events, or build pre-filled links for direct authentication flows.
-        </p>
+        <div className='text-xs leading-relaxed'>
+          <p className='text-cyan-900 font-semibold'>
+            Configure redirect destinations and verification webhooks for authentication events.
+          </p>
+          <p className='text-cyan-700 mt-1'>
+            Verification webhooks check credentials (email existence, password verification, active status) in real time before redirecting.
+          </p>
+        </div>
       </div>
 
       {activeMode === 'signin' && (
@@ -205,7 +228,10 @@ export const RedirectURLPanel = () => {
               <div className='p-2 rounded-xl bg-cyan-50 text-cyan-600 border border-cyan-200'>
                 <CheckCircle2 size={18} />
               </div>
-              <h3 className='text-[var(--text-main)] font-bold text-sm'>Sign In Redirects</h3>
+              <div>
+                <h3 className='text-[var(--text-main)] font-bold text-sm'>Sign In Redirects & Verification</h3>
+                <p className='text-[11px] text-[var(--text-dim)]'>Destination callbacks & real-time credential verification webhook</p>
+              </div>
             </div>
             <Link 
               to='/auth-docs' 
@@ -215,13 +241,14 @@ export const RedirectURLPanel = () => {
             </Link>
           </div>
           <div className='space-y-6'>
-            {URL_FIELDS.slice(0, 2).map(({ key, label, hint, icon }) => (
+            {SIGNIN_FIELDS.map(({ key, label, hint, icon, placeholder }) => (
               <URLField
                 key={key}
                 fieldKey={key}
                 label={label}
                 hint={hint}
                 icon={icon}
+                placeholder={placeholder}
                 value={redirectURLs[key] || ''}
                 onChange={(val) => updateRedirectURL(key, val)}
               />
@@ -237,7 +264,10 @@ export const RedirectURLPanel = () => {
               <div className='p-2 rounded-xl bg-cyan-50 text-cyan-600 border border-cyan-200'>
                 <CheckCircle2 size={18} />
               </div>
-              <h3 className='text-[var(--text-main)] font-bold text-sm'>Sign Up Redirects</h3>
+              <div>
+                <h3 className='text-[var(--text-main)] font-bold text-sm'>Sign Up Redirects & Verification</h3>
+                <p className='text-[11px] text-[var(--text-dim)]'>Destination callbacks & real-time registration verification webhook</p>
+              </div>
             </div>
             <Link 
               to='/auth-docs' 
@@ -247,13 +277,14 @@ export const RedirectURLPanel = () => {
             </Link>
           </div>
           <div className='space-y-6'>
-            {URL_FIELDS.slice(2).map(({ key, label, hint, icon }) => (
+            {SIGNUP_FIELDS.map(({ key, label, hint, icon, placeholder }) => (
               <URLField
                 key={key}
                 fieldKey={key}
                 label={label}
                 hint={hint}
                 icon={icon}
+                placeholder={placeholder}
                 value={redirectURLs[key] || ''}
                 onChange={(val) => updateRedirectURL(key, val)}
               />
@@ -262,13 +293,75 @@ export const RedirectURLPanel = () => {
         </div>
       )}
 
+      {/* Verification Webhook Schema Guide */}
+      <div className='bg-[var(--bg-card)] border border-[var(--border-glass)] rounded-2xl p-5 space-y-3 shadow-md'>
+        <button
+          onClick={() => setShowWebhookGuide(v => !v)}
+          className='w-full flex items-center justify-between text-left group'
+        >
+          <div className='flex items-center gap-2.5'>
+            <div className='p-1.5 rounded-lg bg-cyan-50 border border-cyan-200 text-cyan-600'>
+              <Code2 size={15} />
+            </div>
+            <span className='text-xs font-bold text-[var(--text-main)] group-hover:text-cyan-600 transition-colors'>
+              How does the Verification / Checking URL work?
+            </span>
+          </div>
+          <span className='text-xs font-bold text-cyan-600'>{showWebhookGuide ? 'Hide Details ▲' : 'Show Protocol ▼'}</span>
+        </button>
+
+        <AnimatePresence>
+          {showWebhookGuide && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className='pt-3 border-t border-[var(--border-glass)] space-y-3 text-xs text-[var(--text-muted)]'
+            >
+              <p>When the user clicks submit on the login portal, DAuth sends an HTTP POST request to your verification endpoint:</p>
+              
+              <div className='bg-[var(--bg-deep)] border border-[var(--border-glass)] rounded-xl p-3 font-mono text-[11px] text-slate-800 space-y-1'>
+                <span className='text-cyan-700 font-bold block'>POST payload sent to your Verification URL:</span>
+                <pre className='overflow-x-auto text-slate-700'>{`{
+  "request_id": "req_12345",
+  "flow_type": "signin",
+  "auth_provider": "password",
+  "email": "user@example.com",
+  "password": "userEnteredPassword",
+  "full_name": "...",
+  "custom_fields": {},
+  "ip": "127.0.0.1",
+  "client_id": "your_api_key"
+}`}</pre>
+              </div>
+
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-3 pt-1'>
+                <div className='p-3 bg-emerald-50 border border-emerald-200 rounded-xl space-y-1.5'>
+                  <span className='text-emerald-800 font-bold flex items-center gap-1.5'>
+                    <CheckCircle2 size={14} className='text-emerald-600' /> Success (200 OK)
+                  </span>
+                  <p className='text-emerald-900 text-[11px]'>Return HTTP 200 with optional custom metadata. DAuth directly redirects to your <strong>Success URL</strong> with the auth token.</p>
+                </div>
+
+                <div className='p-3 bg-red-50 border border-red-200 rounded-xl space-y-1.5'>
+                  <span className='text-red-800 font-bold flex items-center gap-1.5'>
+                    <XCircle size={14} className='text-red-600' /> Rejection (401 / 403 / 400)
+                  </span>
+                  <p className='text-red-900 text-[11px]'>Return non-2xx status (e.g. 401) with <code className='font-mono font-bold'>{`{"message": "Incorrect password", "status_code": 401}`}</code>. DAuth shows the error on the portal and immediately routes to your <strong>Failure URL</strong>.</p>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
       {/* Redirect Autofill Builder */}
       <AutofillURLBuilder />
     </div>
   );
 };
 
-const URLField = ({ label, hint, icon, value, onChange }) => (
+const URLField = ({ label, hint, icon, value, placeholder, onChange }) => (
   <div className='space-y-2.5 group/field'>
     <div className='flex items-center gap-2'>
       <div className='opacity-70 group-hover/field:opacity-100 transition-opacity'>{icon}</div>
@@ -278,9 +371,10 @@ const URLField = ({ label, hint, icon, value, onChange }) => (
       type='url'
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      placeholder='https://yourapp.com/...'
+      placeholder={placeholder || 'https://yourapp.com/...'}
       className='w-full bg-[var(--bg-deep)] border border-[var(--border-glass)] rounded-xl px-4 py-3 text-[var(--text-main)] text-sm focus:outline-none focus:border-cyan-500/50 focus:bg-[var(--bg-card)] transition-all placeholder-[var(--text-dim)] font-medium'
     />
     <p className='text-[var(--text-dim)] text-[11px] font-medium pl-1'>{hint}</p>
   </div>
 );
+

@@ -39,7 +39,7 @@ export const SSOPanel = ({ onOpenAdmin }) => {
             <p className='text-[var(--text-muted)] text-[11px] font-medium'>Enterprise single sign-on domains</p>
           </div>
         </div>
-        
+
         {/* Active Toggle Switch / Lock Badge */}
         {sso.isLocked ? (
           <div className='flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-orange-50 border border-amber-500/30 text-orange-600 text-xs font-semibold select-none'>
@@ -48,11 +48,11 @@ export const SSOPanel = ({ onOpenAdmin }) => {
           </div>
         ) : (
           <label className='relative inline-flex items-center cursor-pointer'>
-            <input 
-              type='checkbox' 
-              className='sr-only peer' 
-              checked={sso.enabled} 
-              onChange={toggleSSO} 
+            <input
+              type='checkbox'
+              className='sr-only peer'
+              checked={sso.enabled}
+              onChange={toggleSSO}
             />
             <div className="w-11 h-6 bg-slate-800 rounded-full peer peer-checked:bg-cyan-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5 shadow-inner" />
           </label>
@@ -92,7 +92,7 @@ export const SSOPanel = ({ onOpenAdmin }) => {
               <Plus size={18} /> Add
             </button>
           </div>
-          
+
           {error && (
             <motion.p initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className='text-red-400 text-[11px] font-medium flex items-center gap-1.5 pl-1'>
               <ShieldAlert size={12} /> {error}

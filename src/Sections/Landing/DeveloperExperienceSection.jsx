@@ -15,7 +15,7 @@ export const DeveloperExperienceSection = () => {
   ];
 
   return (
-    <section id="developer-exp" className="py-24 bg-white relative border-t border-slate-200/80">
+    <section id="developer-exp" className="py-24 relative">
       <div className="max-w-7xl mx-auto px-6">
         
         {/* Section Header */}
@@ -24,7 +24,7 @@ export const DeveloperExperienceSection = () => {
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-100 border border-cyan-200 text-cyan-800 text-xs font-semibold"
+            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-100 -cyan-200 text-cyan-800 text-xs font-semibold"
           >
             <Terminal size={14} /> Developer First Platform
           </motion.div>
@@ -53,20 +53,20 @@ export const DeveloperExperienceSection = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="bg-[#f8fafc] border border-slate-200 rounded-3xl p-8 mb-16 font-mono text-xs text-slate-800 shadow-lg relative overflow-hidden"
+          className="bg-[#f8fafc] rounded-3xl p-8 mb-16 font-mono text-xs text-slate-800 neu-flat relative overflow-hidden"
         >
           <div className="text-cyan-700 font-bold mb-4 flex items-center gap-2">
             <Cpu size={16} /> ARCHITECTURE SIMPLIFICATION
           </div>
 
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6 py-4 px-4 bg-white rounded-2xl border border-slate-200">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 py-4 px-4 rounded-2xl">
             <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-600">
-              <span className="px-2.5 py-1 bg-slate-50 rounded border border-slate-200 font-semibold">Google</span>
-              <span className="px-2.5 py-1 bg-slate-50 rounded border border-slate-200 font-semibold">GitHub</span>
-              <span className="px-2.5 py-1 bg-slate-50 rounded border border-slate-200 font-semibold">Microsoft</span>
-              <span className="px-2.5 py-1 bg-slate-50 rounded border border-slate-200 font-semibold">Facebook</span>
-              <span className="px-2.5 py-1 bg-slate-50 rounded border border-slate-200 font-semibold">Email OTP</span>
-              <span className="px-2.5 py-1 bg-slate-50 rounded border border-slate-200 font-semibold">Passkeys</span>
+              <span className="px-2.5 py-1 rounded font-semibold">Google</span>
+              <span className="px-2.5 py-1 rounded font-semibold">GitHub</span>
+              <span className="px-2.5 py-1 rounded font-semibold">Microsoft</span>
+              <span className="px-2.5 py-1 rounded font-semibold">Facebook</span>
+              <span className="px-2.5 py-1 rounded font-semibold">Email OTP</span>
+              <span className="px-2.5 py-1 rounded font-semibold">Passkeys</span>
             </div>
 
             <div className="flex flex-col items-center gap-1 text-cyan-600 font-bold text-xs">
@@ -74,17 +74,17 @@ export const DeveloperExperienceSection = () => {
               <span>Single Integration</span>
             </div>
 
-            <div className="p-4 bg-cyan-50 border border-cyan-300 rounded-xl text-center">
+            <div className="p-4 bg-cyan-50 -cyan-300 rounded-xl text-center">
               <span className="text-cyan-800 font-bold block text-sm">DAuth Engine</span>
               <span className="text-[10px] text-slate-500">Unified Auth Interface</span>
             </div>
 
-            <div className="flex flex-col items-center gap-1 text-emerald-600 font-bold text-xs">
+            <div className="flex flex-col items-center gap-1 text-blue-600 font-bold text-xs">
               <ArrowRight size={24} className="animate-pulse hidden md:block" />
               <span>Identity Payload</span>
             </div>
 
-            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl text-center">
+            <div className="p-4 rounded-xl text-center">
               <span className="text-slate-900 font-bold block text-sm">Your Backend</span>
               <span className="text-[10px] text-slate-500">Your Database</span>
             </div>
@@ -96,7 +96,7 @@ export const DeveloperExperienceSection = () => {
           {devFeatures.map((item, i) => (
             <div
               key={item.title}
-              className="p-6 rounded-2xl bg-[#f8fafc] border border-slate-200 hover:border-cyan-400/40 transition-all shadow-sm"
+              className="p-6 rounded-2xl bg-[#f8fafc] hover:-cyan-400/40 transition-all neu-flat"
             >
               <div className="flex items-center gap-2 mb-2 text-slate-900 font-bold text-base tracking-tight">
                 <CheckCircle2 size={16} className="text-cyan-600" />
@@ -113,7 +113,7 @@ export const DeveloperExperienceSection = () => {
         <div className="text-center">
           <a
             href="#hero"
-            className="px-8 py-4 rounded-xl font-bold text-sm text-slate-800 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all inline-flex items-center gap-2"
+            className="px-8 py-4 rounded-xl font-bold text-sm text-slate-800 hover:text-slate-900 hover:bg-slate-200 transition-all inline-flex items-center gap-2"
           >
             <FileText size={16} className="text-cyan-600" />
             Read the Documentation

@@ -105,10 +105,9 @@ export const LandingNavbar = () => {
           return;
         }
       }
-      navigate('/dashboard');
+      console.warn("Failed to get sign-in URL from backend:", res);
     } catch (err) {
       console.error("Auth initialization failed:", err);
-      navigate('/dashboard');
     } finally {
       setLoading(false);
     }
@@ -126,7 +125,7 @@ export const LandingNavbar = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full backdrop-blur-xl bg-white/85 border-b border-slate-200/80">
+    <header className="neu-flat sticky top-0 z-50 w-full rounded-none">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         
         {/* Official DAuth Logo */}
@@ -134,7 +133,7 @@ export const LandingNavbar = () => {
           <img
             src="/dauth_logo.png"
             alt="DAuth Logo"
-            className="h-9 w-auto object-contain drop-shadow-sm transition-transform group-hover:scale-105"
+            className="h-9 w-auto object-contain drop-neu-flat transition-transform group-hover:scale-105"
           />
           <span className="text-xl font-black tracking-tight text-slate-900">
             DAuth
@@ -173,7 +172,7 @@ export const LandingNavbar = () => {
                   <motion.div
                     layoutId="activeNavUnderscore"
                     className="absolute -bottom-2 left-0 right-0 h-0.5 bg-cyan-500 rounded-full"
-                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                    transition={{ type:"spring", stiffness: 380, damping: 30 }}
                   />
                 )}
               </div>
@@ -193,7 +192,7 @@ export const LandingNavbar = () => {
               {/* Profile Avatar Trigger Button */}
               <button
                 onClick={() => navigate('/dashboard')}
-                className="flex items-center gap-3 p-1.5 pr-3 bg-slate-50 border border-slate-200 rounded-2xl hover:border-cyan-400/60 transition-all shadow-sm group"
+                className="flex items-center gap-3 p-1.5 pr-3 rounded-2xl hover:-cyan-400/60 transition-all neu-flat group"
               >
                 {user.profile && !imgError ? (
                   <img
@@ -201,7 +200,7 @@ export const LandingNavbar = () => {
                     alt=""
                     referrerPolicy="no-referrer"
                     onError={() => setImgError(true)}
-                    className="w-9 h-9 rounded-xl object-cover border border-slate-200"
+                    className="w-9 h-9 rounded-xl object-cover"
                   />
                 ) : (
                   <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500 to-sky-600 flex items-center justify-center text-white font-black text-sm">
@@ -225,10 +224,10 @@ export const LandingNavbar = () => {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 8, scale: 0.95 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute right-0 mt-2 w-64 bg-white border border-slate-200 rounded-2xl shadow-xl p-3 z-50 space-y-2"
+                    className="absolute right-0 mt-2 w-64 rounded-2xl neu-flat p-3 z-50 space-y-2"
                   >
                     {/* User Card info */}
-                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-3">
+                    <div className="p-3 rounded-xl flex items-center gap-3">
                       {user.profile && !imgError ? (
                         <img
                           src={user.profile}
@@ -273,7 +272,7 @@ export const LandingNavbar = () => {
               <button
                 onClick={handleSignIn}
                 disabled={loading}
-                className="text-sm font-semibold text-slate-700 hover:text-slate-900 px-4 py-2 rounded-xl hover:bg-slate-100 transition-colors disabled:opacity-50 flex items-center gap-2"
+                className="text-sm font-semibold text-slate-700 hover:text-slate-900 px-4 py-2 rounded-xl hover: transition-colors disabled:opacity-50 flex items-center gap-2"
               >
                 {loading && <Loader2 size={14} className="animate-spin text-cyan-600" />}
                 Sign In
@@ -281,10 +280,10 @@ export const LandingNavbar = () => {
               <button
                 onClick={handleSignIn}
                 disabled={loading}
-                className="relative group px-5 py-2.5 rounded-xl font-extrabold text-sm text-white bg-cyan-500 hover:bg-cyan-600 shadow-lg shadow-cyan-500/25 transition-all hover:scale-105 active:scale-95 flex items-center gap-2 disabled:opacity-50"
+                className="neu-button relative group px-5 py-2.5 font-extrabold text-sm text-cyan-600 transition-all flex items-center gap-2 disabled:opacity-50"
               >
-                {loading ? <Loader2 size={16} className="animate-spin text-white" /> : 'Get Started — Free'}
-                <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-0.5 transition-transform" />
+                {loading ? <Loader2 size={16} className="animate-spin text-cyan-600" /> : 'Get Started — Free'}
+                <ArrowRight className="w-4 h-4 text-cyan-600 group-hover:translate-x-0.5 transition-transform" />
               </button>
             </>
           )}
@@ -306,7 +305,7 @@ export const LandingNavbar = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-white border-b border-slate-200 px-6 py-6 space-y-4"
+            className="md:hidden px-6 py-6 space-y-4"
           >
             {navLinks.map((link) => (
               <a
@@ -322,10 +321,10 @@ export const LandingNavbar = () => {
               </a>
             ))}
 
-            <div className="pt-4 border-t border-slate-200 flex flex-col gap-3">
+            <div className="pt-4 flex flex-col gap-3">
               {user ? (
                 <>
-                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center gap-3">
+                  <div className="p-3 rounded-xl flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-cyan-500 text-white font-black flex items-center justify-center">
                       {user.name.charAt(0).toUpperCase()}
                     </div>
@@ -336,7 +335,7 @@ export const LandingNavbar = () => {
                   </div>
                   <button
                     onClick={() => navigate('/dashboard')}
-                    className="w-full text-center py-3 font-bold text-white bg-cyan-500 rounded-xl shadow-lg shadow-cyan-500/20"
+                    className="w-full text-center py-3 font-bold text-white bg-cyan-500 rounded-xl neu-flat shadow-cyan-500/20"
                   >
                     Go to Dashboard
                   </button>
@@ -352,14 +351,14 @@ export const LandingNavbar = () => {
                   <button
                     onClick={handleSignIn}
                     disabled={loading}
-                    className="w-full text-center py-2.5 text-slate-700 hover:text-slate-900 font-semibold rounded-xl bg-slate-100"
+                    className="w-full text-center py-2.5 text-slate-700 hover:text-slate-900 font-semibold rounded-xl"
                   >
                     Sign In
                   </button>
                   <button
                     onClick={handleSignIn}
                     disabled={loading}
-                    className="w-full text-center py-3 font-bold text-white bg-cyan-500 rounded-xl shadow-lg shadow-cyan-500/20"
+                    className="w-full text-center py-3 font-bold text-white bg-cyan-500 rounded-xl neu-flat shadow-cyan-500/20"
                   >
                     Get Started — Free
                   </button>

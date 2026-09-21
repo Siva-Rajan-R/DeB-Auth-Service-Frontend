@@ -3,7 +3,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark, prism } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { codeExamples } from '../Constants/index';
 import { motion } from 'framer-motion';
-import { Lock, ShieldAlert, Key, Clock, ShieldCheck, RefreshCw, Copy, Check, Server, Code2, KeyRound, ArrowDown, Link2, ExternalLink } from 'lucide-react';
+import { Lock, ShieldAlert, Key, Clock, ShieldCheck, RefreshCw, Copy, Check, Server, Code2, KeyRound, ArrowDown, Link2, ExternalLink, Webhook } from 'lucide-react';
 import { useAuthConfigStore } from '../Store/useAuthConfigStore';
 import { APP_CONFIG } from '../config';
 
@@ -24,14 +24,15 @@ export const AuthDocs = () => {
           label: 'Base Auth',
           subItems: [
             { id: 'endpoints-base', label: 'Base Endpoints' },
-            { id: 'endpoints-autofill', label: 'Autofill & Lock URLs' }
+            { id: 'endpoints-autofill', label: 'Autofill & Lock URLs' },
+            { id: 'endpoints-verification', label: 'Verification Webhooks' }
           ]
         },
         { id: 'endpoints-2fa', label: '2-Factor Auth' }
       ]
     },
     { id: 'examples', label: 'Examples', icon: Code2 },
-    { id: 'token-info', label: 'Token', icon: KeyRound },
+    { id: 'token-info', label: 'Token & Claims', icon: KeyRound },
     { id: 'guidelines', label: 'Security', icon: ShieldCheck }
   ];
 
@@ -44,51 +45,51 @@ export const AuthDocs = () => {
   };
 
   const CodeEditor = ({ code, language, filename }) => (
-    <div className="bg-[var(--bg-card)] rounded-xl border border-[var(--border-glass)] overflow-hidden shadow-xl">
-      <div className="flex items-center justify-between bg-black/5 dark:bg-black/40 px-4 py-3 border-b border-[var(--border-glass)]">
+    <div className="bg-[#0f172a] rounded-xl border border-slate-700/80 overflow-hidden shadow-2xl">
+      <div className="flex items-center justify-between bg-slate-900/90 px-4 py-3 border-b border-slate-800">
         <div className="flex items-center gap-3">
           <div className="flex gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-red-500/80 border border-red-500/50" />
-            <div className="w-3 h-3 rounded-full bg-amber-500/80 border border-amber-500/50" />
-            <div className="w-3 h-3 rounded-full bg-emerald-500/80 border border-emerald-500/50" />
+            <div className="w-3 h-3 rounded-full bg-red-500/80" />
+            <div className="w-3 h-3 rounded-full bg-amber-500/80" />
+            <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
           </div>
-          <span className="text-[var(--text-muted)] text-xs font-medium font-mono">{filename}</span>
+          <span className="text-slate-300 text-xs font-semibold font-mono">{filename}</span>
         </div>
         <button
           onClick={() => copyToClipboard(code, language)}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-[var(--text-muted)] rounded-lg text-xs font-medium transition-colors border border-[var(--border-glass)]"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold transition-colors border border-slate-700"
         >
           {copiedCode === language ? (
             <>
-              <Check size={14} className="text-emerald-500" />
-              <span className="text-emerald-500">Copied!</span>
+              <Check size={14} className="text-cyan-400" />
+              <span className="text-cyan-400 font-bold">Copied!</span>
             </>
           ) : (
             <>
-              <Copy size={14} />
-              <span>Copy</span>
+              <Copy size={14} className="text-slate-400" />
+              <span className="text-slate-200">Copy</span>
             </>
           )}
         </button>
       </div>
-      <div className="overflow-x-auto custom-scrollbar">
+      <div className="overflow-x-auto custom-scrollbar bg-[#0f172a]">
         <SyntaxHighlighter
           language={codeExamples[language]?.language || language}
-          style={theme === 'light' ? prism : atomDark}
+          style={atomDark}
           customStyle={{
             margin: 0,
             padding: '1.5rem',
-            background: 'transparent',
+            background: '#0f172a',
             fontSize: '0.875rem',
             lineHeight: '1.6'
           }}
           showLineNumbers={true}
           lineNumberStyle={{
-            color: 'var(--text-dim)',
+            color: '#475569',
             minWidth: '2.5em',
             paddingRight: '1em',
             textAlign: 'right',
-            borderRight: '1px solid var(--border-glass)',
+            borderRight: '1px solid #1e293b',
             marginRight: '1.5em'
           }}
         >
@@ -207,10 +208,10 @@ export const AuthDocs = () => {
       >
         <div className="max-w-4xl mx-auto px-6 lg:px-10 py-8">
           <header className="mb-8">
-            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-3">
-              Authentication <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-cyan)] to-[var(--accent-purple)]">Made Simple</span>
+            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-3 text-slate-900">
+              Authentication <span className="text-[var(--primary-cyan)]">Made Simple</span>
             </h1>
-            <p className="text-base text-[var(--text-muted)]">
+            <p className="text-base text-slate-700 font-medium leading-relaxed">
               Secure OAuth 2.0 Implementation with JWT Tokens. Assign API Key & Client Secret once, get seamless authentication across all your apps.
             </p>
           </header>
@@ -233,8 +234,8 @@ export const AuthDocs = () => {
               >
                 {copiedCode === 'base_url' ? (
                   <>
-                    <Check size={14} className="text-emerald-500" />
-                    <span className="text-emerald-500">Copied!</span>
+                    <Check size={14} className="text-blue-500" />
+                    <span className="text-blue-500">Copied!</span>
                   </>
                 ) : (
                   <>
@@ -261,13 +262,13 @@ export const AuthDocs = () => {
 
                 <div className="flex flex-col gap-2 max-w-3xl mx-auto w-full relative">
                   {/* Flow Line (optional background connector) */}
-                  <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[var(--accent-cyan)] via-[var(--accent-purple)] to-emerald-500 opacity-20 -translate-x-1/2 hidden md:block"></div>
+                  <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[var(--accent-cyan)] via-[var(--accent-purple)] to-blue-500 opacity-20 -translate-x-1/2 hidden md:block"></div>
 
                   {/* STEP 1: GET SIGNIN & SIGNUP URLS WITH ADDITIONAL INFOS */}
                   <div className="bg-[var(--bg-surface)] w-full backdrop-blur-xl border border-[var(--border-glass)] rounded-2xl p-5 shadow-xl flex flex-col space-y-4 relative z-10">
                     <div className="flex items-center justify-between border-b border-[var(--border-glass)] pb-4">
                       <div className="flex items-center gap-3">
-                        <span className="bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-3 py-1 rounded-lg text-xs font-bold tracking-wide">POST</span>
+                        <span className="bg-blue-500/10 text-blue-500 border border-blue-500/20 px-3 py-1 rounded-lg text-xs font-bold tracking-wide">POST</span>
                         <code className="text-[var(--text-main)] font-mono font-bold bg-black/5 dark:bg-white/5 px-2 py-0.5 rounded">/auth</code>
                       </div>
                       <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-500 bg-cyan-500/10 px-2 py-1 rounded-md border border-cyan-500/20">Step 1: Get Sign-in & Sign-up URLs</span>
@@ -360,11 +361,11 @@ export const AuthDocs = () => {
                   </div>
 
                   {/* FLOW ARROW 2 */}
-                  <div className="flex flex-col items-center justify-center py-2 text-emerald-500 relative z-10 md:hidden">
-                    <div className="w-0.5 h-6 bg-gradient-to-b from-[var(--accent-cyan)] to-emerald-500 opacity-50 mb-1"></div>
+                  <div className="flex flex-col items-center justify-center py-2 text-blue-500 relative z-10 md:hidden">
+                    <div className="w-0.5 h-6 bg-gradient-to-b from-[var(--accent-cyan)] to-blue-500 opacity-50 mb-1"></div>
                     <ArrowDown size={24} className="animate-bounce" />
                   </div>
-                  <div className="hidden md:flex flex-col items-center justify-center text-emerald-500 relative z-10 w-14 h-14 bg-[var(--bg-deep)] rounded-full border border-[var(--border-glass)] my-4 shadow-lg shadow-emerald-500/20">
+                  <div className="hidden md:flex flex-col items-center justify-center text-blue-500 relative z-10 w-14 h-14 bg-[var(--bg-deep)] rounded-full border border-[var(--border-glass)] my-4 shadow-lg shadow-blue-500/20">
                     <ArrowDown size={24} className="animate-bounce" />
                   </div>
 
@@ -372,10 +373,10 @@ export const AuthDocs = () => {
                   <div className="bg-[var(--bg-surface)] w-full backdrop-blur-xl border border-[var(--border-glass)] rounded-2xl p-5 shadow-xl flex flex-col space-y-4 relative z-10">
                     <div className="flex items-center justify-between border-b border-[var(--border-glass)] pb-4">
                       <div className="flex items-center gap-3">
-                        <span className="bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-3 py-1 rounded-lg text-xs font-bold tracking-wide">POST</span>
+                        <span className="bg-blue-500/10 text-blue-500 border border-blue-500/20 px-3 py-1 rounded-lg text-xs font-bold tracking-wide">POST</span>
                         <code className="text-[var(--text-main)] font-mono font-bold bg-black/5 dark:bg-white/5 px-2 py-0.5 rounded">/auth/authenticated-user</code>
                       </div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-md border border-emerald-500/20">Step 3: Exchange token_id for JWT</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-blue-500 bg-blue-500/10 px-2 py-1 rounded-md border border-blue-500/20">Step 3: Exchange token_id for JWT</span>
                     </div>
                     <p className="text-[var(--text-muted)] text-sm leading-relaxed">
                       Send <code className="text-cyan-500 font-bold">token_id</code>, <code className="text-cyan-500 font-bold">client_id</code> (your API key), and <code className="text-cyan-500 font-bold">client_secret</code> to receive the final signed JWT token.
@@ -483,6 +484,84 @@ export const AuthDocs = () => {
               </section>
             )}
 
+            {activeSection === 'endpoints-verification' && (
+              <section id="endpoints-verification" className="relative animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                    <Webhook size={24} />
+                  </div>
+                  <div>
+                    <h2 className="text-xl md:text-2xl font-bold">Verification & Checking Webhooks</h2>
+                    <p className="text-sm text-[var(--text-dim)]">Real-time custom user validation and credential checking webhooks before authentication completes.</p>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-6 max-w-3xl mx-auto w-full relative">
+                  {/* Overview Card */}
+                  <div className="bg-[var(--bg-surface)] w-full backdrop-blur-xl border border-[var(--border-glass)] rounded-2xl p-5 shadow-xl space-y-4">
+                    <h3 className="text-lg font-bold text-[var(--text-main)]">How Verification Webhooks Work</h3>
+                    <p className="text-[var(--text-muted)] text-sm leading-relaxed">
+                      Configure <code className="text-cyan-500 font-bold font-mono">signin_verification</code> and <code className="text-cyan-500 font-bold font-mono">signup_verification</code> URLs in your project dashboard under Redirects. When users submit their credentials, DAuth performs an HTTP POST request to your webhook endpoint before generating tokens.
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                      <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20 space-y-1">
+                        <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block">Sign-in Verification</span>
+                        <p className="text-xs text-[var(--text-muted)]">Validates that the account exists in your DB and credentials/passwords are correct.</p>
+                      </div>
+                      <div className="p-4 rounded-xl bg-blue-500/5 border border-blue-500/20 space-y-1">
+                        <span className="text-xs font-black text-blue-600 dark:text-blue-400 uppercase tracking-wider block">Sign-up Verification</span>
+                        <p className="text-xs text-[var(--text-muted)]">Validates whether an account with that email/phone already exists before creating an account.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Webhook Payload */}
+                  <div className="bg-[var(--bg-surface)] w-full backdrop-blur-xl border border-[var(--border-glass)] rounded-2xl p-5 shadow-xl space-y-4">
+                    <div className="flex items-center justify-between border-b border-[var(--border-glass)] pb-3">
+                      <span className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">Payload Sent by DAuth to Your Webhook</span>
+                      <span className="bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-2.5 py-0.5 rounded text-[10px] font-bold font-mono">POST JSON</span>
+                    </div>
+                    <CodeEditor
+                      code={`{\n  "flow_type": "signin", // "signin" or "signup"\n  "auth_provider": "password", // "password", "otp-email", "otp-phone", "google", "github"\n  "email": "user@example.com",\n  "mobile_number": "+19876543210",\n  "password": "plain_entered_password", // sent during password authentication\n  "custom_fields": {},\n  "request_id": "58edb05e-eb34-540f-bbc2-8ad212ce2dd3"\n}`}
+                      language="json"
+                      filename="dauth_verification_payload.json"
+                    />
+                  </div>
+
+                  {/* Expected Responses */}
+                  <div className="bg-[var(--bg-surface)] w-full backdrop-blur-xl border border-[var(--border-glass)] rounded-2xl p-5 shadow-xl space-y-6">
+                    <h3 className="text-base font-bold text-[var(--text-main)]">Expected Webhook Responses</h3>
+                    
+                    <div className="space-y-2">
+                      <span className="text-xs font-bold text-emerald-500 uppercase tracking-wider flex items-center gap-1.5">
+                        <Check size={14} /> Success Response (HTTP 200)
+                      </span>
+                      <p className="text-xs text-[var(--text-muted)]">User is allowed to complete login/registration.</p>
+                      <CodeEditor
+                        code={`{\n  "success": true,\n  "message": "Verification successful"\n}`}
+                        language="json"
+                        filename="webhook_success_response.json"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <span className="text-xs font-bold text-red-500 uppercase tracking-wider flex items-center gap-1.5">
+                        <ShieldAlert size={14} /> Failure Response (HTTP 401 / 409 / 400)
+                      </span>
+                      <p className="text-xs text-[var(--text-muted)]">
+                        DAuth immediately displays the status code and error message in the user login modal for easy corrections. After maximum retry attempts, DAuth safely redirects to your failure URL.
+                      </p>
+                      <CodeEditor
+                        code={`{\n  "success": false,\n  "status_code": 401,\n  "message": "Incorrect password. Please check your credentials."\n}`}
+                        language="json"
+                        filename="webhook_failure_response.json"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </section>
+            )}
+
             {activeSection === 'endpoints-2fa' && (
               <section id="endpoints-2fa" className="relative animate-in fade-in slide-in-from-bottom-4 duration-500">
                 {/* 2FA SECTION HEADER */}
@@ -498,17 +577,17 @@ export const AuthDocs = () => {
 
                 <div className="flex flex-col gap-2 max-w-3xl mx-auto w-full relative">
                   {/* Flow Line */}
-                  <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-emerald-500 via-cyan-500 to-sky-400 opacity-20 -translate-x-1/2 hidden md:block"></div>
+                  <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-500 via-cyan-500 to-sky-400 opacity-20 -translate-x-1/2 hidden md:block"></div>
 
                   {/* 2FA ENDPOINT 1: SETUP */}
                   <div className="bg-[var(--bg-surface)] w-full backdrop-blur-xl border border-[var(--border-glass)] rounded-2xl p-5 shadow-xl flex flex-col space-y-4 relative z-10">
                     <div className="flex items-center justify-between border-b border-[var(--border-glass)] pb-4">
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-3">
-                          <span className="bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-2.5 py-1 rounded-lg text-xs font-bold font-mono">POST</span>
+                          <span className="bg-blue-500/10 text-blue-500 border border-blue-500/20 px-2.5 py-1 rounded-lg text-xs font-bold font-mono">POST</span>
                           <code className="text-[var(--text-main)] font-mono font-bold text-lg">/auth/2fa/setup</code>
                         </div>
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-500 bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/20 self-start mt-2">1. Initiate 2FA & Generate QR Code</span>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-blue-500 bg-blue-500/10 px-2.5 py-1 rounded-md border border-blue-500/20 self-start mt-2">1. Initiate 2FA & Generate QR Code</span>
                       </div>
                     </div>
                     <p className="text-[var(--text-muted)] text-sm leading-relaxed">
@@ -535,11 +614,11 @@ export const AuthDocs = () => {
                   </div>
 
                   {/* FLOW ARROW 1 */}
-                  <div className="flex flex-col items-center justify-center py-2 text-emerald-500 relative z-10 md:hidden">
-                    <div className="w-0.5 h-6 bg-gradient-to-b from-emerald-500 to-cyan-500 opacity-50 mb-1"></div>
+                  <div className="flex flex-col items-center justify-center py-2 text-blue-500 relative z-10 md:hidden">
+                    <div className="w-0.5 h-6 bg-gradient-to-b from-blue-500 to-cyan-500 opacity-50 mb-1"></div>
                     <ArrowDown size={24} className="animate-bounce" />
                   </div>
-                  <div className="hidden md:flex flex-col items-center justify-center text-emerald-500 relative z-10 w-14 h-14 bg-[var(--bg-deep)] rounded-full border border-[var(--border-glass)] my-4 shadow-lg shadow-emerald-500/20">
+                  <div className="hidden md:flex flex-col items-center justify-center text-blue-500 relative z-10 w-14 h-14 bg-[var(--bg-deep)] rounded-full border border-[var(--border-glass)] my-4 shadow-lg shadow-blue-500/20">
                     <ArrowDown size={24} className="animate-bounce" />
                   </div>
 
@@ -759,11 +838,27 @@ export const AuthDocs = () => {
                         filename="extended-jwt-decoded.json"
                       />
                     </div>
+
+                    {/* FORGOT PASSWORD / PASSWORD RESET JWT PAYLOAD */}
+                    <div className="space-y-4 lg:col-span-2">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2.5 py-1 bg-amber-500/20 text-amber-700 dark:text-amber-300 text-xs font-bold rounded-lg">Password Reset Payload</span>
+                        <h3 className="text-lg font-bold">Forgot Password Completion Token</h3>
+                      </div>
+                      <p className="text-[var(--text-muted)] text-sm">
+                        When a user resets their password, DAuth issues a token with <code className="text-cyan-500 font-bold font-mono">auth_provider: &quot;forgot-password&quot;</code> and includes the newly set <code className="text-cyan-500 font-bold font-mono">password</code> so your backend can hash and update the user&apos;s record.
+                      </p>
+                      <CodeEditor
+                        code={`{\n  "email": "user@example.com",\n  "auth_provider": "forgot-password",\n  "flow_type": "password_reset",\n  "password": "newly_set_secure_password",\n  "custom_fields": {},\n  "additional_infos": null,\n  "ip": "127.0.0.1",\n  "browser": "Mozilla/5.0...",\n  "exp": 1786218915\n}`}
+                        language="json"
+                        filename="forgot-password-jwt-decoded.json"
+                      />
+                    </div>
                   </div>
 
                   <div className="border-t border-[var(--border-glass)] pt-6">
                     <h4 className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-wider mb-4">Claim Descriptions</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
                       <div className="bg-[var(--bg-card)] p-4 rounded-xl border border-[var(--border-glass)]">
                         <code className="text-cyan-600 dark:text-cyan-400 font-bold">additional_infos</code>
                         <p className="text-[var(--text-muted)] text-xs mt-1">Custom key-value metadata provided by your application when requesting <code className="text-cyan-500">POST /auth</code>.</p>
@@ -773,8 +868,8 @@ export const AuthDocs = () => {
                         <p className="text-[var(--text-muted)] text-xs mt-1">Form attributes collected from end-users during sign up (e.g. phone, full name).</p>
                       </div>
                       <div className="bg-[var(--bg-card)] p-4 rounded-xl border border-[var(--border-glass)]">
-                        <code className="text-cyan-600 dark:text-cyan-400 font-bold">auth_provider & profile</code>
-                        <p className="text-[var(--text-muted)] text-xs mt-1">Authentication provider used (google, github, password, email_otp) and verified user profile attributes.</p>
+                        <code className="text-cyan-600 dark:text-cyan-400 font-bold">auth_provider</code>
+                        <p className="text-[var(--text-muted)] text-xs mt-1">Provider used (<code>google</code>, <code>github</code>, <code>password</code>, <code>otp-email</code>, <code>otp-phone</code>, or <code>forgot-password</code>).</p>
                       </div>
                       <div className="bg-[var(--bg-card)] p-4 rounded-xl border border-[var(--border-glass)]">
                         <code className="text-cyan-600 dark:text-cyan-400 font-bold">location</code>
@@ -803,7 +898,7 @@ export const AuthDocs = () => {
                     { icon: Lock, color: 'text-blue-500', bg: 'bg-blue-500/10', title: "HTTPS Only", desc: "Always use HTTPS in production to protect API keys and tokens in transit." },
                     { icon: ShieldAlert, color: 'text-red-500', bg: 'bg-red-500/10', title: "Secret Protection", desc: "Never expose your client_secret in client-side code like React or Vue." },
                     { icon: Key, color: 'text-amber-500', bg: 'bg-amber-500/10', title: "Environment Variables", desc: "Store API keys securely in .env files, not in your version control." },
-                    { icon: Clock, color: 'text-emerald-500', bg: 'bg-emerald-500/10', title: "Token Expiration", desc: "Our JWTs expire in 1 hour. Implement proper refresh mechanisms." },
+                    { icon: Clock, color: 'text-blue-500', bg: 'bg-blue-500/10', title: "Token Expiration", desc: "Our JWTs expire in 1 hour. Implement proper refresh mechanisms." },
                     { icon: Check, color: 'text-cyan-500', bg: 'bg-cyan-500/10', title: "Server Validation", desc: "Always validate JWT signatures on your backend for protected routes." },
                     { icon: RefreshCw, color: 'text-purple-500', bg: 'bg-purple-500/10', title: "Key Rotation", desc: "Regularly rotate your Client Secret from the dashboard if compromised." }
                   ].map((item, i) => (

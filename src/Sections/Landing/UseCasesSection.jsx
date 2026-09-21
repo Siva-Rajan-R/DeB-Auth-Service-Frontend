@@ -4,15 +4,15 @@ import { ShoppingBag, Landmark, HeartPulse, Building2, Briefcase, ShieldCheck, Z
 export const UseCasesSection = () => {
   const chips = [
     { icon: <Building2 className="text-cyan-600" size={18} />, label: "SaaS Platforms" },
-    { icon: <ShoppingBag className="text-emerald-600" size={18} />, label: "E-Commerce" },
+    { icon: <ShoppingBag className="text-blue-600" size={18} />, label: "E-Commerce" },
     { icon: <Landmark className="text-amber-600" size={18} />, label: "FinTech" },
     { icon: <HeartPulse className="text-red-600" size={18} />, label: "Healthcare" },
     { icon: <Building2 className="text-purple-600" size={18} />, label: "Enterprise Software" },
-    { icon: <Briefcase className="text-teal-600" size={18} />, label: "Agencies & Dev Shops" },
+    { icon: <Briefcase className="text-indigo-600" size={18} />, label: "Agencies & Dev Shops" },
     { icon: <ShieldCheck className="text-cyan-600" size={18} />, label: "Mobile Apps" },
     { icon: <Zap className="text-amber-600" size={18} />, label: "API Gateways" },
     { icon: <Layers className="text-sky-600" size={18} />, label: "Multi-Tenant Systems" },
-    { icon: <Lock className="text-emerald-600" size={18} />, label: "Zero-Trust Infra" },
+    { icon: <Lock className="text-blue-600" size={18} />, label: "Zero-Trust Infra" },
     { icon: <Cpu className="text-indigo-600" size={18} />, label: "Microservices" },
     { icon: <Globe className="text-cyan-600" size={18} />, label: "Global Web Apps" },
   ];
@@ -21,12 +21,12 @@ export const UseCasesSection = () => {
   const marqueeChips = [...chips, ...chips, ...chips, ...chips];
 
   return (
-    <section id="use-cases" className="py-20 bg-[#f8fafc] relative border-t border-slate-200/80 overflow-hidden">
+    <section id="use-cases" className="py-20 bg-[#f8fafc] relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3 mb-12">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-100 border border-cyan-200 text-cyan-800 text-xs font-semibold">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-100 -cyan-200 text-cyan-800 text-xs font-semibold">
             <img src="/dauth_logo.png" alt="DAuth" className="h-4 w-auto object-contain" />
             <span>Supported Architectures</span>
           </div>
@@ -63,9 +63,9 @@ export const UseCasesSection = () => {
           {marqueeChips.map((chip, i) => (
             <div
               key={i}
-              className="px-5 py-3 bg-white border border-slate-200/90 rounded-full flex items-center gap-3 shadow-sm hover:shadow-md hover:border-cyan-400/60 hover:scale-105 transition-all cursor-pointer font-bold text-xs sm:text-sm text-slate-800"
+              className="px-5 py-3 rounded-full flex items-center gap-3 neu-flat hover:neu-flat hover:-cyan-400/60 hover:scale-105 transition-all cursor-pointer font-bold text-xs sm:text-sm text-slate-800"
             >
-              <div className="p-1.5 bg-slate-50 border border-slate-200 rounded-full flex justify-center items-center">
+              <div className="p-1.5 rounded-full flex justify-center items-center">
                 {chip.icon}
               </div>
               <span className="whitespace-nowrap">{chip.label}</span>

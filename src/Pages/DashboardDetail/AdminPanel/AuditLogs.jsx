@@ -107,7 +107,7 @@ export const AuditLogs = () => {
 
 const getStatusColor = (status) => {
   switch (status) {
-    case 'success': return 'text-emerald-500 bg-emerald-500';
+    case 'success': return 'text-blue-500 bg-blue-500';
     case 'warning': return 'text-orange-600 bg-amber-500';
     case 'error': return 'text-red-500 bg-red-500';
     case 'info': return 'text-cyan-500 bg-cyan-500';

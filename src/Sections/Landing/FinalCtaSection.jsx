@@ -6,7 +6,7 @@ export const FinalCtaSection = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="py-24 bg-gradient-to-b from-white via-cyan-50/40 to-white relative border-t border-slate-200/80 overflow-hidden">
+    <section className="py-24 bg-gradient-to-b from-white via-cyan-50/40 to-white relative overflow-hidden">
       {/* Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-cyan-200/40 blur-[140px] rounded-full pointer-events-none" />
 
@@ -17,7 +17,7 @@ export const FinalCtaSection = () => {
           initial={{ opacity: 0, scale: 0.9 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          className="w-16 h-16 rounded-2xl bg-white border border-cyan-200 flex items-center justify-center mx-auto mb-2 shadow-md shadow-cyan-500/10 p-2.5"
+          className="w-16 h-16 rounded-2xl -cyan-200 flex items-center justify-center mx-auto mb-2 neu-flat shadow-cyan-500/10 p-2.5"
         >
           <img src="/dauth_logo.png" alt="DAuth Logo" className="w-full h-full object-contain" />
         </motion.div>
@@ -51,14 +51,14 @@ export const FinalCtaSection = () => {
         >
           <button
             onClick={() => navigate('/dashboard')}
-            className="w-full sm:w-auto px-8 py-4 rounded-2xl font-extrabold text-base text-white bg-cyan-500 hover:bg-cyan-600 shadow-xl shadow-cyan-500/25 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-3"
+            className="w-full sm:w-auto px-8 py-4 rounded-2xl font-extrabold text-base text-white bg-cyan-500 hover:bg-cyan-600 neu-flat shadow-cyan-500/25 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-3"
           >
             Start Building — Free
             <ArrowRight size={18} />
           </button>
           <button
             onClick={() => navigate('/auth-docs')}
-            className="w-full sm:w-auto px-8 py-4 rounded-2xl font-bold text-base text-slate-700 hover:text-slate-900 bg-white border border-slate-200 hover:border-slate-300 shadow-sm transition-all flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-8 py-4 rounded-2xl font-bold text-base text-slate-700 hover:text-slate-900 hover: neu-flat transition-all flex items-center justify-center gap-2"
           >
             <FileText size={18} className="text-cyan-600" />
             Read Documentation

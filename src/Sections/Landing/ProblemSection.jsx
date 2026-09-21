@@ -24,7 +24,7 @@ export const ProblemSection = () => {
   ];
 
   return (
-    <section id="problem" className="py-24 bg-white relative border-t border-slate-200/80">
+    <section id="problem" className="py-24 relative">
       <div className="max-w-7xl mx-auto px-6">
         
         {/* Section Header */}
@@ -33,7 +33,7 @@ export const ProblemSection = () => {
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-red-50 border border-red-200 text-red-700 text-xs font-semibold"
+            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-red-50 -red-200 text-red-700 text-xs font-semibold"
           >
             <AlertTriangle size={14} /> The Authentication Dilemma
           </motion.div>
@@ -67,14 +67,14 @@ export const ProblemSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="bg-[#f8fafc] border border-slate-200/80 rounded-3xl p-8 hover:border-cyan-400/40 transition-all hover:-translate-y-1 relative flex flex-col justify-between shadow-sm"
+              className="bg-[#f8fafc] rounded-3xl p-8 hover:-cyan-400/40 transition-all hover:-translate-y-1 relative flex flex-col justify-between neu-flat"
             >
               <div>
                 <div className="flex items-center justify-between mb-6">
-                  <div className="p-3 bg-white border border-slate-200 rounded-2xl shadow-sm">
+                  <div className="p-3 rounded-2xl neu-flat">
                     {prob.icon}
                   </div>
-                  <span className="px-3 py-1 bg-white border border-slate-200 rounded-full text-[11px] font-mono text-slate-600 font-semibold shadow-sm">
+                  <span className="px-3 py-1 rounded-full text-[11px] font-mono text-slate-600 font-semibold neu-flat">
                     {prob.badge}
                   </span>
                 </div>
@@ -88,7 +88,7 @@ export const ProblemSection = () => {
                 </p>
               </div>
 
-              <div className="mt-8 pt-4 border-t border-slate-200 text-xs font-mono text-slate-400">
+              <div className="mt-8 pt-4 text-xs font-mono text-slate-400">
                 0{i + 1} / Problem
               </div>
             </motion.div>

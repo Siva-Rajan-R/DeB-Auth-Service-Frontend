@@ -23,7 +23,7 @@ export const CustomExperienceSection = () => {
   ];
 
   return (
-    <section id="custom-ui" className="py-24 bg-white relative border-t border-slate-200/80">
+    <section id="custom-ui" className="py-24 relative">
       <div className="max-w-7xl mx-auto px-6">
         
         {/* Section Header */}
@@ -32,7 +32,7 @@ export const CustomExperienceSection = () => {
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-100 border border-cyan-200 text-cyan-800 text-xs font-semibold"
+            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-100 -cyan-200 text-cyan-800 text-xs font-semibold"
           >
             <Paintbrush size={14} /> Full Brand Identity Control
           </motion.div>
@@ -64,7 +64,7 @@ export const CustomExperienceSection = () => {
           <div className="space-y-6">
             
             {/* Branding Customization Card */}
-            <div className="bg-[#f8fafc] border border-slate-200/80 rounded-3xl p-8 shadow-sm">
+            <div className="bg-[#f8fafc] rounded-3xl p-8 neu-flat">
               <div className="flex items-center gap-3 mb-4 text-slate-900 font-bold text-lg">
                 <Paintbrush className="text-cyan-600" size={22} />
                 <span>Custom UI & Theme Engine</span>
@@ -75,7 +75,7 @@ export const CustomExperienceSection = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 {brandControls.map((c) => (
-                  <div key={c.label} className="p-3 bg-white border border-slate-200 rounded-xl shadow-sm">
+                  <div key={c.label} className="p-3 rounded-xl neu-flat">
                     <span className="text-[10px] font-mono text-slate-400 block">{c.label}</span>
                     <span className="text-xs font-bold text-slate-900 font-mono mt-0.5 block">{c.value}</span>
                   </div>
@@ -84,9 +84,9 @@ export const CustomExperienceSection = () => {
             </div>
 
             {/* Custom Signup Fields Card */}
-            <div className="bg-[#f8fafc] border border-slate-200/80 rounded-3xl p-8 shadow-sm">
+            <div className="bg-[#f8fafc] rounded-3xl p-8 neu-flat">
               <div className="flex items-center gap-3 mb-2 text-slate-900 font-bold text-lg">
-                <UserPlus className="text-emerald-600" size={22} />
+                <UserPlus className="text-blue-600" size={22} />
                 <span>Custom Signup Fields</span>
               </div>
               <p className="text-xs text-slate-600 mb-4 leading-relaxed">
@@ -95,7 +95,7 @@ export const CustomExperienceSection = () => {
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {customFields.map((field) => (
-                  <div key={field} className="px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-700 flex items-center gap-1.5 shadow-sm">
+                  <div key={field} className="px-3 py-2 rounded-xl text-xs font-medium text-slate-700 flex items-center gap-1.5 neu-flat">
                     <CheckCircle2 size={13} className="text-cyan-600 flex-shrink-0" />
                     <span className="truncate">{field}</span>
                   </div>
@@ -106,12 +106,12 @@ export const CustomExperienceSection = () => {
           </div>
 
           {/* Live Preview Card (Right Column) */}
-          <div className="bg-gradient-to-br from-cyan-50 via-white to-sky-50 border border-cyan-200 rounded-3xl p-8 shadow-xl relative">
-            <div className="absolute top-4 right-4 px-3 py-1 bg-cyan-100 border border-cyan-300 rounded-full text-[10px] font-mono text-cyan-900 font-bold">
+          <div className="bg-gradient-to-br from-cyan-50 via-white to-sky-50 -cyan-200 rounded-3xl p-8 neu-flat relative">
+            <div className="absolute top-4 right-4 px-3 py-1 bg-cyan-100 -cyan-300 rounded-full text-[10px] font-mono text-cyan-900 font-bold">
               PREVIEW MATCHING YOUR BRAND
             </div>
 
-            <div className="max-w-sm mx-auto bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl space-y-4">
+            <div className="max-w-sm mx-auto rounded-2xl p-6 shadow-2xl space-y-4">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-cyan-500 flex items-center justify-center font-black text-white text-sm">
                   AC
@@ -125,13 +125,13 @@ export const CustomExperienceSection = () => {
               <div className="space-y-3 pt-2">
                 <div>
                   <label className="text-[11px] font-mono text-slate-600 block mb-1">Company Email</label>
-                  <input disabled value="user@acmecorp.com" className="w-full bg-slate-50 border border-slate-200 text-xs text-slate-700 rounded-lg px-3 py-2 outline-none font-mono" />
+                  <input disabled value="user@acmecorp.com" className="w-full text-xs text-slate-700 rounded-lg px-3 py-2 outline-none font-mono" />
                 </div>
                 <div>
                   <label className="text-[11px] font-mono text-slate-600 block mb-1">Workspace Name</label>
-                  <input disabled value="engineering-team" className="w-full bg-slate-50 border border-slate-200 text-xs text-slate-700 rounded-lg px-3 py-2 outline-none font-mono" />
+                  <input disabled value="engineering-team" className="w-full text-xs text-slate-700 rounded-lg px-3 py-2 outline-none font-mono" />
                 </div>
-                <button className="w-full py-2.5 bg-cyan-500 text-white font-bold rounded-lg text-xs shadow-md shadow-cyan-500/20">
+                <button className="w-full py-2.5 bg-cyan-500 text-white font-bold rounded-lg text-xs neu-flat shadow-cyan-500/20">
                   Continue to App →
                 </button>
               </div>
@@ -144,7 +144,7 @@ export const CustomExperienceSection = () => {
         <div className="text-center">
           <button
             onClick={() => navigate('/auth')}
-            className="px-8 py-4 rounded-xl font-extrabold text-sm text-white bg-cyan-500 hover:bg-cyan-600 shadow-xl shadow-cyan-500/20 transition-all hover:scale-105 inline-flex items-center gap-2"
+            className="px-8 py-4 rounded-xl font-extrabold text-sm text-white bg-cyan-500 hover:bg-cyan-600 neu-flat shadow-cyan-500/20 transition-all hover:scale-105 inline-flex items-center gap-2"
           >
             Customize Your Authentication Experience
             <ArrowRight size={16} />

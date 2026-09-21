@@ -35,18 +35,18 @@ const StepIndicator = ({ current, labels }) => (
         <div key={i} className='flex items-center'>
           <div className='flex flex-col items-center'>
             <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-              isDone   ? 'bg-emerald-500 text-white' :
+              isDone   ? 'bg-blue-500 text-white' :
               isActive ? 'bg-purple-600 text-white ring-4 ring-purple-600/20 shadow-lg shadow-purple-600/20' :
                          'bg-[var(--bg-surface)] text-[var(--text-dim)] border border-[var(--border-glass)]'
             }`}>
               {isDone ? '✓' : stepNum}
             </div>
             <span className={`text-[10px] mt-1.5 whitespace-nowrap transition-colors uppercase font-bold tracking-widest ${
-              isActive ? 'text-purple-600' : isDone ? 'text-emerald-600' : 'text-[var(--text-dim)]'
+              isActive ? 'text-purple-600' : isDone ? 'text-blue-600' : 'text-[var(--text-dim)]'
             }`}>{label}</span>
           </div>
           {i < labels.length - 1 && (
-            <div className={`w-12 h-0.5 mx-2 mb-5 transition-colors ${isDone ? 'bg-emerald-500/50' : 'bg-[var(--border-glass)]'}`} />
+            <div className={`w-12 h-0.5 mx-2 mb-5 transition-colors ${isDone ? 'bg-blue-500/50' : 'bg-[var(--border-glass)]'}`} />
           )}
         </div>
       );
@@ -245,7 +245,7 @@ export const AddUserModal = ({ editingUser, onClose }) => {
                       className={`flex-1 py-2.5 text-xs font-bold rounded-xl transition-all capitalize ${
                         formData.status === s
                           ? s === 'active'
-                            ? 'bg-emerald-50 text-emerald-500 border border-emerald-200 shadow-lg shadow-emerald-500/5'
+                            ? 'bg-blue-50 text-blue-500 border border-emerald-200 shadow-lg shadow-blue-500/5'
                             : 'bg-[var(--bg-surface)] text-[var(--text-muted)] border border-[var(--border-glass)]'
                           : 'text-[var(--text-dim)] hover:text-[var(--text-muted)] border border-transparent'
                       }`}
@@ -387,7 +387,7 @@ export const AddUserModal = ({ editingUser, onClose }) => {
             ) : (
               <button
                 onClick={handleSubmit}
-                className='bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all shadow-lg shadow-emerald-600/20 active:scale-95'
+                className='bg-blue-600 hover:bg-blue-500 text-white px-8 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all shadow-lg shadow-blue-600/20 active:scale-95'
               >
                 {editingUser ? 'Save Changes' : 'Confirm & Create'}
               </button>

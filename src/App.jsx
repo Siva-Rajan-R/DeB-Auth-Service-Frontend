@@ -12,6 +12,7 @@ import { LoginPortal } from './Pages/LoginPortal'
 import { ResetPassword } from './Pages/ResetPassword'
 import { DashboardLayout } from './Components/DashboardLayout'
 import { InvoicesPage } from './Pages/Invoices'
+import { AnalyticsPage } from './Pages/AnalyticsPage'
 import { AnalyticsStandalone } from './Pages/AnalyticsStandalone'
 import { ToastContainer } from './Components/ToastContainer'
 import { PricingPage } from './Pages/Pricing'
@@ -25,10 +26,10 @@ function App() {
         <Route path='/' element={<HomePage/>}></Route>
         <Route path='/auth/request/:request_id/:flow_type' element={<LoginPortal/>}></Route>
         <Route path='/auth/reset-password/:token' element={<ResetPassword/>}></Route>
-        <Route path='/analytics' element={<AnalyticsStandalone/>}></Route>
         
         {/* Dashboard Routes wrapped in DashboardLayout */}
         <Route element={<DashboardLayout />}>
+          <Route path='/analytics' element={<AnalyticsPage/>}></Route>
           <Route path='/auth-docs' element={<AuthDocs/>}></Route>
           <Route path='/dashboard' element={<DashboardPage/>}></Route>
           <Route path='/dashboard-detail' element={<DashboardDetail/>}></Route>

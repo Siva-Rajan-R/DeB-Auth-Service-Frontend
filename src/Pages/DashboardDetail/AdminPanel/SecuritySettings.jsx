@@ -40,7 +40,7 @@ export const SecuritySettings = () => {
                 className='text-[var(--text-dim)] hover:text-cyan-600 transition-colors p-1'
                 title='Copy API Key'
               >
-                {copied ? <Check size={16} className='text-emerald-500' /> : <Copy size={16} />}
+                {copied ? <Check size={16} className='text-blue-500' /> : <Copy size={16} />}
               </button>
             </div>
             <button className='bg-[var(--bg-surface)] border border-[var(--border-glass)] hover:border-[var(--border-active)] text-[var(--text-main)] px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-sm'>

@@ -207,7 +207,7 @@ const LogoUploader = () => {
         <p className='text-red-400 text-[10px] font-bold mt-1.5 pl-1 leading-relaxed'>{error}</p>
       )}
       {success && (
-        <p className='text-emerald-600 text-[10px] font-bold mt-1.5 pl-1 flex items-center gap-1'><Check size={11} /> Logo uploaded & applied successfully!</p>
+        <p className='text-blue-600 text-[10px] font-bold mt-1.5 pl-1 flex items-center gap-1'><Check size={11} /> Logo uploaded & applied successfully!</p>
       )}
     </div>
   );
@@ -443,7 +443,7 @@ export const SignInCustomizer = () => {
       {/* 0. Quick Themes */}
       <div className='rounded-2xl border border-orange-200 bg-amber-500/5 p-4 space-y-3'>
         <div className='flex items-center gap-2 mb-1'>
-          <Sparkles size={14} className='text-orange-600' />
+          <img src='/dauth_logo.png' alt='DAuth' className='w-4 h-4 object-contain' />
           <h3 className='text-sm font-bold text-[var(--text-main)]'>Quick Themes</h3>
         </div>
         <QuickThemes />

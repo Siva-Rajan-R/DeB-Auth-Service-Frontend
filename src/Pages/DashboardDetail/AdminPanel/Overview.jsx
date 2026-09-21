@@ -31,8 +31,8 @@ export const Overview = () => {
           value={activeUsers}
           trend='+5%'
           trendUp={true}
-          colorClass='text-emerald-500'
-          bgClass='bg-emerald-50'
+          colorClass='text-blue-500'
+          bgClass='bg-blue-50'
         />
         <MetricCard
           icon={<Shield />}
@@ -59,13 +59,13 @@ export const Overview = () => {
         {/* System Health */}
         <div className='lg:col-span-1 bg-[var(--bg-card)] border border-[var(--border-glass)] rounded-2xl p-5 shadow-sm h-fit'>
           <h4 className='text-[var(--text-main)] font-bold text-sm mb-4 flex items-center gap-2'>
-            <Activity size={16} className='text-emerald-500' /> System Health
+            <Activity size={16} className='text-blue-500' /> System Health
           </h4>
           <div className='space-y-4'>
-            <HealthItem label='Auth API' status='Operational' color='bg-emerald-500' />
-            <HealthItem label='Database' status='Operational' color='bg-emerald-500' />
+            <HealthItem label='Auth API' status='Operational' color='bg-blue-500' />
+            <HealthItem label='Database' status='Operational' color='bg-blue-500' />
             <HealthItem label='Email Service' status='Degraded' color='bg-amber-500' />
-            <HealthItem label='SSO Provider' status={sso.enabled ? 'Operational' : 'Disabled'} color={sso.enabled ? 'bg-emerald-500' : 'bg-[var(--text-dim)]'} />
+            <HealthItem label='SSO Provider' status={sso.enabled ? 'Operational' : 'Disabled'} color={sso.enabled ? 'bg-blue-500' : 'bg-[var(--text-dim)]'} />
           </div>
         </div>
 
@@ -99,7 +99,7 @@ const MetricCard = ({ icon, title, value, trend, trendUp, colorClass, bgClass })
       <div className={`p-2.5 rounded-xl ${bgClass} ${colorClass}`}>
         {icon}
       </div>
-      <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-lg ${trendUp ? 'bg-emerald-50 text-emerald-500' : 'bg-[var(--bg-deep)] text-[var(--text-dim)]'}`}>
+      <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-lg ${trendUp ? 'bg-blue-50 text-blue-500' : 'bg-[var(--bg-deep)] text-[var(--text-dim)]'}`}>
         {trend}
       </span>
     </div>
@@ -134,8 +134,8 @@ const mockActivities = [
     user: 'admin@debuggerstechnologies.com',
     time: '2 hours ago',
     icon: <UserCheck size={16} />,
-    iconBg: 'bg-emerald-50',
-    iconColor: 'text-emerald-500',
+    iconBg: 'bg-blue-50',
+    iconColor: 'text-blue-500',
   },
   {
     action: 'Multiple failed login attempts detected',

@@ -1,18 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useAuthConfigStore } from '../../Store/useAuthConfigStore';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaGoogle, FaGithub, FaFacebook } from 'react-icons/fa';
-import { BsMicrosoft } from 'react-icons/bs';
 import { MdOutlineSms } from 'react-icons/md';
 import { RiLockPasswordLine } from 'react-icons/ri';
 import { Eye, EyeOff, Check } from 'lucide-react';
+import { GoogleLogo, GithubLogo, FacebookLogo, MicrosoftLogo } from '../../Components/BrandLogos';
 
 const PROVIDER_META = {
   password:  { icon: <RiLockPasswordLine />, label: 'Password',  color: '#22d3ee'  },
-  google:    { icon: <FaGoogle   />,         label: 'Google',    color: '#ea4335'  },
-  github:    { icon: <FaGithub   />,         label: 'GitHub',    color: '#e2e8f0'  },
-  facebook:  { icon: <FaFacebook />,         label: 'Facebook',  color: '#1877f2'  },
-  microsoft: { icon: <BsMicrosoft />,        label: 'Microsoft', color: '#00a4ef'  },
+  google:    { icon: <GoogleLogo size={18} />,    label: 'Google',    color: '#ea4335'  },
+  github:    { icon: <GithubLogo size={18} />,    label: 'GitHub',    color: '#24292e'  },
+  facebook:  { icon: <FacebookLogo size={18} />,  label: 'Facebook',  color: '#0866ff'  },
+  microsoft: { icon: <MicrosoftLogo size={18} />, label: 'Microsoft', color: '#00a4ef'  },
   email_otp:  { icon: <MdOutlineSms />,       label: 'Email OTP',       color: '#22c55e'  },
   mobile_otp: { icon: <MdOutlineSms />,       label: 'Mobile OTP',      color: '#06b6d4'  },
   otp:       { icon: <MdOutlineSms />,       label: 'OTP',       color: '#22c55e'  },
@@ -20,11 +19,11 @@ const PROVIDER_META = {
 
 const FONT_MAP = {
   system:     'system-ui, sans-serif',
-  Inter:      "'Inter', sans-serif",
-  Roboto:     "'Roboto', sans-serif",
-  Poppins:    "'Poppins', sans-serif",
-  Nunito:     "'Nunito', sans-serif",
-  Montserrat: "'Montserrat', sans-serif",
+  Inter:"'Inter', sans-serif",
+  Roboto:"'Roboto', sans-serif",
+  Poppins:"'Poppins', sans-serif",
+  Nunito:"'Nunito', sans-serif",
+  Montserrat:"'Montserrat', sans-serif",
 };
 const FONT_SIZE_MAP = { sm: '0.8125rem', md: '0.875rem', lg: '1rem' };
 const RADIUS_MAP    = { square: '0.5rem', rounded: '1.25rem', pill: '2rem' };
@@ -50,7 +49,7 @@ const FInput = ({ label, type = 'text', placeholder, textColor, inputStyle, inpu
           type={isPass && !show ? 'password' : 'text'}
           placeholder={placeholder || label}
           readOnly
-          className='w-full px-3 py-2.5 text-sm outline-none border transition-all duration-300'
+          className='w-full px-3 py-2.5 text-sm outline-none  transition-all duration-300'
           style={{
             borderRadius,
             backgroundColor: isFilled ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)',
@@ -125,7 +124,7 @@ const OTPForm = ({ primary, textColor, btnTextColor, buttonStyle, inputStyle, in
           </p>
           <div className='flex gap-1 justify-center'>
             {Array(6).fill(0).map((_, i) => (
-              <div key={i} className='w-8 h-9 flex items-center justify-center text-sm font-mono border'
+              <div key={i} className='w-8 h-9 flex items-center justify-center text-sm font-mono '
                 style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.1)', color: `${textColor}50`, borderRadius }}>_</div>
             ))}
           </div>
@@ -140,7 +139,7 @@ const OTPForm = ({ primary, textColor, btnTextColor, buttonStyle, inputStyle, in
 // ─── Social provider button (list layout) ────────────────────────────────────
 const SocialBtn = ({ method, textColor, borderRadius }) => (
   <button
-    className='w-full flex items-center justify-center gap-2 border py-2.5 text-sm font-bold hover:bg-white/5 transition-all group/social'
+    className='w-full flex items-center justify-center gap-2  py-2.5 text-sm font-bold hover:/5 transition-all group/social'
     style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)', color: textColor, borderRadius }}
   >
     <span className='text-base transition-transform group-hover/social:scale-110' style={{ color: PROVIDER_META[method.id]?.color }}>
@@ -157,7 +156,7 @@ const SocialGrid = ({ methods, textColor, borderRadius }) => (
       <div
         key={m.id}
         title={PROVIDER_META[m.id]?.label}
-        className='w-12 h-12 border flex items-center justify-center text-xl cursor-pointer hover:opacity-80 transition-all group/soc'
+        className='w-12 h-12  flex items-center justify-center text-xl cursor-pointer hover:opacity-80 transition-all group/soc'
         style={{ backgroundColor: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.08)', color: PROVIDER_META[m.id]?.color, borderRadius }}
       >
         <span className='group-hover/soc:scale-110 transition-transform'>{PROVIDER_META[m.id]?.icon}</span>
@@ -221,7 +220,7 @@ const ProviderSelectionFlow = ({ enabledMethods, socialLayout, textColor, btnTex
           {/* Divider if social AND password/otp */}
           {socialMethods.length > 0 && (hasPassword || hasEmailOTP || hasMobileOTP) && (
             <div className='relative flex items-center justify-center py-1'>
-              <div className='absolute inset-0 flex items-center'><div className='w-full border-t' style={{ borderColor: `${textColor}15` }} /></div>
+              <div className='absolute inset-0 flex items-center'><div className='w-full ' style={{ borderColor: `${textColor}15` }} /></div>
               <span className='relative px-3 text-xs' style={{ color: `${textColor}40` }}>or continue with</span>
             </div>
           )}
@@ -232,12 +231,12 @@ const ProviderSelectionFlow = ({ enabledMethods, socialLayout, textColor, btnTex
                 Continue with OTP
               </p>
               <div className='flex gap-2'>
-                <button onClick={() => setStep('email_otp')} className='flex-1 flex items-center justify-center gap-2 border py-2.5 text-xs font-bold hover:opacity-80 transition-all'
+                <button onClick={() => setStep('email_otp')} className='flex-1 flex items-center justify-center gap-2  py-2.5 text-xs font-bold hover:opacity-80 transition-all'
                   style={{ backgroundColor: 'rgba(34,197,94,0.08)', borderColor: 'rgba(34,197,94,0.2)', color: btnTextColor || textColor, borderRadius }}>
-                  <span className='text-green-400 text-sm'><MdOutlineSms /></span>
+                  <span className='text-blue-500 text-sm'><MdOutlineSms /></span>
                   Email
                 </button>
-                <button onClick={() => setStep('mobile_otp')} className='flex-1 flex items-center justify-center gap-2 border py-2.5 text-xs font-bold hover:opacity-80 transition-all'
+                <button onClick={() => setStep('mobile_otp')} className='flex-1 flex items-center justify-center gap-2  py-2.5 text-xs font-bold hover:opacity-80 transition-all'
                   style={{ backgroundColor: 'rgba(6,182,212,0.08)', borderColor: 'rgba(6,182,212,0.2)', color: btnTextColor || textColor, borderRadius }}>
                   <span className='text-cyan-600 text-sm'><MdOutlineSms /></span>
                   Mobile
@@ -245,13 +244,13 @@ const ProviderSelectionFlow = ({ enabledMethods, socialLayout, textColor, btnTex
               </div>
             </div>
           ) : hasEmailOTP ? (
-            <button onClick={() => setStep('email_otp')} className='w-full flex items-center justify-center gap-2.5 border py-3 text-sm font-bold hover:opacity-80 transition-all'
+            <button onClick={() => setStep('email_otp')} className='w-full flex items-center justify-center gap-2.5  py-3 text-sm font-bold hover:opacity-80 transition-all'
               style={{ backgroundColor: 'rgba(34,197,94,0.08)', borderColor: 'rgba(34,197,94,0.2)', color: btnTextColor || textColor, borderRadius }}>
-              <span className='text-green-400 text-lg'><MdOutlineSms /></span>
+              <span className='text-blue-500 text-lg'><MdOutlineSms /></span>
               Continue with OTP
             </button>
           ) : hasMobileOTP ? (
-            <button onClick={() => setStep('mobile_otp')} className='w-full flex items-center justify-center gap-2.5 border py-3 text-sm font-bold hover:opacity-80 transition-all'
+            <button onClick={() => setStep('mobile_otp')} className='w-full flex items-center justify-center gap-2.5  py-3 text-sm font-bold hover:opacity-80 transition-all'
               style={{ backgroundColor: 'rgba(6,182,212,0.08)', borderColor: 'rgba(6,182,212,0.2)', color: btnTextColor || textColor, borderRadius }}>
               <span className='text-cyan-600 text-lg'><MdOutlineSms /></span>
               Continue with OTP
@@ -261,7 +260,7 @@ const ProviderSelectionFlow = ({ enabledMethods, socialLayout, textColor, btnTex
           {hasPassword && (
             <button
               onClick={() => setStep('password')}
-              className='w-full flex items-center justify-center gap-2.5 border py-3 text-sm font-bold hover:opacity-80 transition-all'
+              className='w-full flex items-center justify-center gap-2.5  py-3 text-sm font-bold hover:opacity-80 transition-all'
               style={{ backgroundColor: 'rgba(59,130,246,0.08)', borderColor: 'rgba(59,130,246,0.2)', color: btnTextColor || textColor, borderRadius }}
             >
               <span className='text-blue-400 text-lg'><RiLockPasswordLine /></span>
@@ -303,7 +302,7 @@ const SignupFlow = ({ enabledMethods, signupFields, primary, textColor, buttonSt
           <>
             {hasPwd && (
               <div className='relative flex items-center justify-center py-1'>
-                <div className='absolute inset-0 flex items-center'><div className='w-full border-t' style={{ borderColor: `${textColor}15` }} /></div>
+                <div className='absolute inset-0 flex items-center'><div className='w-full ' style={{ borderColor: `${textColor}15` }} /></div>
                 <span className='relative px-3 text-xs' style={{ color: `${textColor}40` }}>or sign up with</span>
               </div>
             )}
@@ -318,12 +317,12 @@ const SignupFlow = ({ enabledMethods, signupFields, primary, textColor, buttonSt
                   Sign up with OTP
                 </p>
                 <div className='flex gap-2'>
-                  <button onClick={() => setAuthDone(true)} className='flex-1 flex items-center justify-center gap-2 border py-2.5 text-xs font-bold hover:opacity-80 transition-all'
+                  <button onClick={() => setAuthDone(true)} className='flex-1 flex items-center justify-center gap-2  py-2.5 text-xs font-bold hover:opacity-80 transition-all'
                     style={{ backgroundColor: 'rgba(34,197,94,0.08)', borderColor: 'rgba(34,197,94,0.2)', color: textColor, borderRadius }}>
-                    <span className='text-green-400 text-sm'><MdOutlineSms /></span>
+                    <span className='text-blue-500 text-sm'><MdOutlineSms /></span>
                     Email
                   </button>
-                  <button onClick={() => setAuthDone(true)} className='flex-1 flex items-center justify-center gap-2 border py-2.5 text-xs font-bold hover:opacity-80 transition-all'
+                  <button onClick={() => setAuthDone(true)} className='flex-1 flex items-center justify-center gap-2  py-2.5 text-xs font-bold hover:opacity-80 transition-all'
                     style={{ backgroundColor: 'rgba(6,182,212,0.08)', borderColor: 'rgba(6,182,212,0.2)', color: textColor, borderRadius }}>
                     <span className='text-cyan-600 text-sm'><MdOutlineSms /></span>
                     Mobile
@@ -331,13 +330,13 @@ const SignupFlow = ({ enabledMethods, signupFields, primary, textColor, buttonSt
                 </div>
               </div>
             ) : hasEmailOTP ? (
-              <button onClick={() => setAuthDone(true)} className='w-full flex items-center justify-center gap-2.5 border py-2.5 text-sm font-bold hover:opacity-80 transition-all'
+              <button onClick={() => setAuthDone(true)} className='w-full flex items-center justify-center gap-2.5  py-2.5 text-sm font-bold hover:opacity-80 transition-all'
                 style={{ backgroundColor: 'rgba(34,197,94,0.08)', borderColor: 'rgba(34,197,94,0.2)', color: textColor, borderRadius }}>
-                <span className='text-green-400'><MdOutlineSms /></span>
+                <span className='text-blue-500'><MdOutlineSms /></span>
                 Continue with OTP
               </button>
             ) : hasMobileOTP ? (
-              <button onClick={() => setAuthDone(true)} className='w-full flex items-center justify-center gap-2.5 border py-2.5 text-sm font-bold hover:opacity-80 transition-all'
+              <button onClick={() => setAuthDone(true)} className='w-full flex items-center justify-center gap-2.5  py-2.5 text-sm font-bold hover:opacity-80 transition-all'
                 style={{ backgroundColor: 'rgba(6,182,212,0.08)', borderColor: 'rgba(6,182,212,0.2)', color: textColor, borderRadius }}>
                 <span className='text-cyan-600'><MdOutlineSms /></span>
                 Continue with OTP
@@ -352,8 +351,8 @@ const SignupFlow = ({ enabledMethods, signupFields, primary, textColor, buttonSt
   if (signupFields.length === 0) {
     return (
       <div className='text-center space-y-3 py-4'>
-        <div className='w-12 h-12 mx-auto rounded-full bg-emerald-500/20 flex items-center justify-center'>
-          <span className='text-green-400 text-2xl'>✓</span>
+        <div className='w-12 h-12 mx-auto rounded-full bg-blue-500/20 flex items-center justify-center'>
+          <span className='text-blue-500 text-2xl'>✓</span>
         </div>
         <p className='text-sm' style={{ color: textColor }}>Almost done! Click below to complete.</p>
         <FButton {...sharedProps}>Create Account</FButton>
@@ -371,7 +370,7 @@ const SignupFlow = ({ enabledMethods, signupFields, primary, textColor, buttonSt
       </AnimatePresence>
       <div className='flex gap-2 pt-1'>
         {step > 0 && (
-          <button onClick={() => setStep(s => s - 1)} className='px-4 py-2.5 text-sm font-medium border transition-colors'
+          <button onClick={() => setStep(s => s - 1)} className='px-4 py-2.5 text-sm font-medium  transition-colors'
             style={{ borderRadius, borderColor: `${textColor}20`, color: `${textColor}70`, backgroundColor: 'transparent' }}>Back</button>
         )}
         <FButton {...sharedProps} onClick={() => !isLastStep && setStep(s => s + 1)}>
@@ -441,7 +440,7 @@ export const LivePreview = () => {
   return (
     <div
       className='w-full h-full flex items-start justify-center overflow-y-auto relative transition-all duration-500 py-8'
-      style={bgStyle}
+      style={{ backgroundColor: 'var(--bg-deep)' }}
     >
       {/* Background pattern overlay */}
       {bg_pattern === 'dots' && (
@@ -464,7 +463,7 @@ export const LivePreview = () => {
         initial={{ opacity: 0, scale: 0.97, y: 8 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.3, ease: 'easeOut' }}
-        className='relative w-full mx-4 p-6 z-10 flex-shrink-0'
+        className='neu-flat relative w-full mx-4 p-6 z-10 flex-shrink-0'
         style={{
           maxWidth: '320px',
           backgroundColor: login_card_bg_color,
@@ -519,7 +518,7 @@ export const LivePreview = () => {
 
         {/* Sign in / Sign up switcher */}
         <p className='text-center text-xs mt-4' style={{ color: `${text_color}30` }}>
-          {activeMode === 'signin' ? "Don't have an account? " : 'Already have an account? '}
+          {activeMode === 'signin' ?"Don't have an account?" : 'Already have an account? '}
           <span className='cursor-pointer hover:underline' style={{ color: link_color || '#3b82f6' }}>
             {activeMode === 'signin' ? 'Sign up' : 'Sign in'}
           </span>

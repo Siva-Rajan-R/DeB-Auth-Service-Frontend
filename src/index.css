@@ -1,34 +1,45 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=Outfit:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=Outfit:wght@400;600;700;800;900&display=swap');
 
 html {
   scroll-behavior: smooth;
+  color-scheme: light !important;
 }
 
-:root {
+:root, [data-theme='dark'] {
   font-family: 'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  /* Premium Light Theme */
-  --bg-deep: #f8fafc;
-  --bg-card: rgba(255, 255, 255, 0.98);
-  --bg-surface: rgba(248, 250, 252, 0.9);
-  --bg-navbar: rgba(255, 255, 255, 0.95);
+  /* Rich Neumorphism + Electric Cyan-Blue Color System */
+  --bg-deep: #e8ecf4;
+  --bg-card: #f3f6fa;
+  --bg-surface: #e8ecf4;
+  --bg-navbar: #e8ecf4;
   
-  --text-main: #020617; /* Darker for better contrast */
-  --text-muted: #334155;
+  /* Electric Cyan-Blue Accent */
+  --primary-cyan: #00a8e8;
+  --primary-cyan-gradient: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+  --primary-cyan-hover: linear-gradient(135deg, #0096c7 0%, #03045e 100%);
+  --cyan-glow: rgba(0, 168, 232, 0.45);
+  
+  /* High-Contrast Typography */
+  --text-main: #0f172a;
+  --text-muted: #475569;
   --text-dim: #64748b;
   
-  --border-glass: rgba(226, 232, 240, 0.9);
-  --border-active: rgba(0, 210, 229, 0.5);
+  --border-color: #d1d5db;
+  --success-color: #10b981;
+  --error-color: #ef4444;
+  --warning-color: #f59e0b;
   
-  --accent-cyan: #00d2e5;
-  --accent-purple: #06b6d4;
-  --accent-indigo: #0284c7;
-  --accent-emerald: #10b981;
+  --shadow-dark: rgba(165, 175, 195, 0.55);
+  --shadow-light: rgba(255, 255, 255, 0.95);
 
-  --glass-blur: blur(20px);
-  --glass-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08), inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
+  /* Deep Glossy Neumorphic Shadows */
+  --neu-flat: 10px 10px 22px var(--shadow-dark), -10px -10px 22px var(--shadow-light);
+  --neu-flat-hover: 6px 6px 16px var(--shadow-dark), -6px -6px 16px var(--shadow-light);
+  --neu-pressed: inset 5px 5px 10px var(--shadow-dark), inset -5px -5px 10px var(--shadow-light);
+  --neu-button-shadow: 6px 6px 14px var(--shadow-dark), -6px -6px 14px var(--shadow-light);
   
   color-scheme: light;
   color: var(--text-main);
@@ -40,43 +51,17 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
-[data-theme='dark'] {
-  --bg-deep: #03131a;
-  --bg-card: rgba(8, 28, 36, 0.7);
-  --bg-surface: rgba(14, 43, 54, 0.5);
-  --bg-navbar: rgba(3, 19, 26, 0.85);
-  
-  --text-main: rgba(255, 255, 255, 0.95);
-  --text-muted: #94a3b8;
-  --text-dim: #64748b;
-  
-  --border-glass: rgba(255, 255, 255, 0.08);
-  --border-active: rgba(0, 210, 229, 0.5);
-  
-  --accent-cyan: #00d2e5;
-  --accent-purple: #22d3ee;
-  --accent-indigo: #38bdf8;
-  --accent-emerald: #10b981;
-
-  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
-  
-  color-scheme: dark;
-  color: var(--text-main);
-  background-color: var(--bg-deep);
-}
-
 * {
   box-sizing: border-box;
 }
 
 body {
-  background-color: var(--bg-deep);
-  color: var(--text-main);
+  background-color: var(--bg-deep) !important;
+  color: var(--text-main) !important;
   margin: 0;
   padding: 0;
   min-height: 100vh;
   overflow-x: hidden;
-  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Custom Scrollbar */
@@ -85,16 +70,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: var(--bg-deep);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(203, 213, 225, 0.8);
+  background: #cbd5e1;
   border-radius: 20px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 210, 229, 0.6);
+  background: var(--primary-cyan);
 }
 
 .scrollbar-hide::-webkit-scrollbar {
@@ -106,26 +91,178 @@ body {
   scrollbar-width: none;
 }
 
-/* Glassmorphism Classes */
-.glass-panel {
-  background: var(--bg-card);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--border-glass);
-  box-shadow: var(--glass-shadow);
+/* Master Neumorphism Utilities (Rich Pearl Surfaces) */
+.glass-panel,
+.glass-card,
+.neu-flat {
+  background: var(--bg-card) !important;
+  box-shadow: var(--neu-flat) !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  border-radius: 20px;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.glass-card {
-  background: var(--bg-surface);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--border-glass);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+.glass-panel:hover,
+.glass-card:hover,
+.neu-flat:hover {
+  box-shadow: var(--neu-flat-hover), 0 0 16px rgba(99, 102, 241, 0.15) !important;
+  transform: translateY(-2px);
 }
 
-.glass-card:hover {
-  background: var(--bg-card);
-  border-color: var(--border-active);
-  transform: translateY(-4px);
+.neu-flat:active {
+  box-shadow: var(--neu-pressed) !important;
+  transform: translateY(1px);
 }
 
+.neu-pressed {
+  background: var(--bg-surface) !important;
+  box-shadow: var(--neu-pressed) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 14px;
+  transition: all 0.25s ease;
+}
+
+.neu-pressed:focus-within {
+  box-shadow: inset 6px 6px 12px rgba(160, 165, 175, 0.5), inset -6px -6px 12px rgba(255, 255, 255, 0.95), 0 0 16px rgba(0, 168, 232, 0.25) !important;
+  border-color: var(--primary-cyan) !important;
+}
+
+/* Primary Electric Cyan-Blue Button with PURE WHITE Text */
+.neu-button-primary,
+button.bg-cyan-500,
+button.bg-teal-500,
+button.bg-cyan-600,
+button.bg-blue-600 {
+  background: var(--primary-cyan-gradient) !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  box-shadow: 0 8px 20px rgba(0, 168, 232, 0.35), 4px 4px 10px var(--shadow-dark) !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  border-radius: 9999px !important;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.neu-button-primary:hover,
+button.bg-cyan-500:hover,
+button.bg-teal-500:hover,
+button.bg-cyan-600:hover,
+button.bg-blue-600:hover {
+  background: var(--primary-cyan-hover) !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 25px rgba(0, 168, 232, 0.55), 4px 4px 12px var(--shadow-dark) !important;
+  transform: translateY(-2px) scale(1.02);
+}
+
+.neu-button-primary:active {
+  box-shadow: inset 3px 3px 8px rgba(0, 0, 0, 0.3) !important;
+  transform: translateY(1px) scale(0.98);
+}
+
+/* Secondary Button (Neumorphic Pearl Surface) */
+.neu-button {
+  background: var(--bg-card) !important;
+  box-shadow: var(--neu-button-shadow) !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  border-radius: 14px;
+  color: #1e293b !important;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.neu-button:hover {
+  box-shadow: var(--neu-flat-hover), 0 0 15px rgba(0, 168, 232, 0.18) !important;
+  transform: translateY(-2px);
+  color: var(--primary-cyan) !important;
+}
+
+.neu-button:active {
+  box-shadow: var(--neu-pressed) !important;
+  transform: translateY(1px);
+}
+
+/* Inset Input Fields */
+.neu-input {
+  background: var(--bg-surface) !important;
+  box-shadow: var(--neu-pressed) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 14px;
+  color: var(--text-main) !important;
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+.neu-input:focus {
+  border-color: var(--primary-cyan) !important;
+  box-shadow: inset 5px 5px 10px var(--shadow-dark), inset -5px -5px 10px var(--shadow-light), 0 0 16px rgba(0, 168, 232, 0.25) !important;
+}
+
+/* Electric Cyan-Blue Navigation & Tabs with PURE WHITE TEXT */
+.neu-tab {
+  transition: all 0.25s ease;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.neu-tab.active,
+.neu-tab[data-active='true'] {
+  background: var(--primary-cyan-gradient) !important;
+  box-shadow: 0 4px 14px var(--cyan-glow) !important;
+  color: #ffffff !important;
+  font-weight: 800;
+}
+
+/* Highlightable Text & Gradient Headings */
+.text-highlight {
+  color: var(--primary-cyan) !important;
+}
+
+.gradient-text-cyan {
+  background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Electric Cyan Icon Badge with PURE WHITE TEXT */
+.cyan-icon-badge {
+  background: linear-gradient(135deg, #00b4d8 0%, #0096c7 100%);
+  color: #ffffff;
+  font-weight: 900;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px var(--cyan-glow);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Global Light Overrides */
+.bg-slate-900, .bg-slate-850, .bg-slate-800, .bg-slate-950, .bg-black, .bg-gray-900, .bg-gray-800 {
+  background-color: var(--bg-card) !important;
+  color: var(--text-main) !important;
+}
+
+.text-slate-100, .text-slate-200, .text-slate-300 {
+  color: var(--text-main) !important;
+}
+
+.text-slate-400, .text-slate-500 {
+  color: var(--text-muted) !important;
+}
+
+.text-cyan-600, .text-cyan-500, .text-blue-600, .text-indigo-600 {
+  color: var(--primary-cyan) !important;
+}
+
+.bg-cyan-500, .bg-cyan-600, .bg-blue-600, .bg-indigo-600 {
+  background-color: var(--primary-cyan) !important;
+}
+
+.border-cyan-500, .border-cyan-400, .border-blue-500 {
+  border-color: var(--primary-cyan) !important;
+}

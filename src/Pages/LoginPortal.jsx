@@ -5,20 +5,21 @@ import { FaGoogle, FaGithub, FaFacebook } from 'react-icons/fa';
 import { BsMicrosoft } from 'react-icons/bs';
 import { MdOutlineSms } from 'react-icons/md';
 import { RiLockPasswordLine } from 'react-icons/ri';
-import { Eye, EyeOff, Check, Lock } from 'lucide-react';
+import { Eye, EyeOff, Check, Lock, AlertTriangle, ArrowLeft, RotateCcw, ExternalLink } from 'lucide-react';
 import axios from 'axios';
 import { UAParser } from 'ua-parser-js';
 import { APP_CONFIG } from '../config';
-import { GoogleIcon, MicrosoftIcon } from '../Components/ProviderIcons';
+import { GoogleLogo, GithubLogo, FacebookLogo, MicrosoftLogo } from '../Components/BrandLogos';
+import { useToastStore } from '../Store/useToastStore';
 
 const backend_url = APP_CONFIG.BACKEND_URL;
 
 const PROVIDER_META = {
   password:  { icon: <RiLockPasswordLine />, label: 'Password',  color: '#22d3ee'  },
-  google:    { icon: <GoogleIcon size={18} />,    label: 'Google',    color: '#ea4335'  },
-  github:    { icon: <FaGithub   />,         label: 'GitHub',    color: '#24292e'  },
-  facebook:  { icon: <FaFacebook />,         label: 'Facebook',  color: '#1877f2'  },
-  microsoft: { icon: <MicrosoftIcon size={18} />, label: 'Microsoft', color: '#00a4ef'  },
+  google:    { icon: <GoogleLogo size={18} />,    label: 'Google',    color: '#ea4335'  },
+  github:    { icon: <GithubLogo size={18} />,    label: 'GitHub',    color: '#24292e'  },
+  facebook:  { icon: <FacebookLogo size={18} />,  label: 'Facebook',  color: '#0866ff'  },
+  microsoft: { icon: <MicrosoftLogo size={18} />, label: 'Microsoft', color: '#00a4ef'  },
   email_otp:  { icon: <MdOutlineSms />,       label: 'Email OTP',       color: '#22c55e'  },
   mobile_otp: { icon: <MdOutlineSms />,       label: 'Mobile OTP',      color: '#06b6d4'  },
   otp:       { icon: <MdOutlineSms />,       label: 'OTP',       color: '#22c55e'  },
@@ -26,11 +27,11 @@ const PROVIDER_META = {
 
 const FONT_MAP = {
   system:     'system-ui, sans-serif',
-  Inter:      "'Inter', sans-serif",
-  Roboto:     "'Roboto', sans-serif",
-  Poppins:    "'Poppins', sans-serif",
-  Nunito:     "'Nunito', sans-serif",
-  Montserrat: "'Montserrat', sans-serif",
+  Inter:"'Inter', sans-serif",
+  Roboto:"'Roboto', sans-serif",
+  Poppins:"'Poppins', sans-serif",
+  Nunito:"'Nunito', sans-serif",
+  Montserrat:"'Montserrat', sans-serif",
 };
 const FONT_SIZE_MAP = { sm: '0.8125rem', md: '0.875rem', lg: '1rem' };
 const RADIUS_MAP    = { square: '0.5rem', rounded: '1.25rem', pill: '2rem' };
@@ -82,15 +83,12 @@ const FInput = ({ label, name, type = 'text', placeholder, textColor, inputStyle
           value={value || ''}
           onChange={locked ? undefined : onChange}
           readOnly={locked}
-          className={`w-full px-4 py-3 text-sm outline-none border transition-all duration-300 ${locked ? 'cursor-not-allowed select-none' : ''}`}
+          className={`neu-input w-full px-4 py-3 text-sm outline-none transition-all duration-300 ${locked ? 'cursor-not-allowed select-none' : ''}`}
           style={{
             borderRadius,
             backgroundColor: locked
               ? `${primary || '#22d3ee'}0a`
-              : isFilled ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)',
-            borderColor: locked
-              ? `${primary || '#22d3ee'}40`
-              : inputBorderColor || 'rgba(255,255,255,0.1)',
+              : isFilled ? 'var(--bg-surface)' : 'var(--bg-surface)',
             color: textColor,
             paddingRight: locked ? '90px' : undefined,
           }}
@@ -114,17 +112,16 @@ const FButton = ({ children, primary, textColor, btnTextColor, buttonStyle, bord
     ghost:    { backgroundColor: 'transparent', color: primary, border: 'none', textDecoration: 'underline', textUnderlineOffset: '4px', fontWeight: 'bold' },
   };
   return (
-    <button
+    <motion.button
+      whileHover={{ y: -2 }}
+      whileTap={{ y: 2, scale: 0.98 }}
       onClick={onClick}
       disabled={disabled}
-      className={`w-full py-3 font-bold text-sm transition-all relative overflow-hidden group/btn ${disabled ? 'opacity-50 cursor-not-allowed' : 'active:scale-[0.98]'}`}
-      style={{ borderRadius, ...(styles[buttonStyle] || styles.filled) }}
+      className={`neu-button w-full py-3 font-bold text-sm relative overflow-hidden group/btn ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+      style={{ borderRadius, color: btnTextColor || textColor }}
     >
       <span className='relative z-10'>{children}</span>
-      {buttonStyle === 'filled' && !disabled && (
-        <div className='absolute inset-0 bg-white/10 opacity-0 group-hover/btn:opacity-100 transition-opacity' />
-      )}
-    </button>
+    </motion.button>
   );
 };
 
@@ -132,7 +129,7 @@ const FButton = ({ children, primary, textColor, btnTextColor, buttonStyle, bord
 const SocialButton = ({ method, textColor, borderRadius, auth_token }) => (
   <button
     onClick={() => window.location.href = `${backend_url}/auth/${method.id}/login/${auth_token}`}
-    className='w-full flex items-center justify-center gap-3 border py-3 text-sm font-bold hover:bg-white/5 transition-all group/social'
+    className='w-full flex items-center justify-center gap-3 py-3 text-sm font-bold border border-white/10 hover:bg-white/5 transition-all group/social'
     style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)', color: textColor, borderRadius }}
   >
     <span className='text-lg transition-transform group-hover/social:scale-110' style={{ color: PROVIDER_META[method.id]?.color }}>
@@ -146,7 +143,7 @@ const SocialIcon = ({ method, borderRadius, auth_token }) => (
   <div
     title={PROVIDER_META[method.id]?.label}
     onClick={() => window.location.href = `${backend_url}/auth/${method.id}/login/${auth_token}`}
-    className='w-12 h-12 border flex items-center justify-center text-xl cursor-pointer hover:bg-white/10 transition-all group/soc'
+    className='w-12 h-12 flex items-center justify-center text-xl cursor-pointer border border-white/10 hover:bg-white/10 transition-all group/soc'
     style={{ backgroundColor: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.08)', color: PROVIDER_META[method.id]?.color, borderRadius }}
   >
     <span className='group-hover/soc:scale-110 transition-transform'>{PROVIDER_META[method.id]?.icon}</span>
@@ -204,13 +201,23 @@ const OTPFlow = ({
       if (res.data.success) setStep(1);
     } catch (err) {
       const detail = err.response?.data?.detail;
+      const statusCode = err.response?.status;
+      const rawMsg = typeof detail === 'string' ? detail : detail?.message || detail?.msg || 'Failed to send OTP';
+      const displayMsg = (typeof detail === 'object' && detail?.status_code)
+        ? `[${detail.status_code}] ${rawMsg}`
+        : (statusCode && statusCode !== 400 && statusCode !== 500)
+          ? `[${statusCode}] ${rawMsg}`
+          : rawMsg;
+
+      useToastStore.getState().addToast(displayMsg, 'error');
+      setError(displayMsg);
+
       if (detail && detail.redirect_url) {
-        setError(detail.message || 'Failed to send OTP');
-        setLoading(true);
-        setTimeout(() => { window.location.href = detail.redirect_url; }, 3000);
+        setTimeout(() => {
+          window.location.href = detail.redirect_url;
+        }, 1500);
         return;
       }
-      setError(typeof detail === 'string' ? detail : detail?.message || 'Failed to send OTP');
     }
     setLoading(false);
   };
@@ -225,16 +232,26 @@ const OTPFlow = ({
         headers: getDeviceFingerprintHeaders()
       });
       if (res.data.next_step) onComplete(res.data.next_step);
-      else if (res.data.redirect_url) onSuccess(res.data.redirect_url, 'Sign in successful! Redirecting...');
+      else if (res.data.redirect_url) onSuccess(res.data.redirect_url);
     } catch (err) {
       const detail = err.response?.data?.detail;
+      const statusCode = err.response?.status;
+      const rawMsg = typeof detail === 'string' ? detail : detail?.message || detail?.msg || 'Failed to verify OTP';
+      const displayMsg = (typeof detail === 'object' && detail?.status_code)
+        ? `[${detail.status_code}] ${rawMsg}`
+        : (statusCode && statusCode !== 400 && statusCode !== 500)
+          ? `[${statusCode}] ${rawMsg}`
+          : rawMsg;
+
+      useToastStore.getState().addToast(displayMsg, 'error');
+      setError(displayMsg);
+
       if (detail && detail.redirect_url) {
-        setError(detail.message || 'Failed to verify OTP');
-        setLoading(true);
-        setTimeout(() => { window.location.href = detail.redirect_url; }, 3000);
+        setTimeout(() => {
+          window.location.href = detail.redirect_url;
+        }, 1500);
         return;
       }
-      setError(typeof detail === 'string' ? detail : detail?.message || 'Failed to verify OTP');
     }
     setLoading(false);
   };
@@ -333,16 +350,26 @@ const PasswordFlow = ({
         request_id, email: formData.email, password: formData.password
       }, { withCredentials: true, headers: getDeviceFingerprintHeaders() });
       if (res.data.next_step) onComplete(res.data.next_step);
-      else if (res.data.redirect_url) onSuccess(res.data.redirect_url, 'Sign in successful! Redirecting...');
+      else if (res.data.redirect_url) onSuccess(res.data.redirect_url);
     } catch (err) {
       const detail = err.response?.data?.detail;
+      const statusCode = err.response?.status;
+      const rawMsg = typeof detail === 'string' ? detail : detail?.message || detail?.msg || 'Failed to authenticate';
+      const displayMsg = (typeof detail === 'object' && detail?.status_code)
+        ? `[${detail.status_code}] ${rawMsg}`
+        : (statusCode && statusCode !== 400 && statusCode !== 500)
+          ? `[${statusCode}] ${rawMsg}`
+          : rawMsg;
+
+      useToastStore.getState().addToast(displayMsg, 'error');
+      setError(displayMsg);
+
       if (detail && detail.redirect_url) {
-        setError(detail.message || 'Failed to authenticate');
-        setLoading(true);
-        setTimeout(() => { window.location.href = detail.redirect_url; }, 3000);
+        setTimeout(() => {
+          window.location.href = detail.redirect_url;
+        }, 1500);
         return;
       }
-      setError(typeof detail === 'string' ? detail : detail?.message || 'Failed to authenticate');
     }
     setLoading(false);
   };
@@ -468,12 +495,12 @@ const ProviderSelectionFlow = ({ enabledMethods, socialLayout, textColor, btnTex
             Continue with OTP
           </p>
           <div className='flex gap-2.5'>
-            <button onClick={onSelectEmailOTP} className='flex-1 flex items-center justify-center gap-2 border py-3 text-sm font-bold hover:opacity-80 transition-all'
+            <button onClick={onSelectEmailOTP} className='flex-1 flex items-center justify-center gap-2 py-3 text-sm font-bold border hover:opacity-80 transition-all'
               style={{ backgroundColor: 'rgba(34,197,94,0.08)', borderColor: 'rgba(34,197,94,0.2)', color: btnTextColor || textColor, borderRadius }}>
-              <span className='text-green-400 text-base'><MdOutlineSms /></span>
+              <span className='text-blue-500 text-base'><MdOutlineSms /></span>
               Email
             </button>
-            <button onClick={onSelectMobileOTP} className='flex-1 flex items-center justify-center gap-2 border py-3 text-sm font-bold hover:opacity-80 transition-all'
+            <button onClick={onSelectMobileOTP} className='flex-1 flex items-center justify-center gap-2 py-3 text-sm font-bold border hover:opacity-80 transition-all'
               style={{ backgroundColor: 'rgba(6,182,212,0.08)', borderColor: 'rgba(6,182,212,0.2)', color: btnTextColor || textColor, borderRadius }}>
               <span className='text-cyan-400 text-base'><MdOutlineSms /></span>
               Mobile
@@ -481,20 +508,20 @@ const ProviderSelectionFlow = ({ enabledMethods, socialLayout, textColor, btnTex
           </div>
         </div>
       ) : hasEmailOTP ? (
-        <button onClick={onSelectEmailOTP} className='w-full flex items-center justify-center gap-2 border py-3 text-sm font-bold hover:opacity-80 transition-all'
+        <button onClick={onSelectEmailOTP} className='w-full flex items-center justify-center gap-2 py-3 text-sm font-bold border hover:opacity-80 transition-all'
           style={{ backgroundColor: 'rgba(34,197,94,0.08)', borderColor: 'rgba(34,197,94,0.2)', color: btnTextColor || textColor, borderRadius }}>
-          <span className='text-green-400 text-lg'><MdOutlineSms /></span>
+          <span className='text-blue-500 text-lg'><MdOutlineSms /></span>
           Continue with OTP
         </button>
       ) : hasMobileOTP ? (
-        <button onClick={onSelectMobileOTP} className='w-full flex items-center justify-center gap-2 border py-3 text-sm font-bold hover:opacity-80 transition-all'
+        <button onClick={onSelectMobileOTP} className='w-full flex items-center justify-center gap-2 py-3 text-sm font-bold border hover:opacity-80 transition-all'
           style={{ backgroundColor: 'rgba(6,182,212,0.08)', borderColor: 'rgba(6,182,212,0.2)', color: btnTextColor || textColor, borderRadius }}>
           <span className='text-cyan-400 text-lg'><MdOutlineSms /></span>
           Continue with OTP
         </button>
       ) : null}
       {enabledMethods.some(m => m.id === 'password') && (
-        <button onClick={onSelectPassword} className='w-full flex items-center justify-center gap-2 border py-3 text-sm font-bold hover:opacity-80 transition-all'
+        <button onClick={onSelectPassword} className='w-full flex items-center justify-center gap-2 py-3 text-sm font-bold border hover:opacity-80 transition-all'
           style={{ backgroundColor: 'rgba(59,130,246,0.08)', borderColor: 'rgba(59,130,246,0.2)', color: btnTextColor || textColor, borderRadius }}>
           <span className='text-blue-400 text-lg'><RiLockPasswordLine /></span>
           Continue with Password
@@ -522,11 +549,26 @@ const AdditionalFieldsFlow = ({ request_id, signupFields, onSuccess, primary, te
         withCredentials: true,
         headers: getDeviceFingerprintHeaders()
       });
-      if (res.data.redirect_url) onSuccess(res.data.redirect_url, 'Sign up successful! Redirecting...');
+      if (res.data.redirect_url) onSuccess(res.data.redirect_url);
     } catch (err) {
       const detail = err.response?.data?.detail;
-      if (detail && detail.redirect_url) { window.location.href = detail.redirect_url; return; }
-      setError(typeof detail === 'string' ? detail : detail?.message || 'Failed to complete signup');
+      const statusCode = err.response?.status;
+      const rawMsg = typeof detail === 'string' ? detail : detail?.message || detail?.msg || 'Failed to complete signup';
+      const displayMsg = (typeof detail === 'object' && detail?.status_code)
+        ? `[${detail.status_code}] ${rawMsg}`
+        : (statusCode && statusCode !== 400 && statusCode !== 500)
+          ? `[${statusCode}] ${rawMsg}`
+          : rawMsg;
+
+      useToastStore.getState().addToast(displayMsg, 'error');
+      setError(displayMsg);
+
+      if (detail && detail.redirect_url) {
+        setTimeout(() => {
+          window.location.href = detail.redirect_url;
+        }, 1500);
+        return;
+      }
     }
     setLoading(false);
   };
@@ -554,6 +596,36 @@ const AdditionalFieldsFlow = ({ request_id, signupFields, onSuccess, primary, te
 };
 
 // ─── Main LoginPortal ─────────────────────────────────────────────────────────
+const DEFAULT_CONFIG_FALLBACK = {
+  config: {
+    branding: 'DAuth',
+    ui: {
+      screen_bg_color: '#0f172a',
+      login_card_bg_color: 'rgba(30, 41, 59, 0.7)',
+      primary_color: '#3b82f6',
+      text_color: '#ffffff',
+      btn_text_color: '#ffffff',
+      link_color: '#60a5fa',
+      border_radius: 'rounded',
+      shadow_intensity: 'md',
+      blur_amount: 24,
+      border_width: 1,
+      border_color: 'rgba(255,255,255,0.10)',
+      button_style: 'filled',
+      input_style: 'outlined',
+      input_border_color: 'rgba(255,255,255,0.12)',
+      logo_position: 'center',
+      social_layout: 'list',
+      bg_pattern: 'dots',
+      gradient_start: '#0f172a',
+      gradient_end: '#1e1b4b',
+      gradient_direction: '135deg',
+    }
+  },
+  enabled_methods: ['password', 'google', 'github', 'otp', 'email_otp', 'mobile_otp'],
+  signup_fields: []
+};
+
 export const LoginPortal = () => {
   const { request_id, flow_type } = useParams();
   const [searchParams] = useSearchParams();
@@ -571,8 +643,9 @@ export const LoginPortal = () => {
   const [configData, setConfigData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [redirectTarget, setRedirectTarget] = useState(null);
+  const [countdown, setCountdown] = useState(4);
   const [currentStep, setCurrentStep] = useState('provider_selection');
-  const [successState, setSuccessState] = useState(null);
 
   const rawMethods = configData?.config?.auth_methods || [];
   const isEmailOTPEnabled = rawMethods.some(m => (m.id === 'email_otp' || m.id === 'otp') && m.enabled);
@@ -593,9 +666,22 @@ export const LoginPortal = () => {
     )
   );
 
-  const handleSuccessRedirect = (url, message) => {
-    setSuccessState({ url, message });
-    setTimeout(() => { window.location.href = url; }, 2000);
+  const handleReturn = useCallback((target = redirectTarget) => {
+    if (!target || target === 'history_back') {
+      if (window.history.length > 1) {
+        window.history.back();
+        return;
+      }
+      window.location.href = '/';
+      return;
+    }
+    window.location.href = target;
+  }, [redirectTarget]);
+
+  const handleSuccessRedirect = (url) => {
+    if (url) {
+      window.location.href = url;
+    }
   };
 
   const fetchConfig = useCallback(async (locationCoords = null) => {
@@ -644,19 +730,48 @@ export const LoginPortal = () => {
         return;
       }
 
+      // Determine the origin / return destination
+      let target = null;
       if (detail && detail.redirect_url) {
-        setError(detail.message || 'Something went wrong, please try again.');
-        setTimeout(() => { window.location.href = detail.redirect_url; }, 3000);
-        return;
+        target = detail.redirect_url;
+      } else if (searchParams.get('return_url')) {
+        target = searchParams.get('return_url');
+      } else if (searchParams.get('redirect_url')) {
+        target = searchParams.get('redirect_url');
+      } else if (document.referrer && !document.referrer.includes(window.location.host)) {
+        target = document.referrer;
+      } else if (window.history.length > 1) {
+        target = 'history_back';
       }
+
+      setRedirectTarget(target);
       setError(msg);
+      setCountdown(4);
       setLoading(false);
     }
-  }, [backend_url, flow_type, lockMethod, prefillEmail, prefillPhone, request_id]);
+  }, [backend_url, flow_type, lockMethod, prefillEmail, prefillPhone, request_id, searchParams]);
 
   useEffect(() => {
     fetchConfig();
   }, [fetchConfig]);
+
+  // Auto-redirect countdown on error
+  useEffect(() => {
+    if (!error || error.includes("location permissions")) return;
+
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          handleReturn(redirectTarget);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [error, redirectTarget, handleReturn]);
 
   // Auto-navigate to locked method once config is loaded
   useEffect(() => {
@@ -685,14 +800,6 @@ export const LoginPortal = () => {
     document.head.appendChild(link);
   }, [configData]);
 
-  if (loading) {
-    return (
-      <div className='min-h-screen bg-slate-950 flex items-center justify-center'>
-        <div className='w-12 h-12 border-4 border-cyan-500/20 border-t-indigo-500 rounded-full animate-spin' />
-      </div>
-    );
-  }
-
   if (error) {
     const isLocationError = error.includes("location permissions");
 
@@ -719,28 +826,81 @@ export const LoginPortal = () => {
       }
     };
 
+    let targetLabel = "Application";
+    try {
+      if (redirectTarget && redirectTarget.startsWith('http')) {
+        const parsed = new URL(redirectTarget);
+        targetLabel = parsed.hostname;
+      }
+    } catch (_) {}
+
     return (
-      <div className='min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4'>
-        <div className='bg-red-500/10 border border-red-500/20 rounded-2xl p-8 max-w-sm text-center w-full'>
-          <h2 className='text-red-400 font-bold text-xl mb-2'>Authentication Error</h2>
-          <p className={`text-slate-400 text-sm ${isLocationError ? 'mb-6' : ''}`}>{error}</p>
-          {isLocationError && (
-            <button 
-              onClick={handleRetryLocation}
-              className='bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-400 font-bold py-2.5 px-4 rounded-xl text-sm transition-all w-full'
-            >
-              Retry Location Access
-            </button>
+      <div className='min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-[#0a0d14] text-white p-4'>
+        {/* Subtle grid background */}
+        <div
+          className='absolute inset-0 pointer-events-none'
+          style={{
+            backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)',
+            backgroundSize: '28px 28px',
+          }}
+        />
+        <div className='absolute w-96 h-96 rounded-full pointer-events-none opacity-15 blur-3xl bg-red-500/30 top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2' />
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 12 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.35, ease: 'easeOut' }}
+          className='relative w-full max-w-md mx-4 p-7 sm:p-8 z-10 rounded-3xl border border-red-500/20 bg-[#140f12]/95 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8),0_0_30px_rgba(239,68,68,0.15)] text-center'
+        >
+          <div className='w-16 h-16 rounded-2xl bg-gradient-to-tr from-red-500/20 to-orange-500/10 border border-red-500/30 flex items-center justify-center mx-auto mb-4 text-red-400 shadow-inner'>
+            <AlertTriangle size={30} className='animate-pulse' />
+          </div>
+
+          <h2 className='text-red-400 font-extrabold text-xl tracking-tight mb-2'>Authentication Error</h2>
+          <p className='text-slate-300 text-xs sm:text-sm leading-relaxed mb-5'>{error}</p>
+
+          {!isLocationError && (
+            <div className='mb-6 px-3.5 py-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-300/90 flex items-center justify-center gap-2'>
+              <span className='w-2 h-2 rounded-full bg-red-400 animate-ping' />
+              <span>Redirecting back in <strong className='text-white font-mono font-bold'>{countdown}s</strong>...</span>
+            </div>
           )}
-        </div>
+
+          <div className='space-y-2.5'>
+            {isLocationError ? (
+              <button 
+                onClick={handleRetryLocation}
+                className='bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold py-3 px-4 rounded-xl text-sm transition-all w-full shadow-lg shadow-red-500/20 active:scale-98 flex items-center justify-center gap-2'
+              >
+                <RotateCcw size={16} />
+                <span>Retry Location Access</span>
+              </button>
+            ) : (
+              <button 
+                onClick={() => handleReturn(redirectTarget)}
+                className='bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-black py-3.5 px-5 rounded-2xl text-xs sm:text-sm transition-all w-full shadow-lg shadow-cyan-500/25 active:scale-98 flex items-center justify-center gap-2 group'
+              >
+                <ArrowLeft size={16} className='group-hover:-translate-x-1 transition-transform' />
+                <span>Return to {targetLabel !== "Application" ? targetLabel : "Previous Page"}</span>
+              </button>
+            )}
+
+            <button
+              onClick={() => window.location.reload()}
+              className='w-full py-2 text-xs font-semibold text-slate-400 hover:text-white transition-colors'
+            >
+              Try Reloading
+            </button>
+          </div>
+        </motion.div>
       </div>
     );
   }
 
-  if (!configData) return null;
+  const activeConfigData = configData || DEFAULT_CONFIG_FALLBACK;
 
-  const { ui, branding } = configData.config;
-  const { enabled_methods, signup_fields } = configData;
+  const { ui, branding } = activeConfigData.config || {};
+  const { enabled_methods = ['password', 'google', 'github', 'otp'], signup_fields = [] } = activeConfigData;
 
   const uiConfig = ui || {};
   const {
@@ -863,17 +1023,7 @@ export const LoginPortal = () => {
 
         {/* Flow content */}
         <AnimatePresence mode='wait'>
-          {successState ? (
-            <motion.div key='success' initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className='flex flex-col items-center justify-center py-8 text-center space-y-4'>
-              <div className='w-16 h-16 rounded-full flex items-center justify-center' style={{ backgroundColor: `${primary_color}22`, color: primary_color }}>
-                <Check size={32} />
-              </div>
-              <div>
-                <h2 className='text-lg font-bold' style={{ color: text_color }}>Success</h2>
-                <p className='text-sm mt-1' style={{ color: `${text_color}80` }}>{successState.message}</p>
-              </div>
-            </motion.div>
-          ) : currentStep === 'additional_fields' ? (
+          {currentStep === 'additional_fields' ? (
             <AdditionalFieldsFlow key='fields' request_id={request_id} signupFields={signup_fields} onSuccess={handleSuccessRedirect} {...sharedFormProps} />
           ) : currentStep === 'email_otp_verification' || currentStep === 'otp_verification' ? (
             <OTPFlow

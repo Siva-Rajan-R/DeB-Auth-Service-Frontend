@@ -522,7 +522,7 @@ export const AnalyticsPanel = ({ apikey }) => {
                       <td className="px-4 py-3 truncate max-w-[150px] font-medium text-slate-800" title={log.identifier}>{log.identifier}</td>
                       <td className="px-4 py-3">
                         <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${
-                          log.event_type.includes('SUCCESS') ? 'bg-emerald-50 text-emerald-600 border border-emerald-200/50' :
+                          log.event_type.includes('SUCCESS') ? 'bg-blue-50 text-blue-600 border border-emerald-200/50' :
                           log.event_type.includes('FAILED') ? 'bg-red-50 text-red-600 border border-red-200/50' :
                           'bg-cyan-50 text-cyan-600 border border-cyan-200/50'
                         }`}>
@@ -618,7 +618,7 @@ export const AnalyticsPanel = ({ apikey }) => {
                         {item.key.includes('@') ? (
                           <Mail size={14} className="text-cyan-500 flex-shrink-0" />
                         ) : (
-                          <Phone size={14} className="text-emerald-500 flex-shrink-0" />
+                          <Phone size={14} className="text-blue-500 flex-shrink-0" />
                         )}
                         <span className="text-xs font-semibold text-slate-800 truncate" title={item.key}>
                           {item.key}

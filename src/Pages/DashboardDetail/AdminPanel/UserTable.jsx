@@ -80,7 +80,7 @@ export const UserTable = ({ onEdit }) => {
                 {user.custom_fields?.signed_in_sites?.length > 0 ? (
                   <div className='flex flex-wrap gap-1.5 max-w-[200px]'>
                     {user.custom_fields.signed_in_sites.map((s, i) => (
-                      <span key={i} className='text-[10px] bg-emerald-50 border border-emerald-200 text-emerald-600 px-2 py-1 rounded-lg whitespace-nowrap shadow-sm' title={`Last accessed: ${new Date(s.timestamp * 1000).toLocaleString()}`}>
+                      <span key={i} className='text-[10px] bg-blue-50 border border-emerald-200 text-blue-600 px-2 py-1 rounded-lg whitespace-nowrap shadow-sm' title={`Last accessed: ${new Date(s.timestamp * 1000).toLocaleString()}`}>
                         {s.url ? s.url.replace(/^https?:\/\//, '') : '—'}
                       </span>
                     ))}
@@ -101,8 +101,8 @@ export const UserTable = ({ onEdit }) => {
               {/* Status */}
               <td className='px-5 py-4'>
                 {user.status === 'active' || user.created_at ? (
-                  <span className='inline-flex items-center gap-1.5 text-[10px] font-bold bg-emerald-50 text-emerald-500 border border-emerald-200 px-3 py-1.5 rounded-xl uppercase tracking-wider'>
-                    <span className='w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]' />
+                  <span className='inline-flex items-center gap-1.5 text-[10px] font-bold bg-blue-50 text-blue-500 border border-emerald-200 px-3 py-1.5 rounded-xl uppercase tracking-wider'>
+                    <span className='w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]' />
                     Active
                   </span>
                 ) : (

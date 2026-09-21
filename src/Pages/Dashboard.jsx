@@ -6,10 +6,12 @@ import { useNetworkCalls } from '../Utils/NetworkCalls';
 import { AuthContext } from '../Contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Search, X } from 'lucide-react';
 
 export const DashboardPage = () => {
   const [secrets, setSecrets] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const { call } = useNetworkCalls();
   const { isSecretsAdded } = useContext(AuthContext);
@@ -45,6 +47,13 @@ export const DashboardPage = () => {
     setLoading(false);
   };
 
+  const filteredSecrets = secrets.filter((item) => {
+    const name = (item.configurations?.project_name || item.domain || '').toLowerCase();
+    const key = (item.apikey || '').toLowerCase();
+    const q = searchTerm.toLowerCase().trim();
+    return !q || name.includes(q) || key.includes(q);
+  });
+
   return (
     <div 
       className='w-full flex-1 flex flex-col relative overflow-y-auto overflow-x-hidden custom-scrollbar'
@@ -53,18 +62,54 @@ export const DashboardPage = () => {
       {/* Decorative Background Elements */}
       <div className='absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[var(--accent-cyan)]/10 blur-[120px] rounded-full pointer-events-none' />
       
-      <div className='flex-1 px-4 md:px-12 py-8 md:py-12 relative z-10'>
+      <div className='flex-1 px-4 md:px-12 py-6 md:py-8 relative z-10'>
         {/* Header Section */}
-        <div className='flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8'>
+        <div className='flex flex-col md:flex-row md:items-center justify-between gap-4 mb-7'>
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
-            className='max-w-4xl'
+            className='max-w-2xl'
           >
-            <h1 className='text-3xl md:text-5xl font-extrabold text-[var(--text-main)] tracking-tight'>
-              Auth <span className='text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-cyan)] to-[var(--accent-purple)]'>Projects</span>
+            <div className='flex items-center gap-2 mb-1.5'>
+              <span className='px-2.5 py-0.5 rounded-full bg-cyan-100 border border-cyan-300 text-cyan-800 text-[10px] font-black uppercase tracking-wider'>
+                Secure Auth
+              </span>
+              <span className='text-xs font-extrabold text-slate-700'>Authentication Platform</span>
+            </div>
+            <h1 className='text-2xl md:text-3xl font-black text-slate-900 tracking-tight'>
+              Auth <span className='text-[var(--primary-cyan)]'>Projects</span>
             </h1>
+            <p className='text-xs md:text-sm text-slate-600 font-medium mt-0.5'>
+              Manage your authentication applications, API keys, and custom sign-in flows.
+            </p>
+          </motion.div>
+
+          {/* Search Bar in place of create button */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className='w-full md:w-80 relative'
+          >
+            <div className='relative flex items-center'>
+              <Search size={16} className='absolute left-3.5 text-slate-400 pointer-events-none' />
+              <input
+                type='text'
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder='Search projects by name or key...'
+                className='w-full pl-10 pr-9 py-2.5 bg-white/90 border border-slate-200/90 rounded-2xl text-xs font-semibold text-slate-800 placeholder-slate-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition-all'
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm('')}
+                  className='absolute right-3 p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors'
+                  title='Clear search'
+                >
+                  <X size={13} />
+                </button>
+              )}
+            </div>
           </motion.div>
         </div>
 
@@ -72,7 +117,7 @@ export const DashboardPage = () => {
           <div className='flex flex-col items-center justify-center h-64 gap-4'>
             <div className='relative w-16 h-16'>
               <div className='absolute inset-0 border-4 border-[var(--border-glass)] rounded-full' />
-              <div className='absolute inset-0 border-4 border-[var(--accent-cyan)] border-t-transparent rounded-full animate-spin' />
+              <div className='absolute inset-0 border-4 border-t-[var(--accent-cyan)] border-r-transparent rounded-full animate-spin' />
             </div>
             <p className='text-[var(--text-dim)] font-medium animate-pulse'>Loading projects...</p>
           </div>
@@ -83,10 +128,25 @@ export const DashboardPage = () => {
               <CreateNewCard heading='Create your first project' onClick={handleCreateNew} />
             </div>
           </div>
+        ) : filteredSecrets.length === 0 ? (
+          /* No Search Match State */
+          <div className='flex flex-col items-center justify-center min-h-[40vh] w-full text-center space-y-3'>
+            <div className='w-12 h-12 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400'>
+              <Search size={22} />
+            </div>
+            <p className='text-sm font-bold text-slate-700'>No projects match &ldquo;{searchTerm}&rdquo;</p>
+            <p className='text-xs text-slate-500'>Try searching with a different project name or API key.</p>
+            <button
+              onClick={() => setSearchTerm('')}
+              className='px-4 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all'
+            >
+              Clear Search
+            </button>
+          </div>
         ) : (
           /* Projects Grid */
           <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 w-full max-w-7xl mx-auto'>
-            {secrets.map((item, index) => (
+            {filteredSecrets.map((item, index) => (
               <div key={item.apikey || index} className="h-full">
                 <DashboardCards
                   title={item.configurations?.project_name || `Project #${index + 1}`}
@@ -109,13 +169,13 @@ export const DashboardPage = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40  p-4"
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0, y: 10 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 10 }}
-              className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden"
+              className="neu-flat rounded-2xl w-full max-w-sm overflow-hidden"
             >
               <div className="p-6">
                 <h3 className="text-xl font-bold text-slate-800 mb-2">Delete Project</h3>
@@ -123,16 +183,16 @@ export const DashboardPage = () => {
                   Are you sure you want to delete this project? This action cannot be undone and will permanently remove all related authentication data.
                 </p>
               </div>
-              <div className="flex bg-slate-50 p-4 gap-3 justify-end border-t border-slate-100">
+              <div className="flex p-4 gap-3 justify-end  border-[var(--border-glass)] mt-2">
                 <button
                   onClick={() => setDeleteConfirm(null)}
-                  className="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-200 rounded-lg transition-colors"
+                  className="neu-button px-4 py-2 text-sm font-semibold text-[var(--text-muted)]"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={executeDelete}
-                  className="px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors shadow-sm shadow-red-500/20"
+                  className="neu-button px-4 py-2 text-sm font-semibold text-red-500"
                 >
                   Delete
                 </button>

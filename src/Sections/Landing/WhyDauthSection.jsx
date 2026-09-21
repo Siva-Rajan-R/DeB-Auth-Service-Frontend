@@ -19,7 +19,7 @@ export const WhyDauthSection = () => {
       description: "Add modern authentication without implementing every OAuth and OTP flow from scratch.",
     },
     {
-      icon: <Paintbrush className="text-emerald-600" size={24} />,
+      icon: <Paintbrush className="text-blue-600" size={24} />,
       title: "Customize the Experience",
       description: "Make authentication look and feel like an integral part of your own product.",
     },
@@ -29,7 +29,7 @@ export const WhyDauthSection = () => {
       description: "Agencies and dev shops can manage authentication across multiple client applications.",
     },
     {
-      icon: <ShieldCheck className="text-teal-600" size={24} />,
+      icon: <ShieldCheck className="text-indigo-600" size={24} />,
       title: "Pay for Successful Logins",
       description: "Usage is measured strictly by completed authentication events — not page hits.",
     },
@@ -50,7 +50,7 @@ export const WhyDauthSection = () => {
   ];
 
   return (
-    <section id="why-dauth" className="py-24 bg-white relative border-t border-slate-200/80">
+    <section id="why-dauth" className="py-24 relative">
       <div className="max-w-7xl mx-auto px-6">
         
         {/* Why DAuth Grid */}
@@ -59,7 +59,7 @@ export const WhyDauthSection = () => {
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-100 border border-cyan-200 text-cyan-800 text-xs font-semibold"
+            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-100 -cyan-200 text-cyan-800 text-xs font-semibold"
           >
             <Zap size={14} /> Core Advantages
           </motion.div>
@@ -82,9 +82,9 @@ export const WhyDauthSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.05 }}
-              className="bg-[#f8fafc] border border-slate-200 rounded-3xl p-8 hover:border-cyan-400/40 transition-all shadow-sm"
+              className="bg-[#f8fafc] rounded-3xl p-8 hover:-cyan-400/40 transition-all neu-flat"
             >
-              <div className="p-3 bg-white border border-slate-200 rounded-2xl w-fit mb-6 shadow-sm">
+              <div className="p-3 rounded-2xl w-fit mb-6 neu-flat">
                 {r.icon}
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2 tracking-tight">{r.title}</h3>
@@ -94,7 +94,7 @@ export const WhyDauthSection = () => {
         </div>
 
         {/* SECURITY PHILOSOPHY SECTION */}
-        <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-8 sm:p-12 shadow-xl relative text-white">
+        <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-8 sm:p-12 neu-flat relative text-white">
           <div className="max-w-3xl mb-8">
             <div className="inline-flex items-center gap-2 text-cyan-400 font-mono text-xs font-bold uppercase mb-2">
               <Lock size={14} /> Security Philosophy
@@ -107,9 +107,9 @@ export const WhyDauthSection = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 pt-4 border-t border-slate-700/80">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 pt-4">
             {securityPrinciples.map((principle, idx) => (
-              <div key={idx} className="flex items-center gap-2 p-2.5 bg-slate-800/60 rounded-xl border border-slate-700/60">
+              <div key={idx} className="flex items-center gap-2 p-2.5 bg-slate-800/60 rounded-xl">
                 <CheckCircle2 size={13} className="text-cyan-400 flex-shrink-0" />
                 <span className="text-xs font-semibold text-slate-200 truncate">{principle}</span>
               </div>

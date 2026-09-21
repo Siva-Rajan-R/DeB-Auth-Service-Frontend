@@ -26,17 +26,17 @@ export const LocationAuthPanel = () => {
         </div>
       </div>
 
-      <div className="bg-[var(--bg-surface)] border border-[var(--border-glass)] rounded-xl p-4 shadow-md relative overflow-hidden">
+      <div className="bg-[var(--bg-card)] border border-slate-300/80 rounded-2xl p-5 shadow-sm relative overflow-hidden">
         {/* Header/Toggle Row */}
         <div className="flex items-start justify-between relative z-10">
           <div className="flex-1 pr-6">
-            <div className="flex items-center gap-2 mb-1.5">
-              <div className={`p-1.5 rounded-lg transition-colors ${isEnabled ? 'bg-cyan-500/10 text-cyan-500' : 'bg-black/5 dark:bg-white/5 text-[var(--text-muted)]'}`}>
-                <MapPin size={16} />
+            <div className="flex items-center gap-2 mb-2">
+              <div className={`p-2 rounded-xl transition-colors ${isEnabled ? 'bg-cyan-500/15 text-cyan-700 border border-cyan-300' : 'bg-slate-200/80 text-slate-600 border border-slate-300'}`}>
+                <MapPin size={18} />
               </div>
-              <h3 className="text-base font-bold text-[var(--text-main)]">Enable Location Auth</h3>
+              <h3 className="text-base font-extrabold text-slate-900">Enable Location Auth</h3>
             </div>
-            <p className="text-xs text-[var(--text-muted)] leading-relaxed">
+            <p className="text-xs text-slate-700 font-medium leading-relaxed">
               When enabled, users will be prompted by their browser to grant location permissions. Their latitude and longitude will be attached to the final JWT payload.
             </p>
           </div>
@@ -48,7 +48,7 @@ export const LocationAuthPanel = () => {
               checked={isEnabled}
               onChange={(e) => setLocationAuth(e.target.checked)}
             />
-            <div className="w-9 h-5 bg-black/10 dark:bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-cyan-500"></div>
+            <div className="w-11 h-6 bg-slate-300 border border-slate-400/50 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-600 peer-checked:border-cyan-700 shadow-inner"></div>
           </label>
         </div>
 

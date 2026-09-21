@@ -166,7 +166,7 @@ export const PricingPage = () => {
 
   const FeatureRow = ({ children, highlighted = false }) => (
     <li className="flex items-start gap-3">
-      <Check size={18} className={`${highlighted ? 'text-cyan-200' : 'text-emerald-500'} flex-shrink-0 mt-0.5`} />
+      <Check size={18} className={`${highlighted ? 'text-cyan-200' : 'text-blue-500'} flex-shrink-0 mt-0.5`} />
       <span className={highlighted ? 'text-white' : 'text-slate-600'}>{children}</span>
     </li>
   );

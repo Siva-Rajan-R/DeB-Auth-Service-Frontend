@@ -17,7 +17,7 @@ export const ComparisonTableSection = () => {
   ];
 
   return (
-    <section id="comparison" className="py-20 bg-[#f8fafc] relative border-t border-slate-200/80">
+    <section id="comparison" className="py-20 bg-[#f8fafc] relative">
       <div className="max-w-7xl mx-auto px-6">
         
         {/* Section Header */}
@@ -26,7 +26,7 @@ export const ComparisonTableSection = () => {
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-100 border border-cyan-200 text-cyan-800 text-xs font-semibold"
+            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-100 -cyan-200 text-cyan-800 text-xs font-semibold"
           >
             <Sparkles size={14} /> Architectural Contrast
           </motion.div>
@@ -56,13 +56,13 @@ export const ComparisonTableSection = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-xl overflow-x-auto"
+          className="rounded-3xl overflow-hidden neu-flat overflow-x-auto"
         >
-          <table className="w-full text-left border-collapse min-w-[700px]">
+          <table className="w-full text-left -collapse min-w-[700px]">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-200 text-xs uppercase tracking-wider font-mono">
+              <tr className="text-xs uppercase tracking-wider font-mono">
                 <th className="py-5 px-6 text-slate-600">Capability</th>
-                <th className="py-5 px-6 text-cyan-800 font-bold bg-cyan-50 border-x border-cyan-200 flex items-center gap-2">
+                <th className="py-5 px-6 text-cyan-800 font-bold bg-cyan-50 -x -cyan-200 flex items-center gap-2">
                   <ShieldCheck size={16} className="text-cyan-600" />
                   <span>DAuth Platform</span>
                 </th>
@@ -71,11 +71,11 @@ export const ComparisonTableSection = () => {
             </thead>
             <tbody className="divide-y divide-slate-200 text-xs sm:text-sm">
               {comparisonData.map((row, i) => (
-                <tr key={i} className="hover:bg-slate-50 transition-colors">
+                <tr key={i} className="hover: transition-colors">
                   <td className="py-4 px-6 font-medium text-slate-800">
                     {row.cap}
                   </td>
-                  <td className="py-4 px-6 font-bold text-cyan-900 bg-cyan-50/50 border-x border-cyan-100 font-mono">
+                  <td className="py-4 px-6 font-bold text-cyan-900 bg-cyan-50/50 -x -cyan-100 font-mono">
                     <span className="inline-flex items-center gap-1.5">
                       <CheckCircle2 size={15} className="text-cyan-600 flex-shrink-0" />
                       {row.dauth}

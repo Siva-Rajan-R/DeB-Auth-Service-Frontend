@@ -73,7 +73,7 @@ export const RoleManager = () => {
                       className='flex-1 bg-[var(--bg-deep)] border border-cyan-500/50 rounded-xl px-4 py-2 text-[var(--text-main)] text-sm focus:outline-none focus:border-cyan-500 shadow-inner'
                     />
                     <div className='flex items-center gap-1.5'>
-                      <button onClick={confirmEdit} className='text-emerald-500 hover:bg-emerald-50 transition-all p-2 rounded-xl'>
+                      <button onClick={confirmEdit} className='text-blue-500 hover:bg-blue-50 transition-all p-2 rounded-xl'>
                         <Check size={16} />
                       </button>
                       <button onClick={() => setEditingId(null)} className='text-[var(--text-dim)] hover:bg-white/5 transition-all p-2 rounded-xl'>

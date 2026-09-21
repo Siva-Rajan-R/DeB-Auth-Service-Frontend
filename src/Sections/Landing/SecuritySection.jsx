@@ -9,7 +9,7 @@ export const SecuritySection = () => {
       description: "Restrict authentication based on configured geographic locations when required by your application's compliance rules.",
     },
     {
-      icon: <KeyRound className="text-emerald-600" size={24} />,
+      icon: <KeyRound className="text-blue-600" size={24} />,
       title: "MFA (Multi-Factor)",
       description: "Add an additional authentication factor to sensitive accounts and workflows with TOTP and SMS fallback options.",
     },
@@ -29,14 +29,14 @@ export const SecuritySection = () => {
       description: "Secure provider redirects, authorization codes, PKCE parameter validation, and application callbacks.",
     },
     {
-      icon: <Key className="text-teal-600" size={24} />,
+      icon: <Key className="text-indigo-600" size={24} />,
       title: "Key-Based Verification",
       description: "Use client credentials and secure server-side token exchange for backend-to-backend services.",
     },
   ];
 
   return (
-    <section id="security" className="py-24 bg-[#f8fafc] relative border-t border-slate-200/80">
+    <section id="security" className="py-24 bg-[#f8fafc] relative">
       <div className="max-w-7xl mx-auto px-6">
         
         {/* Section Header */}
@@ -45,7 +45,7 @@ export const SecuritySection = () => {
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-100 border border-cyan-200 text-cyan-800 text-xs font-semibold"
+            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-100 -cyan-200 text-cyan-800 text-xs font-semibold"
           >
             <ShieldAlert size={14} /> Enterprise Access Controls
           </motion.div>
@@ -79,9 +79,9 @@ export const SecuritySection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: idx * 0.05 }}
-              className="bg-white border border-slate-200/80 rounded-3xl p-8 hover:border-cyan-400/40 transition-all hover:-translate-y-1 shadow-md"
+              className="rounded-3xl p-8 hover:-cyan-400/40 transition-all hover:-translate-y-1 neu-flat"
             >
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-2xl w-fit mb-6">
+              <div className="p-3 rounded-2xl w-fit mb-6">
                 {sec.icon}
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2 tracking-tight">

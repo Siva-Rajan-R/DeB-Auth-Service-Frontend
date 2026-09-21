@@ -10,7 +10,7 @@ import { LandingFooter } from '../Sections/Landing/LandingFooter';
 
 export const HomePage = () => {
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 selection:bg-cyan-500/20 selection:text-cyan-800 overflow-clip font-sans">
+    <div className="min-h-screen text-slate-900 selection:bg-cyan-500/20 selection:text-cyan-800 overflow-clip font-sans transition-colors duration-500" style={{ backgroundColor: 'var(--bg-deep)' }}>
       <LandingNavbar />
       <main>
         {/* 1. Hero / Entry Point */}

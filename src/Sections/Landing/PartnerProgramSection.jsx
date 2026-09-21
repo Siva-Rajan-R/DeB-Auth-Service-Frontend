@@ -58,7 +58,7 @@ export const PartnerProgramSection = () => {
   const totalMonthlyRevenue = clientCount * marginPerClient;
 
   return (
-    <section id="partners" className="py-20 bg-[#f8fafc] relative border-t border-slate-200/80">
+    <section id="partners" className="py-20 bg-[#f8fafc] relative">
       <div className="max-w-7xl mx-auto px-6">
         
         {/* Section Header */}
@@ -67,7 +67,7 @@ export const PartnerProgramSection = () => {
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-100 border border-cyan-200 text-cyan-800 text-xs font-semibold"
+            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-100 -cyan-200 text-cyan-800 text-xs font-semibold"
           >
             <Briefcase size={14} /> Agency & Partner Program
           </motion.div>
@@ -105,13 +105,13 @@ export const PartnerProgramSection = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mb-16">
           
           {/* Architecture Diagram (Left 6 Cols) */}
-          <div className="lg:col-span-6 bg-white border border-slate-200 rounded-3xl p-8 shadow-md">
+          <div className="lg:col-span-6 rounded-3xl p-8 neu-flat">
             <div className="text-xs font-mono text-cyan-700 font-bold mb-4 flex items-center gap-2">
               <Users size={16} /> PARTNER AGENCY ARCHITECTURE
             </div>
 
             <div className="space-y-4 font-mono text-xs">
-              <div className="p-4 bg-cyan-50 border border-cyan-300 rounded-2xl text-center">
+              <div className="p-4 bg-cyan-50 -cyan-300 rounded-2xl text-center">
                 <span className="text-cyan-900 font-bold text-sm block">DAuth Partner Agency</span>
                 <span className="text-[10px] text-slate-500">Single Centralized Dashboard</span>
               </div>
@@ -119,15 +119,15 @@ export const PartnerProgramSection = () => {
               <div className="flex justify-center text-cyan-600 text-xs">↓ Provisions Clients ↓</div>
 
               <div className="grid grid-cols-3 gap-2">
-                <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-center">
+                <div className="p-3 rounded-xl text-center">
                   <span className="text-slate-900 font-bold block">Client A</span>
                   <span className="text-[9px] text-slate-500">Project 1</span>
                 </div>
-                <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-center">
+                <div className="p-3 rounded-xl text-center">
                   <span className="text-slate-900 font-bold block">Client B</span>
                   <span className="text-[9px] text-slate-500">Project 2</span>
                 </div>
-                <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-center">
+                <div className="p-3 rounded-xl text-center">
                   <span className="text-slate-900 font-bold block">Client C</span>
                   <span className="text-[9px] text-slate-500">Project 3</span>
                 </div>
@@ -135,7 +135,7 @@ export const PartnerProgramSection = () => {
 
               <div className="flex justify-center text-cyan-600 text-xs">↓ Powered By ↓</div>
 
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-center">
+              <div className="p-3 rounded-xl text-center">
                 <span className="text-cyan-700 font-bold">DAuth Platform Infrastructure</span>
               </div>
             </div>
@@ -148,7 +148,7 @@ export const PartnerProgramSection = () => {
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {partnerBenefits.map((b, idx) => (
-                <div key={idx} className="p-3.5 bg-white border border-slate-200 rounded-2xl flex items-center gap-2.5 shadow-sm">
+                <div key={idx} className="p-3.5 rounded-2xl flex items-center gap-2.5 neu-flat">
                   <CheckCircle2 size={16} className="text-cyan-600 flex-shrink-0" />
                   <span className="text-xs font-semibold text-slate-700">{b}</span>
                 </div>
@@ -163,7 +163,7 @@ export const PartnerProgramSection = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="bg-white border border-cyan-200 rounded-3xl p-8 sm:p-12 mb-16 shadow-xl relative overflow-hidden"
+          className="-cyan-200 rounded-3xl p-8 sm:p-12 mb-16 neu-flat relative overflow-hidden"
         >
           <div className="text-center max-w-2xl mx-auto space-y-3 mb-10">
             <span className="text-xs font-mono text-cyan-700 uppercase tracking-widest font-bold">REVENUE MARGIN MODEL</span>
@@ -176,7 +176,7 @@ export const PartnerProgramSection = () => {
           </div>
 
           {/* Interactive Slider */}
-          <div className="max-w-xl mx-auto space-y-6 bg-slate-50 border border-slate-200 p-8 rounded-2xl">
+          <div className="max-w-xl mx-auto space-y-6 p-8 rounded-2xl">
             <div className="flex justify-between items-center text-sm font-bold">
               <span className="text-slate-800">Active Client Projects:</span>
               <span className="text-cyan-700 font-mono text-xl">{clientCount} Clients</span>
@@ -192,7 +192,7 @@ export const PartnerProgramSection = () => {
               className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-cyan-600"
             />
 
-            <div className="grid grid-cols-3 gap-2 text-center text-xs font-mono border-t border-slate-200 pt-4">
+            <div className="grid grid-cols-3 gap-2 text-center text-xs font-mono pt-4">
               <div>
                 <span className="text-slate-500 block text-[10px]">DAUTH PLAN</span>
                 <span className="text-slate-900 font-bold">₹499 / mo</span>
@@ -207,7 +207,7 @@ export const PartnerProgramSection = () => {
               </div>
             </div>
 
-            <div className="p-4 bg-cyan-100 border border-cyan-300 rounded-xl text-center">
+            <div className="p-4 bg-cyan-100 -cyan-300 rounded-xl text-center">
               <span className="text-xs text-cyan-900 block mb-1">Estimated Recurring Monthly Revenue:</span>
               <span className="text-3xl font-black text-cyan-700 tracking-tight">
                 ₹{totalMonthlyRevenue.toLocaleString()} / month
@@ -231,11 +231,11 @@ export const PartnerProgramSection = () => {
             {partnerTiers.map((tier, i) => (
               <div
                 key={tier.name}
-                className="bg-white border border-slate-200 rounded-3xl p-6 hover:border-cyan-400/40 transition-all flex flex-col justify-between shadow-sm"
+                className="rounded-3xl p-6 hover:-cyan-400/40 transition-all flex flex-col justify-between neu-flat"
               >
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-mono font-bold text-cyan-800 bg-cyan-100 px-2.5 py-0.5 rounded-full border border-cyan-300">
+                    <span className="text-xs font-mono font-bold text-cyan-800 bg-cyan-100 px-2.5 py-0.5 rounded-full -cyan-300">
                       {tier.badge}
                     </span>
                     <span className="text-[10px] text-slate-500 font-mono">{tier.level}</span>
@@ -255,7 +255,7 @@ export const PartnerProgramSection = () => {
 
                 <button
                   onClick={() => navigate('/auth')}
-                  className="w-full py-2.5 rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-colors"
+                  className="w-full py-2.5 rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 hover:bg-slate-200 transition-colors"
                 >
                   Apply for {tier.name}
                 </button>

@@ -83,7 +83,7 @@ export const PricingSection = () => {
   ];
 
   return (
-    <section id="pricing" className="py-20 bg-white relative border-t border-slate-200/80">
+    <section id="pricing" className="py-20 relative">
       <div className="max-w-7xl mx-auto px-6">
         
         {/* Section Header */}
@@ -92,7 +92,7 @@ export const PricingSection = () => {
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-100 border border-cyan-200 text-cyan-800 text-xs font-semibold"
+            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-100 -cyan-200 text-cyan-800 text-xs font-semibold"
           >
             <Sparkles size={14} /> Transparent Pricing
           </motion.div>
@@ -117,14 +117,14 @@ export const PricingSection = () => {
         </div>
 
         {/* Definition Highlight Box */}
-        <div className="max-w-3xl mx-auto bg-[#f8fafc] border border-cyan-300 rounded-2xl p-6 mb-16 shadow-md text-center">
+        <div className="max-w-3xl mx-auto bg-[#f8fafc] -cyan-300 rounded-2xl p-6 mb-16 neu-flat text-center">
           <span className="text-xs font-mono text-cyan-800 uppercase font-bold tracking-widest block mb-2">
             FAIR PRICING DEFINITION
           </span>
           <p className="text-base font-extrabold text-slate-900">
             1 Authentication Request = 1 successfully completed authentication through DAuth.
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 pt-4 border-t border-slate-200 text-xs text-left">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 pt-4 text-xs text-left">
             <div className="flex items-start gap-2">
               <XCircle size={16} className="text-red-500 flex-shrink-0 mt-0.5" />
               <div>
@@ -133,9 +133,9 @@ export const PricingSection = () => {
               </div>
             </div>
             <div className="flex items-start gap-2">
-              <CheckCircle2 size={16} className="text-emerald-600 flex-shrink-0 mt-0.5" />
+              <CheckCircle2 size={16} className="text-blue-600 flex-shrink-0 mt-0.5" />
               <div>
-                <span className="text-emerald-700 font-bold block mb-0.5">We ONLY Count:</span>
+                <span className="text-blue-700 font-bold block mb-0.5">We ONLY Count:</span>
                 <span className="text-slate-600 font-normal">Successfully completed Google, GitHub, Password, Email OTP, Mobile OTP, or Passkey logins.</span>
               </div>
             </div>
@@ -158,9 +158,9 @@ export const PricingSection = () => {
               }`}
             >
               {plan.popular && (
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 bg-cyan-500 text-white text-xs font-extrabold rounded-full shadow-md flex items-center gap-1.5">
-                  <Sparkles size={12} className="text-amber-300" />
-                  <span>{plan.badge}</span>
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 bg-cyan-600 text-white text-xs font-extrabold rounded-full neu-flat flex items-center gap-1.5 shadow-md shadow-cyan-500/30">
+                  <img src="/dauth_logo.png" alt="DAuth" className="w-3.5 h-3.5 object-contain brightness-0 invert" />
+                  <span className="text-white font-extrabold">{plan.badge}</span>
                 </div>
               )}
 
@@ -195,7 +195,7 @@ export const PricingSection = () => {
               </div>
 
               {plan.period && (
-                <div className="text-[10px] text-slate-500 font-mono text-center mt-6 pt-4 border-t border-slate-200">
+                <div className="text-[10px] text-slate-500 font-mono text-center mt-6 pt-4">
                   Payment gateway charges may apply.
                 </div>
               )}
@@ -204,7 +204,7 @@ export const PricingSection = () => {
         </div>
 
         {/* MOBILE OTP BILLING CARD */}
-        <div className="bg-[#f8fafc] border border-slate-200 rounded-3xl p-8 max-w-4xl mx-auto shadow-sm">
+        <div className="bg-[#f8fafc] rounded-3xl p-8 max-w-4xl mx-auto neu-flat">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div>
               <div className="inline-flex items-center gap-2 text-cyan-800 text-xs font-mono font-bold uppercase tracking-wider mb-2">
@@ -218,7 +218,7 @@ export const PricingSection = () => {
               </p>
             </div>
 
-            <div className="p-4 bg-white border border-slate-200 rounded-2xl text-center min-w-[200px] shadow-sm">
+            <div className="p-4 rounded-2xl text-center min-w-[200px] neu-flat">
               <span className="text-[10px] text-slate-500 font-mono uppercase block">INDIA SMS RATE</span>
               <span className="text-2xl font-black text-cyan-700 tracking-tight">₹0.40</span>
               <span className="text-[10px] text-slate-500 block font-mono">per successful OTP delivery</span>

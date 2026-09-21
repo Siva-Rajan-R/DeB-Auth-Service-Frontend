@@ -70,7 +70,7 @@ export const ResetPassword = () => {
       >
         {success ? (
           <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className='flex flex-col items-center justify-center py-6 text-center space-y-4'>
-            <div className='w-16 h-16 rounded-full flex items-center justify-center bg-emerald-100 text-emerald-600'>
+            <div className='w-16 h-16 rounded-full flex items-center justify-center bg-blue-100 text-blue-600'>
               <Check size={32} />
             </div>
             <div>

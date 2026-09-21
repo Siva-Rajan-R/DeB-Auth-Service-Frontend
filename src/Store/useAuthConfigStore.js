@@ -45,8 +45,10 @@ const DEFAULT_UI_CONFIG = {
 const DEFAULT_REDIRECT_URLS = {
   signin_success: '',
   signin_failure: '',
+  signin_verification: '',
   signup_success: '',
   signup_failure: '',
+  signup_verification: '',
 };
 
 // Password is the first/default method

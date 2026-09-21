@@ -16,7 +16,7 @@ export const ToastContainer = () => {
             exit={{ opacity: 0, scale: 0.9 }}
             className={`pointer-events-auto flex items-center justify-center gap-3 px-4 py-3 rounded-xl shadow-2xl backdrop-blur-md border ${
               toast.type === 'success' 
-                ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400 bg-white/90 dark:bg-black/90' 
+                ? 'bg-blue-500/10 border-blue-500/20 text-blue-600 dark:text-blue-400 bg-white/90 dark:bg-black/90' 
                 : 'bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-400 bg-white/90 dark:bg-black/90'
             }`}
           >

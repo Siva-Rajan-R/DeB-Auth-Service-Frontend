@@ -76,7 +76,7 @@ export const KeysPanel = ({ apikey }) => {
             className='p-2 bg-[var(--bg-surface)] hover:bg-[var(--bg-navbar)] rounded-lg text-[var(--text-muted)] hover:text-white transition-colors border border-[var(--border-glass)]'
             title='Copy'
           >
-            {copiedKey === copyId ? <Check size={16} className='text-emerald-600' /> : <Copy size={16} />}
+            {copiedKey === copyId ? <Check size={16} className='text-blue-600' /> : <Copy size={16} />}
           </button>
         </div>
       </div>

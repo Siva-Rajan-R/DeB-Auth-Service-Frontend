@@ -47,7 +47,7 @@ export const AuthFLowPage = () => {
           {/* Right Side: Timeline Steps */}
           <div className="w-1/2 max-lg:w-full relative flex flex-col py-6 z-20">
             {/* Continuous vertical timeline line */}
-            <div className="absolute left-[27px] top-12 bottom-12 w-0.5 bg-gradient-to-b from-cyan-500 via-teal-500 to-cyan-300 max-lg:hidden z-0 rounded-full"></div>
+            <div className="absolute left-[27px] top-12 bottom-12 w-0.5 bg-gradient-to-b from-cyan-500 via-indigo-500 to-cyan-300 max-lg:hidden z-0 rounded-full"></div>
 
             <div className="flex flex-col gap-12">
               {authFLowSteps.map((step, index) => (
@@ -72,7 +72,7 @@ const StepCard = ({ step, index, total }) => {
       className="w-full relative flex flex-row max-lg:flex-col items-start gap-8 max-lg:gap-4 group"
     >
       {/* Icon/Number */}
-      <div className="relative z-10 flex shrink-0 justify-center items-center w-14 h-14 rounded-2xl bg-gradient-to-br from-[#00d2e5] to-teal-500 text-slate-950 font-black text-2xl shadow-lg shadow-cyan-400/30 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3">
+      <div className="relative z-10 flex shrink-0 justify-center items-center w-14 h-14 rounded-2xl bg-gradient-to-br from-[#00d2e5] to-indigo-500 text-slate-950 font-black text-2xl shadow-lg shadow-cyan-400/30 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3">
         {index + 1}
       </div>
       

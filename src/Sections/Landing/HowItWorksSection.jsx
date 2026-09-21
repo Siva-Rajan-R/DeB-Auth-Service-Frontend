@@ -99,7 +99,7 @@ const { auth_url } = await response.json();
   };
 
   return (
-    <section id="how-it-works-code" className="py-24 bg-white relative border-t border-slate-200/80">
+    <section id="how-it-works-code" className="py-24 relative">
       <div className="max-w-7xl mx-auto px-6">
         
         {/* Section Header */}
@@ -108,7 +108,7 @@ const { auth_url } = await response.json();
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-100 border border-cyan-200 text-cyan-800 text-xs font-semibold"
+            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-100 -cyan-200 text-cyan-800 text-xs font-semibold"
           >
             <Terminal size={14} /> Integration Workflow
           </motion.div>
@@ -179,13 +179,13 @@ const { auth_url } = await response.json();
           </div>
 
           {/* Code Sandbox Preview (Right 7 Cols) */}
-          <div className="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl sticky top-28">
+          <div className="lg:col-span-7 bg-slate-900 rounded-3xl overflow-hidden shadow-2xl sticky top-28">
             {/* Terminal Header */}
-            <div className="bg-slate-950 px-5 py-3.5 border-b border-slate-800 flex items-center justify-between">
+            <div className="bg-slate-950 px-5 py-3.5 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
                 <div className="w-3 h-3 rounded-full bg-amber-500/80"></div>
-                <div className="w-3 h-3 rounded-full bg-emerald-500/80"></div>
+                <div className="w-3 h-3 rounded-full bg-blue-500/80"></div>
                 <span className="text-xs font-mono text-slate-400 ml-2">
                   Step {steps[activeStep].num} — {steps[activeStep].subtitle}
                 </span>
@@ -194,7 +194,7 @@ const { auth_url } = await response.json();
                 onClick={() => handleCopy(steps[activeStep].code)}
                 className="text-xs font-mono text-slate-400 hover:text-cyan-400 flex items-center gap-1.5 bg-slate-800/80 hover:bg-slate-800 px-3 py-1 rounded-lg transition-colors"
               >
-                {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+                {copied ? <Check size={14} className="text-blue-400" /> : <Copy size={14} />}
                 <span>{copied ? 'Copied!' : 'Copy Code'}</span>
               </button>
             </div>
@@ -207,7 +207,7 @@ const { auth_url } = await response.json();
             </div>
 
             {/* Sandbox Footer Info */}
-            <div className="bg-slate-950 px-6 py-3 border-t border-slate-800 text-[11px] font-mono text-slate-400 flex items-center justify-between">
+            <div className="bg-slate-950 px-6 py-3 text-[11px] font-mono text-slate-400 flex items-center justify-between">
               <span>Standard OAuth 2.0 / OIDC Compliant</span>
               <span className="text-cyan-400 font-bold">DAuth Auth Engine</span>
             </div>

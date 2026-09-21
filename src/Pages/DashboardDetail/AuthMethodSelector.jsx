@@ -4,22 +4,20 @@ import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrate
 import { CSS } from '@dnd-kit/utilities';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GripVertical, Lock, Users2, KeyRound, ShieldCheck } from 'lucide-react';
-import { FaGoogle, FaGithub, FaFacebook } from 'react-icons/fa';
-import { BsMicrosoft } from 'react-icons/bs';
 import { MdOutlineSms, MdWarning } from 'react-icons/md';
 import { RiLockPasswordLine } from 'react-icons/ri';
-
+import { GoogleLogo, GithubLogo, FacebookLogo, MicrosoftLogo } from '../../Components/BrandLogos';
 
 const ICONS = {
-  password:  <RiLockPasswordLine size={20} className='text-cyan-600'   />,
-  google:    <FaGoogle    size={18} className='text-[#ea4335]'    />,
-  github:    <FaGithub    size={18} className='text-white'  />,
-  facebook:  <FaFacebook  size={20} className='text-[#1877f2]'   />,
-  microsoft: <BsMicrosoft size={18} className='text-[#00a4ef]'    />,
-  email_otp:  <MdOutlineSms size={20} className='text-emerald-600' />,
+  password: <RiLockPasswordLine size={20} className='text-cyan-600' />,
+  google: <GoogleLogo size={20} />,
+  github: <GithubLogo size={20} className='text-[#181717]' />,
+  facebook: <FacebookLogo size={20} />,
+  microsoft: <MicrosoftLogo size={20} />,
+  email_otp: <MdOutlineSms size={20} className='text-blue-600' />,
   mobile_otp: <MdOutlineSms size={20} className='text-cyan-600' />,
-  otp:       <MdOutlineSms size={20} className='text-emerald-600' />,
-  totp:      <ShieldCheck size={20} className='text-cyan-600' />,
+  otp: <MdOutlineSms size={20} className='text-blue-600' />,
+  totp: <ShieldCheck size={20} className='text-cyan-600' />,
 };
 
 
@@ -34,45 +32,43 @@ const SortableItem = ({ method, onToggle, enabledCount }) => {
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-center gap-4 bg-[var(--bg-surface)] border border-[var(--border-glass)] rounded-2xl p-4 transition-all hover:border-[var(--border-active)] group/item ${
-        method.enabled ? 'bg-[var(--bg-card)]' : 'opacity-60'
-      }`}
+      className={`flex items-center gap-4 bg-[var(--bg-surface)] border border-slate-300/80 rounded-2xl p-4 transition-all hover:border-slate-400 group/item shadow-sm ${method.enabled ? 'bg-[var(--bg-card)]' : 'opacity-85'
+        }`}
     >
-      <div {...attributes} {...listeners} className='touch-none cursor-grab text-[var(--text-dim)] hover:text-[var(--text-muted)] transition-colors p-1'>
+      <div {...attributes} {...listeners} className='touch-none cursor-grab text-slate-500 hover:text-slate-900 transition-colors p-1'>
         <GripVertical size={18} />
       </div>
 
-      <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all ${
-        method.enabled ? 'bg-[var(--bg-surface)] shadow-lg' : 'bg-[var(--bg-deep)] opacity-50'
-      }`}>
+      <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all ${method.enabled ? 'bg-[var(--bg-surface)] shadow-md border border-slate-200' : 'bg-[var(--bg-deep)] opacity-60'
+        }`}>
         {ICONS[method.id]}
       </div>
 
       <div className='flex-1 min-w-0'>
         <div className='flex items-center gap-2'>
-          <span className='text-[var(--text-main)] font-bold text-sm truncate'>{method.name}</span>
+          <span className='text-slate-900 font-extrabold text-sm truncate'>{method.name}</span>
           {isLocked && (
-            <span className='px-2 py-0.5 bg-orange-50 border border-orange-200 text-orange-600 dark:text-orange-600 text-[10px] font-bold rounded-md flex items-center gap-1'>
+            <span className='px-2 py-0.5 bg-orange-100 border border-orange-300 text-orange-700 text-[10px] font-extrabold rounded-md flex items-center gap-1'>
               <Lock size={10} /> Locked
             </span>
           )}
         </div>
-        <span className='text-[var(--text-dim)] text-[10px] font-bold uppercase tracking-widest'>
+        <span className='text-slate-700 text-[10px] font-extrabold uppercase tracking-widest block mt-0.5'>
           {isLocked ? 'Locked (Coming Soon)' : (method.enabled ? 'Enabled' : 'Disabled')}
         </span>
       </div>
 
       <div className='flex items-center gap-3'>
         {isLastEnabled && !isLocked && (
-          <div className='flex items-center gap-1.5 px-2 py-1 bg-orange-50 border border-orange-200 rounded-lg' title='At least one method required'>
-            <Lock size={12} className='text-orange-600' />
-            <span className='text-orange-600 text-[10px] font-bold uppercase'>Required</span>
+          <div className='flex items-center gap-1.5 px-2 py-1 bg-orange-100 border border-orange-300 rounded-lg' title='At least one method required'>
+            <Lock size={12} className='text-orange-700' />
+            <span className='text-orange-700 text-[10px] font-extrabold uppercase'>Required</span>
           </div>
         )}
 
         <label className={`relative inline-flex items-center ${isDisabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}>
           <input type='checkbox' className='sr-only peer' checked={isLocked ? false : method.enabled} onChange={() => onToggle(method.id)} disabled={isDisabled} />
-          <div className="w-11 h-6 bg-slate-800 rounded-full peer peer-checked:bg-cyan-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5 shadow-inner" />
+          <div className="w-11 h-6 bg-slate-300 border border-slate-400/60 rounded-full peer peer-checked:bg-cyan-600 peer-checked:border-cyan-700 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5 shadow-inner" />
         </label>
       </div>
     </div>
@@ -149,7 +145,7 @@ export const AuthMethodSelector = () => {
       const oldIndex = displayMethods.findIndex((m) => m.id === active.id);
       const newIndex = displayMethods.findIndex((m) => m.id === over.id);
       const rearrangedDisplay = arrayMove(displayMethods, oldIndex, newIndex);
-      
+
       const newRealMethods = [];
       rearrangedDisplay.forEach(dm => {
         if (dm.id === 'otp') {
@@ -192,7 +188,7 @@ export const AuthMethodSelector = () => {
               {displayMethods.map((m) => (
                 <motion.div key={m.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} layout>
                   <SortableItem method={m} onToggle={handleToggle} enabledCount={displayEnabledCount} />
-                  
+
                   {/* Forgot Password sub-toggle */}
                   {m.id === 'password' && m.enabled && (
                     <motion.div
@@ -212,7 +208,7 @@ export const AuthMethodSelector = () => {
                       </div>
                       <label className='relative inline-flex items-center cursor-pointer'>
                         <input type='checkbox' className='sr-only peer' checked={forgotPasswordEnabled} onChange={toggleForgotPassword} />
-                        <div className="w-9 h-5 bg-slate-800 rounded-full peer peer-checked:bg-amber-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4 shadow-inner" />
+                        <div className="w-9 h-5 bg-slate-300 border border-slate-400/60 rounded-full peer peer-checked:bg-amber-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4 shadow-inner" />
                       </label>
                     </motion.div>
                   )}
@@ -227,7 +223,7 @@ export const AuthMethodSelector = () => {
                         exit={{ opacity: 0, height: 0 }}
                         className='flex items-center gap-3 bg-[var(--bg-surface)] border border-[var(--border-glass)] rounded-xl p-3'
                       >
-                        <div className='p-1.5 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-200'>
+                        <div className='p-1.5 rounded-lg bg-blue-50 text-blue-600 border border-emerald-200'>
                           <MdOutlineSms size={14} />
                         </div>
                         <div className='flex-1 min-w-0'>
@@ -237,17 +233,17 @@ export const AuthMethodSelector = () => {
                           </span>
                         </div>
                         <label className='relative inline-flex items-center cursor-pointer'>
-                          <input 
-                            type='checkbox' 
-                            className='sr-only peer' 
-                            checked={emailOtpEnabled} 
+                          <input
+                            type='checkbox'
+                            className='sr-only peer'
+                            checked={emailOtpEnabled}
                             onChange={() => {
                               if (emailOtpEnabled && !mobileOtpEnabled) return; // Keep at least one enabled
                               if (oldOtp?.enabled) toggleAuthMethod('otp');
                               if (emailOtp) toggleAuthMethod('email_otp');
-                            }} 
+                            }}
                           />
-                          <div className="w-9 h-5 bg-slate-800 rounded-full peer peer-checked:bg-emerald-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4 shadow-inner" />
+                          <div className="w-9 h-5 bg-slate-300 border border-slate-400/60 rounded-full peer peer-checked:bg-blue-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4 shadow-inner" />
                         </label>
                       </motion.div>
 
@@ -269,16 +265,16 @@ export const AuthMethodSelector = () => {
                             </span>
                           </div>
                           <label className='relative inline-flex items-center cursor-pointer'>
-                            <input 
-                              type='checkbox' 
-                              className='sr-only peer' 
-                              checked={mobileOtpEnabled} 
+                            <input
+                              type='checkbox'
+                              className='sr-only peer'
+                              checked={mobileOtpEnabled}
                               onChange={() => {
                                 if (mobileOtpEnabled && !emailOtpEnabled) return; // Keep at least one enabled
                                 if (mobileOtp) toggleAuthMethod('mobile_otp');
-                              }} 
+                              }}
                             />
-                            <div className="w-9 h-5 bg-slate-800 rounded-full peer peer-checked:bg-cyan-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4 shadow-inner" />
+                            <div className="w-9 h-5 bg-slate-300 border border-slate-400/60 rounded-full peer peer-checked:bg-cyan-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4 shadow-inner" />
                           </label>
                         </div>
                         {mobileOtpEnabled && (

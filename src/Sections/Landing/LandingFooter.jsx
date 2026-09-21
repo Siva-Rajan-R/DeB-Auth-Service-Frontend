@@ -1,6 +1,6 @@
 export const LandingFooter = () => {
   return (
-    <footer className="bg-white border-t border-slate-200 text-slate-600 py-16">
+    <footer className="text-slate-600 py-16">
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-5 gap-12 mb-12">
         
         {/* Brand Column */}
@@ -52,7 +52,7 @@ export const LandingFooter = () => {
 
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 pt-8 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center text-xs font-mono text-slate-500 gap-4">
+      <div className="max-w-7xl mx-auto px-6 pt-8 flex flex-col sm:flex-row justify-between items-center text-xs font-mono text-slate-500 gap-4">
         <div>© 2026 DAuth. All rights reserved.</div>
         <div>Your Users. Your Database. Your Authentication.</div>
       </div>

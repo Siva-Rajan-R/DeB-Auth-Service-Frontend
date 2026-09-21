@@ -18,13 +18,13 @@ export const ApproachSection = () => {
     {
       step: "03",
       title: "Own",
-      icon: <Database className="text-emerald-600" size={28} />,
+      icon: <Database className="text-blue-600" size={28} />,
       description: "Your application remains the system of record for your users and application-specific data — keeping you in total control.",
     },
   ];
 
   return (
-    <section id="approach" className="py-24 bg-[#f8fafc] relative border-t border-slate-200/80">
+    <section id="approach" className="py-24 bg-[#f8fafc] relative">
       <div className="max-w-7xl mx-auto px-6">
         
         {/* Section Header */}
@@ -33,7 +33,7 @@ export const ApproachSection = () => {
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-100 border border-cyan-200 text-cyan-800 text-xs font-semibold"
+            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-100 -cyan-200 text-cyan-800 text-xs font-semibold"
           >
             <Sparkles size={14} /> The DAuth Philosophy
           </motion.div>
@@ -67,13 +67,13 @@ export const ApproachSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="bg-white border border-slate-200/80 rounded-3xl p-8 hover:border-cyan-400/40 transition-all shadow-md group"
+              className="rounded-3xl p-8 hover:-cyan-400/40 transition-all neu-flat group"
             >
               <div className="flex items-center justify-between mb-6">
-                <span className="text-xs font-mono text-cyan-800 font-bold bg-cyan-100 border border-cyan-300 px-3 py-1 rounded-full">
+                <span className="text-xs font-mono text-cyan-800 font-bold bg-cyan-100 -cyan-300 px-3 py-1 rounded-full">
                   PILLAR {pillar.step}
                 </span>
-                <div className="p-3 bg-slate-50 border border-slate-200 rounded-2xl group-hover:scale-110 transition-transform">
+                <div className="p-3 rounded-2xl group-hover:scale-110 transition-transform">
                   {pillar.icon}
                 </div>
               </div>
@@ -94,7 +94,7 @@ export const ApproachSection = () => {
           initial={{ opacity: 0, scale: 0.98 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-8 sm:p-12 text-center relative overflow-hidden shadow-xl"
+          className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-8 sm:p-12 text-center relative overflow-hidden neu-flat"
         >
           <h3 className="text-2xl sm:text-4xl font-black text-white tracking-tight leading-snug">
             DAuth authenticates your users. <br />

@@ -1,15 +1,20 @@
 services:
   dauth-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_BACKEND_URL: https://api.dauth.debuggerstechnologies.com
+        VITE_FRONTEND_URL: https://dauth.debuggerstechnologies.com
     image: sivarajan001/debuggerstech-dauth-site:latest
     container_name: dauth-frontend
     restart: unless-stopped
 
-    env_file:
-      - ./dauth_service/dauth_frontend.env
+    environment:
+      - VITE_BACKEND_URL=https://api.dauth.debuggerstechnologies.com
+      - VITE_FRONTEND_URL=https://dauth.debuggerstechnologies.com
+      - BACKEND_URL=https://api.dauth.debuggerstechnologies.com
+      - FRONTEND_URL=https://dauth.debuggerstechnologies.com
 
     ports:
       - "94:80"
-
-    volumes:
-      - ./dauth_service/dauth_frontend/logs:/app/logs
-
