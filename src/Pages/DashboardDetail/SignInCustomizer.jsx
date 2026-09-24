@@ -10,23 +10,38 @@ import axios from 'axios';
 import { APP_CONFIG } from '../../config';
 
 
+const rgbaToHex = (color) => {
+  if (!color) return '#ffffff';
+  if (color.startsWith('#')) return color.slice(0, 7);
+  const match = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+  if (match) {
+    const r = Math.min(255, parseInt(match[1])).toString(16).padStart(2, '0');
+    const g = Math.min(255, parseInt(match[2])).toString(16).padStart(2, '0');
+    const b = Math.min(255, parseInt(match[3])).toString(16).padStart(2, '0');
+    return `#${r}${g}${b}`;
+  }
+  return '#ffffff';
+};
+
 // ─── Primitive: Color picker row ─────────────────────────────────────────────
 const ColorRow = ({ label, storeKey }) => {
   const { uiConfig, updateUIConfig } = useAuthConfigStore();
+  const hexVal = rgbaToHex(uiConfig[storeKey]);
+
   return (
     <div className='flex items-center justify-between py-2 group/color'>
       <span className='text-[var(--text-muted)] text-[13px] font-medium group-hover/color:text-[var(--text-main)] transition-colors'>{label}</span>
-      <div className='flex items-center gap-3 bg-[var(--bg-surface)] border border-[var(--border-glass)] rounded-xl px-3 py-1.5 cursor-pointer hover:border-cyan-500/30 hover:bg-[var(--bg-card)] transition-all shadow-sm'>
+      <label className='flex items-center gap-3 bg-[var(--bg-surface)] border border-[var(--border-glass)] rounded-xl px-3 py-1.5 cursor-pointer hover:border-cyan-500/30 hover:bg-[var(--bg-card)] transition-all shadow-sm'>
         <input
           type='color'
-          value={uiConfig[storeKey]?.startsWith('rgba') ? '#ffffff' : (uiConfig[storeKey] || '#ffffff')}
+          value={hexVal}
           onChange={(e) => updateUIConfig(storeKey, e.target.value)}
           className='w-5 h-5 rounded-lg cursor-pointer border-0 bg-transparent p-0 flex-shrink-0'
         />
         <span className='text-[var(--text-dim)] text-[11px] font-mono uppercase tracking-widest w-[80px] truncate group-hover/color:text-cyan-600 transition-colors'>
-          {uiConfig[storeKey]}
+          {uiConfig[storeKey] || hexVal}
         </span>
-      </div>
+      </label>
     </div>
   );
 };
@@ -256,104 +271,255 @@ const selectStyles = {
 // ─── Preset theme palette ─────────────────────────────────────────────────────
 const PRESET_THEMES = [
   {
-    key: 'midnight',
-    label: 'Midnight',
-    preview: ['#0f172a', '#22d3ee', '#ffffff'],
+    key: 'cyber_cyan',
+    label: 'Cyber Cyan',
+    preview: ['#070b14', '#00d2e5', '#f8fafc'],
     config: {
-      screen_bg_color: '#0a0e1a', login_card_bg_color: 'rgba(15,23,42,0.85)',
-      primary_color: '#22d3ee', text_color: '#f1f5f9',
-      bg_pattern: 'dots', border_radius: 'rounded', shadow_intensity: 'lg',
-      blur_amount: 24, border_width: 1, border_color: 'rgba(34,211,238,0.15)',
-      button_style: 'filled', input_style: 'outlined', input_border_color: 'rgba(34,211,238,0.15)',
-      gradient_start: '#0a0e1a', gradient_end: '#1e1b4b',
+      screen_bg_color: '#070b14',
+      bg_type: 'gradient',
+      gradient_start: '#070b14',
+      gradient_mid: '#0d1728',
+      gradient_end: '#131e32',
+      gradient_direction: '135deg',
+      bg_pattern: 'dots',
+      login_card_bg_color: 'rgba(15, 23, 42, 0.85)',
+      card_variant: 'glassmorphism',
+      blur_amount: 24,
+      border_width: 1,
+      border_color: 'rgba(0, 210, 229, 0.25)',
+      primary_color: '#00d2e5',
+      btn_text_color: '#ffffff',
+      text_color: '#ffffff',
+      secondary_text_color: '#94a3b8',
+      link_color: '#38bdf8',
+      brand_text_color: '#ffffff',
+      border_radius: 'rounded',
+      shadow_intensity: 'lg',
+      button_style: 'filled',
+      input_style: 'outlined',
+      input_border_color: 'rgba(255, 255, 255, 0.12)',
+      provider_bg_color: 'rgba(255, 255, 255, 0.05)',
+      provider_text_color: '#ffffff',
     },
   },
   {
-    key: 'neon_purple',
+    key: 'neon_pulse',
     label: 'Neon Pulse',
-    preview: ['#09090b', '#a855f7', '#ffffff'],
+    preview: ['#09090b', '#a855f7', '#faf5ff'],
     config: {
-      screen_bg_color: '#09090b', login_card_bg_color: 'rgba(9,9,11,0.80)',
-      primary_color: '#a855f7', text_color: '#faf5ff',
-      bg_pattern: 'dots', border_radius: 'rounded', shadow_intensity: 'lg',
-      blur_amount: 32, border_width: 1, border_color: 'rgba(168,85,247,0.20)',
-      button_style: 'filled', input_style: 'outlined', input_border_color: 'rgba(168,85,247,0.18)',
-      gradient_start: '#09090b', gradient_end: '#2e1065',
+      screen_bg_color: '#09090b',
+      bg_type: 'gradient',
+      gradient_start: '#09090b',
+      gradient_mid: '#1a0b2e',
+      gradient_end: '#2e1065',
+      gradient_direction: '135deg',
+      bg_pattern: 'dots',
+      login_card_bg_color: 'rgba(18, 12, 32, 0.85)',
+      card_variant: 'glassmorphism',
+      blur_amount: 30,
+      border_width: 1,
+      border_color: 'rgba(168, 85, 247, 0.25)',
+      primary_color: '#a855f7',
+      btn_text_color: '#ffffff',
+      text_color: '#faf5ff',
+      secondary_text_color: '#c084fc',
+      link_color: '#c084fc',
+      brand_text_color: '#faf5ff',
+      border_radius: 'rounded',
+      shadow_intensity: 'lg',
+      button_style: 'filled',
+      input_style: 'outlined',
+      input_border_color: 'rgba(168, 85, 247, 0.20)',
+      provider_bg_color: 'rgba(168, 85, 247, 0.08)',
+      provider_text_color: '#faf5ff',
+    },
+  },
+  {
+    key: 'deep_indigo',
+    label: 'Deep Indigo',
+    preview: ['#090d16', '#6366f1', '#e0e7ff'],
+    config: {
+      screen_bg_color: '#090d16',
+      bg_type: 'gradient',
+      gradient_start: '#090d16',
+      gradient_mid: '#141936',
+      gradient_end: '#1e1b4b',
+      gradient_direction: '135deg',
+      bg_pattern: 'diagonal',
+      login_card_bg_color: 'rgba(15, 20, 48, 0.85)',
+      card_variant: 'glassmorphism',
+      blur_amount: 28,
+      border_width: 1,
+      border_color: 'rgba(99, 102, 241, 0.25)',
+      primary_color: '#6366f1',
+      btn_text_color: '#ffffff',
+      text_color: '#e0e7ff',
+      secondary_text_color: '#818cf8',
+      link_color: '#818cf8',
+      brand_text_color: '#e0e7ff',
+      border_radius: 'rounded',
+      shadow_intensity: 'lg',
+      button_style: 'filled',
+      input_style: 'outlined',
+      input_border_color: 'rgba(99, 102, 241, 0.20)',
+      provider_bg_color: 'rgba(99, 102, 241, 0.08)',
+      provider_text_color: '#e0e7ff',
     },
   },
   {
     key: 'emerald',
     label: 'Emerald',
-    preview: ['#052e16', '#10b981', '#ecfdf5'],
+    preview: ['#03170e', '#10b981', '#ecfdf5'],
     config: {
-      screen_bg_color: '#052e16', login_card_bg_color: 'rgba(5,46,22,0.85)',
-      primary_color: '#10b981', text_color: '#ecfdf5',
-      bg_pattern: 'gradient', gradient_start: '#052e16', gradient_end: '#0d3321', gradient_direction: '135deg',
-      border_radius: 'rounded', shadow_intensity: 'md',
-      blur_amount: 24, border_width: 1, border_color: 'rgba(16,185,129,0.20)',
-      button_style: 'filled', input_style: 'outlined', input_border_color: 'rgba(16,185,129,0.18)',
+      screen_bg_color: '#03170e',
+      bg_type: 'gradient',
+      gradient_start: '#03170e',
+      gradient_mid: '#063321',
+      gradient_end: '#064e3b',
+      gradient_direction: '135deg',
+      bg_pattern: 'dots',
+      login_card_bg_color: 'rgba(4, 30, 20, 0.85)',
+      card_variant: 'glassmorphism',
+      blur_amount: 24,
+      border_width: 1,
+      border_color: 'rgba(16, 185, 129, 0.25)',
+      primary_color: '#10b981',
+      btn_text_color: '#ffffff',
+      text_color: '#ecfdf5',
+      secondary_text_color: '#6ee7b7',
+      link_color: '#34d399',
+      brand_text_color: '#ecfdf5',
+      border_radius: 'rounded',
+      shadow_intensity: 'md',
+      button_style: 'filled',
+      input_style: 'outlined',
+      input_border_color: 'rgba(16, 185, 129, 0.20)',
+      provider_bg_color: 'rgba(16, 185, 129, 0.08)',
+      provider_text_color: '#ecfdf5',
     },
   },
   {
-    key: 'ocean',
-    label: 'Ocean',
-    preview: ['#0c1a4a', '#3b82f6', '#e0f2fe'],
+    key: 'sunset_amber',
+    label: 'Sunset Amber',
+    preview: ['#140b05', '#f59e0b', '#fffbeb'],
     config: {
-      screen_bg_color: '#0c1a4a', login_card_bg_color: 'rgba(12,26,74,0.85)',
-      primary_color: '#3b82f6', text_color: '#e0f2fe',
-      bg_pattern: 'gradient', gradient_start: '#0c1a4a', gradient_end: '#0f2857', gradient_direction: '135deg',
-      border_radius: 'pill', shadow_intensity: 'md',
-      blur_amount: 20, border_width: 1, border_color: 'rgba(59,130,246,0.20)',
-      button_style: 'filled', input_style: 'outlined', input_border_color: 'rgba(59,130,246,0.18)',
+      screen_bg_color: '#140b05',
+      bg_type: 'gradient',
+      gradient_start: '#140b05',
+      gradient_mid: '#291508',
+      gradient_end: '#451a03',
+      gradient_direction: '135deg',
+      bg_pattern: 'dots',
+      login_card_bg_color: 'rgba(28, 16, 8, 0.85)',
+      card_variant: 'glassmorphism',
+      blur_amount: 24,
+      border_width: 1,
+      border_color: 'rgba(245, 158, 11, 0.25)',
+      primary_color: '#f59e0b',
+      btn_text_color: '#111827',
+      text_color: '#fffbeb',
+      secondary_text_color: '#fcd34d',
+      link_color: '#f59e0b',
+      brand_text_color: '#fffbeb',
+      border_radius: 'rounded',
+      shadow_intensity: 'md',
+      button_style: 'filled',
+      input_style: 'outlined',
+      input_border_color: 'rgba(245, 158, 11, 0.20)',
+      provider_bg_color: 'rgba(245, 158, 11, 0.08)',
+      provider_text_color: '#fffbeb',
     },
   },
   {
-    key: 'rose',
-    label: 'Rose',
-    preview: ['#1a0a0f', '#f43f5e', '#fff1f2'],
+    key: 'luxury_pearl',
+    label: 'Luxury Pearl',
+    preview: ['#f1f5f9', '#0284c7', '#0f172a'],
     config: {
-      screen_bg_color: '#1a0a0f', login_card_bg_color: 'rgba(26,10,15,0.85)',
-      primary_color: '#f43f5e', text_color: '#fff1f2',
-      bg_pattern: 'dots', border_radius: 'rounded', shadow_intensity: 'lg',
-      blur_amount: 28, border_width: 1, border_color: 'rgba(244,63,94,0.18)',
-      button_style: 'filled', input_style: 'filled', input_border_color: 'rgba(244,63,94,0.15)',
+      screen_bg_color: '#f1f5f9',
+      bg_type: 'gradient',
+      gradient_start: '#f8fafc',
+      gradient_mid: '#eef2f6',
+      gradient_end: '#e2e8f0',
+      gradient_direction: '135deg',
+      bg_pattern: 'none',
+      login_card_bg_color: '#ffffff',
+      card_variant: 'normal',
+      blur_amount: 0,
+      border_width: 1,
+      border_color: 'rgba(0, 0, 0, 0.08)',
+      primary_color: '#0284c7',
+      btn_text_color: '#ffffff',
+      text_color: '#0f172a',
+      secondary_text_color: '#64748b',
+      link_color: '#0284c7',
+      brand_text_color: '#0f172a',
+      border_radius: 'rounded',
+      shadow_intensity: 'lg',
+      button_style: 'filled',
+      input_style: 'outlined',
+      input_border_color: 'rgba(0, 0, 0, 0.12)',
+      provider_bg_color: 'rgba(0, 0, 0, 0.03)',
+      provider_text_color: '#0f172a',
     },
   },
   {
-    key: 'clean_light',
-    label: 'Clean Light',
-    preview: ['#f8fafc', '#4f46e5', '#1e293b'],
+    key: 'nordic_frost',
+    label: 'Nordic Frost',
+    preview: ['#e0eafc', '#2563eb', '#1e293b'],
     config: {
-      screen_bg_color: '#f8fafc', login_card_bg_color: '#ffffff',
-      primary_color: '#4f46e5', text_color: '#1e293b',
-      bg_pattern: 'solid', border_radius: 'rounded', shadow_intensity: 'md',
-      blur_amount: 0, border_width: 1, border_color: 'rgba(0,0,0,0.08)',
-      button_style: 'filled', input_style: 'outlined', input_border_color: 'rgba(0,0,0,0.12)',
+      screen_bg_color: '#e8eff7',
+      bg_type: 'gradient',
+      gradient_start: '#e0eafc',
+      gradient_mid: '#cfdef3',
+      gradient_end: '#e8eff7',
+      gradient_direction: '135deg',
+      bg_pattern: 'dots',
+      login_card_bg_color: 'rgba(255, 255, 255, 0.90)',
+      card_variant: 'glassmorphism',
+      blur_amount: 24,
+      border_width: 1,
+      border_color: 'rgba(255, 255, 255, 0.80)',
+      primary_color: '#2563eb',
+      btn_text_color: '#ffffff',
+      text_color: '#1e293b',
+      secondary_text_color: '#64748b',
+      link_color: '#2563eb',
+      brand_text_color: '#1e293b',
+      border_radius: 'rounded',
+      shadow_intensity: 'lg',
+      button_style: 'filled',
+      input_style: 'outlined',
+      input_border_color: 'rgba(37, 99, 235, 0.20)',
+      provider_bg_color: 'rgba(255, 255, 255, 0.80)',
+      provider_text_color: '#1e293b',
     },
   },
   {
-    key: 'minimal_light',
-    label: 'Minimal',
-    preview: ['#ffffff', '#111827', '#6b7280'],
+    key: 'minimal_obsidian',
+    label: 'Minimal Dark',
+    preview: ['#09090b', '#ffffff', '#fafafa'],
     config: {
-      screen_bg_color: '#f1f5f9', login_card_bg_color: '#ffffff',
-      primary_color: '#111827', text_color: '#111827',
-      bg_pattern: 'solid', border_radius: 'square', shadow_intensity: 'sm',
-      blur_amount: 0, border_width: 1, border_color: 'rgba(0,0,0,0.10)',
-      button_style: 'outlined', input_style: 'outlined', input_border_color: 'rgba(0,0,0,0.15)',
-    },
-  },
-  {
-    key: 'glass',
-    label: 'Glass',
-    preview: ['#1e293b', '#818cf8', 'rgba(255,255,255,0.15)'],
-    config: {
-      screen_bg_color: '#1e293b', login_card_bg_color: 'rgba(255,255,255,0.07)',
-      primary_color: '#818cf8', text_color: '#f1f5f9',
-      bg_pattern: 'gradient', gradient_start: '#1e293b', gradient_end: '#312e81', gradient_direction: '135deg',
-      border_radius: 'rounded', shadow_intensity: 'lg',
-      blur_amount: 40, border_width: 1, border_color: 'rgba(255,255,255,0.12)',
-      button_style: 'filled', input_style: 'outlined', input_border_color: 'rgba(255,255,255,0.12)',
+      screen_bg_color: '#09090b',
+      bg_type: 'static',
+      bg_pattern: 'none',
+      login_card_bg_color: '#121215',
+      card_variant: 'normal',
+      blur_amount: 0,
+      border_width: 1,
+      border_color: 'rgba(255, 255, 255, 0.10)',
+      primary_color: '#ffffff',
+      btn_text_color: '#09090b',
+      text_color: '#fafafa',
+      secondary_text_color: '#a1a1aa',
+      link_color: '#ffffff',
+      brand_text_color: '#fafafa',
+      border_radius: 'square',
+      shadow_intensity: 'md',
+      button_style: 'filled',
+      input_style: 'outlined',
+      input_border_color: 'rgba(255, 255, 255, 0.15)',
+      provider_bg_color: 'rgba(255, 255, 255, 0.05)',
+      provider_text_color: '#fafafa',
     },
   },
 ];
@@ -425,12 +591,13 @@ export const SignInCustomizer = () => {
   const { uiConfig, updateUIConfig, resetToDefaults } = useAuthConfigStore();
   const [openSections, setOpenSections] = useState({
     branding: true,
+    global_bg: false,
+    card_bg: false,
     colors: true,
     typography: false,
     shape: false,
     buttons: false,
     layout: false,
-    background: false,
     css: false,
   });
 
@@ -462,6 +629,11 @@ export const SignInCustomizer = () => {
               placeholder='Your Brand Name'
             />
           </div>
+          <OptionGroup
+            label='Logo Position'
+            storeKey='logo_position'
+            options={[{ value: 'left', label: 'Left' }, { value: 'center', label: 'Center' }, { value: 'right', label: 'Right' }]}
+          />
           <div className='space-y-2'>
             <label className='text-[var(--text-dim)] text-[10px] font-bold uppercase tracking-widest block'>Brand Logo URL</label>
             <input
@@ -472,26 +644,117 @@ export const SignInCustomizer = () => {
               placeholder='https://example.com/logo.png'
             />
           </div>
-          
-          {/* Logo file uploader */}
           <LogoUploader />
         </div>
       </Section>
 
+      {/* 2. Global Background */}
+      <Section title='Global Background' icon={<ImageIcon size={20} />} sectionKey='global_bg' openSections={openSections} toggleSection={toggleSection}>
+        <div className='space-y-4'>
+          <OptionGroup
+            label='Background Type'
+            storeKey='bg_type'
+            options={[{ value: 'static', label: 'Static' }, { value: 'gradient', label: 'Gradient' }]}
+          />
+          
+          {uiConfig.bg_type === 'static' ? (
+            <ColorRow label='Background Color' storeKey='screen_bg_color' />
+          ) : (
+            <div className='space-y-3 pt-2'>
+              <ColorRow label='Gradient Start' storeKey='gradient_start' />
+              <ColorRow label='Gradient Middle' storeKey='gradient_mid' />
+              <ColorRow label='Gradient End' storeKey='gradient_end' />
+              <OptionGroup
+                label='Direction'
+                storeKey='gradient_direction'
+                options={[
+                  { value: '45deg',  label: '↗ 45°' },
+                  { value: '90deg',  label: '→ 90°' },
+                  { value: '135deg', label: '↘ 135°' },
+                  { value: '180deg', label: '↓ 180°' },
+                ]}
+              />
+            </div>
+          )}
+          
+          <div className='pt-2 border-t border-[var(--border-glass)]'>
+            <OptionGroup
+              label='Pattern Overlay'
+              storeKey='bg_pattern'
+              options={[
+                { value: 'none', label: 'None' },
+                { value: 'dots', label: 'Dots' },
+                { value: 'diagonal', label: 'Lines' },
+              ]}
+            />
+          </div>
+        </div>
+      </Section>
 
-      {/* 2. Colors */}
-      <Section title='Colors' icon={<Layers size={20} />} sectionKey='colors' openSections={openSections} toggleSection={toggleSection}>
+      {/* 3. Card Background */}
+      <Section title='Card Background' icon={<Layers size={20} />} sectionKey='card_bg' openSections={openSections} toggleSection={toggleSection}>
+        <div className='space-y-4'>
+          <OptionGroup
+            label='Card Variant'
+            storeKey='card_variant'
+            options={[
+              { value: 'normal', label: 'Normal' },
+              { value: 'neumorphism', label: 'Neumorphism' },
+              { value: 'glassmorphism', label: 'Glassmorphism' }
+            ]}
+          />
+
+          <OptionGroup
+            label='Background Type'
+            storeKey='card_bg_type'
+            options={[{ value: 'static', label: 'Static' }, { value: 'gradient', label: 'Gradient' }]}
+          />
+          
+          {uiConfig.card_bg_type === 'static' ? (
+            <ColorRow label='Card Background Color' storeKey='login_card_bg_color' />
+          ) : (
+            <div className='space-y-3 pt-2'>
+              <ColorRow label='Gradient Start' storeKey='card_gradient_start' />
+              <ColorRow label='Gradient Middle' storeKey='card_gradient_mid' />
+              <ColorRow label='Gradient End' storeKey='card_gradient_end' />
+              <OptionGroup
+                label='Direction'
+                storeKey='card_gradient_direction'
+                options={[
+                  { value: '45deg',  label: '↗ 45°' },
+                  { value: '90deg',  label: '→ 90°' },
+                  { value: '135deg', label: '↘ 135°' },
+                  { value: '180deg', label: '↓ 180°' },
+                ]}
+              />
+            </div>
+          )}
+
+          <div className='pt-2 border-t border-[var(--border-glass)]'>
+            <OptionGroup
+              label='Pattern Overlay'
+              storeKey='card_bg_pattern'
+              options={[
+                { value: 'none', label: 'None' },
+                { value: 'dots', label: 'Dots' },
+                { value: 'diagonal', label: 'Lines' },
+              ]}
+            />
+          </div>
+        </div>
+      </Section>
+
+      {/* 4. Colors & Text */}
+      <Section title='Colors & Text' icon={<Layers size={20} />} sectionKey='colors' openSections={openSections} toggleSection={toggleSection}>
         <div className='divide-y divide-[var(--border-glass)] bg-[var(--bg-deep)]/20 rounded-2xl border border-[var(--border-glass)] px-4'>
-          <ColorRow label='Screen Background' storeKey='screen_bg_color' />
-          <ColorRow label='Card Background'   storeKey='login_card_bg_color' />
-          <ColorRow label='Primary Button'    storeKey='primary_color' />
-          <ColorRow label='Button Text Color' storeKey='btn_text_color' />
-          <ColorRow label='Text Color'        storeKey='text_color' />
+          <ColorRow label='Brand Text Color'  storeKey='brand_text_color' />
+          <ColorRow label='Main Text Color'   storeKey='text_color' />
+          <ColorRow label='Secondary Text Color' storeKey='secondary_text_color' />
           <ColorRow label='Link Color'        storeKey='link_color' />
         </div>
       </Section>
 
-      {/* 3. Typography */}
+      {/* 5. Typography */}
       <Section title='Typography' icon={<Type size={20} />} sectionKey='typography' openSections={openSections} toggleSection={toggleSection}>
         <div className='space-y-5'>
           <div className='space-y-2'>
@@ -513,8 +776,8 @@ export const SignInCustomizer = () => {
         </div>
       </Section>
 
-      {/* 4. Shape & Card */}
-      <Section title='Shape & Card' icon={<Layers size={20} />} sectionKey='shape' openSections={openSections} toggleSection={toggleSection}>
+      {/* 6. Shape & Card Borders */}
+      <Section title='Shape & Borders' icon={<Layers size={20} />} sectionKey='shape' openSections={openSections} toggleSection={toggleSection}>
         <div className='space-y-5'>
           <OptionGroup
             label='Border Radius'
@@ -532,31 +795,37 @@ export const SignInCustomizer = () => {
         </div>
       </Section>
 
-      {/* 5. Buttons & Inputs */}
+      {/* 7. Buttons & Inputs */}
       <Section title='Buttons & Inputs' icon={<MousePointer2 size={20} />} sectionKey='buttons' openSections={openSections} toggleSection={toggleSection}>
         <div className='space-y-5'>
           <OptionGroup
-            label='Button Style'
+            label='Main Button Style'
             storeKey='button_style'
             options={[{ value: 'filled', label: 'Filled' }, { value: 'outlined', label: 'Outlined' }, { value: 'ghost', label: 'Ghost' }]}
           />
-          <OptionGroup
-            label='Input Style'
-            storeKey='input_style'
-            options={[{ value: 'filled', label: 'Filled' }, { value: 'outlined', label: 'Outlined' }]}
-          />
-          <ColorRow label='Input Border Color' storeKey='input_border_color' />
+          <ColorRow label='Primary Button Color' storeKey='primary_color' />
+          <ColorRow label='Button Text Color' storeKey='btn_text_color' />
+
+          <div className='pt-3 border-t border-[var(--border-glass)] space-y-3'>
+            <label className='text-slate-500 text-[11px] font-bold uppercase tracking-widest block'>Provider Buttons</label>
+            <ColorRow label='Provider Background' storeKey='provider_bg_color' />
+            <ColorRow label='Provider Text Color' storeKey='provider_text_color' />
+          </div>
+
+          <div className='pt-3 border-t border-[var(--border-glass)] space-y-3'>
+            <OptionGroup
+              label='Input Style'
+              storeKey='input_style'
+              options={[{ value: 'filled', label: 'Filled' }, { value: 'outlined', label: 'Outlined' }]}
+            />
+            <ColorRow label='Input Border Color' storeKey='input_border_color' />
+          </div>
         </div>
       </Section>
 
-      {/* 6. Layout */}
+      {/* 8. Layout */}
       <Section title='Layout' icon={<LayoutTemplate size={20} />} sectionKey='layout' openSections={openSections} toggleSection={toggleSection}>
         <div className='space-y-5'>
-          <OptionGroup
-            label='Logo Position'
-            storeKey='logo_position'
-            options={[{ value: 'left', label: 'Left' }, { value: 'center', label: 'Center' }, { value: 'right', label: 'Right' }]}
-          />
           <OptionGroup
             label='Social Button Layout'
             storeKey='social_layout'
@@ -565,39 +834,7 @@ export const SignInCustomizer = () => {
         </div>
       </Section>
 
-      {/* 7. Background */}
-      <Section title='Background' icon={<ImageIcon size={20} />} sectionKey='background' openSections={openSections} toggleSection={toggleSection}>
-        <div className='space-y-4'>
-          <OptionGroup
-            label='Pattern'
-            storeKey='bg_pattern'
-            options={[
-              { value: 'solid', label: 'Solid' },
-              { value: 'dots', label: 'Dots' },
-              { value: 'diagonal', label: 'Lines' },
-              { value: 'gradient', label: 'Gradient' },
-            ]}
-          />
-          {uiConfig.bg_pattern === 'gradient' && (
-            <div className='space-y-3 pt-4 border-t border-[var(--border-glass)]'>
-              <ColorRow label='Gradient Start'  storeKey='gradient_start' />
-              <ColorRow label='Gradient End'    storeKey='gradient_end' />
-              <OptionGroup
-                label='Direction'
-                storeKey='gradient_direction'
-                options={[
-                  { value: '45deg',  label: '↗ 45°' },
-                  { value: '90deg',  label: '→ 90°' },
-                  { value: '135deg', label: '↘ 135°' },
-                  { value: '180deg', label: '↓ 180°' },
-                ]}
-              />
-            </div>
-          )}
-        </div>
-      </Section>
-
-      {/* 8. Custom CSS */}
+      {/* 9. Custom CSS */}
       <Section title='Custom CSS' icon={<Code2 size={20} />} sectionKey='css' openSections={openSections} toggleSection={toggleSection}>
         <div className='space-y-3'>
           <p className='text-[var(--text-dim)] text-[11px] font-bold uppercase tracking-widest'>Injected directly into preview</p>

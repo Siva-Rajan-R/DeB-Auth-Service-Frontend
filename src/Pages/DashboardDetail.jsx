@@ -67,17 +67,27 @@ export const DashboardDetail = () => {
           data: config,
           withCred: true
         });
-        setSearchParams({ id: res.apikey });
+        if (res?.apikey) {
+          setSearchParams({ id: res.apikey });
+          useToastStore.getState().addToast('Configuration saved successfully!', 'success');
+          useAuthConfigStore.getState().setHasUnsavedChanges(false);
+        } else {
+          useToastStore.getState().addToast('Failed to save configuration', 'error');
+        }
       } else {
-        await call({
+        const res = await call({
           method: 'PUT',
           path: '/user/secrets/config',
           data: { apikey, config },
           withCred: true
         });
+        if (res !== null && res !== undefined) {
+          useToastStore.getState().addToast('Configuration saved successfully!', 'success');
+          useAuthConfigStore.getState().setHasUnsavedChanges(false);
+        } else {
+          useToastStore.getState().addToast('Failed to save configuration', 'error');
+        }
       }
-      useToastStore.getState().addToast('Configuration saved successfully!', 'success');
-      useAuthConfigStore.getState().setHasUnsavedChanges(false);
     } catch (error) {
       useToastStore.getState().addToast('Failed to save configuration', 'error');
     } finally {
@@ -227,10 +237,8 @@ export const DashboardDetail = () => {
       </div>
 
       {/* RIGHT PANEL: Floating Live Preview WITHOUT Outer Box Border (lg:w-[38%]) */}
-      <div className='w-full lg:w-[38%] flex flex-col h-full bg-[#e8ecf4] p-4 lg:p-6 justify-center items-center relative overflow-hidden'>
-        <div className='w-full max-w-md flex flex-col items-center justify-center relative'>
-          <LivePreview />
-        </div>
+      <div className='w-full lg:w-[38%] flex flex-col h-full bg-[#e8ecf4] relative overflow-hidden'>
+        <LivePreview />
       </div>
     </div>
   );

@@ -2,41 +2,56 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 const DEFAULT_UI_CONFIG = {
-  // Existing
-  screen_bg_color: '#f9fafb',
-  login_card_bg_color: '#ffffff',
+  // Brand & General
   brand_logo: 'https://images.menukit.debuggers.co.in/dauth-logos/logo_1786212957.png',
   brand_name: 'DAuth',
+  brand_text_color: '#ffffff',
   primary_color: '#00d2e5',
-  text_color: '#111827',
+  text_color: '#ffffff',
+  secondary_text_color: '#94a3b8',
   btn_text_color: '#ffffff',
-  link_color: '#3b82f6',
+  link_color: '#38bdf8',
 
   // Typography
-  font_family: 'system',       // 'system'|'Inter'|'Roboto'|'Poppins'|'Nunito'|'Montserrat'
+  font_family: 'Inter',        // 'system'|'Inter'|'Roboto'|'Poppins'|'Nunito'|'Montserrat'
   font_size: 'md',             // 'sm'|'md'|'lg'
 
   // Shape & Card
   border_radius: 'rounded',    // 'square'|'rounded'|'pill'
-  shadow_intensity: 'md',      // 'none'|'sm'|'md'|'lg'
+  shadow_intensity: 'lg',      // 'none'|'sm'|'md'|'lg'
   blur_amount: 24,             // 0–40 (px)
   border_width: 1,             // 0–4 (px)
-  border_color: 'rgba(255,255,255,0.10)',
+  border_color: 'rgba(0, 210, 229, 0.25)',
+  card_variant: 'glassmorphism', // 'normal'|'neumorphism'|'glassmorphism'
 
   // Button & Input
   button_style: 'filled',      // 'filled'|'outlined'|'ghost'
   input_style: 'outlined',     // 'filled'|'outlined'
-  input_border_color: 'rgba(255,255,255,0.12)',
+  input_border_color: 'rgba(255, 255, 255, 0.12)',
+  provider_bg_color: 'rgba(255, 255, 255, 0.05)',
+  provider_text_color: '#ffffff',
 
   // Layout
   logo_position: 'center',     // 'left'|'center'|'right'
   social_layout: 'list',       // 'grid'|'list'|'compact'
 
-  // Background
-  bg_pattern: 'dots',          // 'solid'|'dots'|'diagonal'|'gradient'
-  gradient_start: '#0f172a',
-  gradient_end: '#1e1b4b',
-  gradient_direction: '135deg',// '45deg'|'90deg'|'135deg'|'180deg'
+  // Global Background
+  bg_type: 'gradient',         // 'static'|'gradient'
+  bg_pattern: 'dots',          // 'none'|'dots'|'diagonal'
+  screen_bg_color: '#070b14',
+  gradient_start: '#070b14',
+  gradient_mid: '#0d1728',
+  gradient_end: '#131e32',
+  gradient_direction: '135deg',
+
+  // Card Background
+  card_bg_type: 'static',      // 'static'|'gradient'
+  card_bg_pattern: 'none',     // 'none'|'dots'|'diagonal'
+  login_card_bg_color: 'rgba(15, 23, 42, 0.85)',
+  card_gradient_start: 'rgba(15, 23, 42, 0.90)',
+  card_gradient_mid: 'rgba(15, 23, 42, 0.80)',
+  card_gradient_end: 'rgba(15, 23, 42, 0.70)',
+  card_gradient_direction: '135deg',
 
   // Custom CSS
   custom_css: '',

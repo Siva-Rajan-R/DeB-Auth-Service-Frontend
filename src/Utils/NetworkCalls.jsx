@@ -63,10 +63,11 @@ export const useNetworkCalls = () => {
 
     try {
       let response;
-      if (method === "POST") response = await axios.post(urlToCall, data, { headers : access_headers });
-      else if (method === "GET") response = await axios.get(urlToCall, { headers : access_headers });
-      else if (method === "PUT") response = await axios.put(urlToCall, data, { headers : access_headers });
-      else if (method === "DELETE") response = await axios.delete(urlToCall, { headers : access_headers });
+      const reqConfig = { headers: access_headers, timeout: 15000 };
+      if (method === "POST") response = await axios.post(urlToCall, data, reqConfig);
+      else if (method === "GET") response = await axios.get(urlToCall, reqConfig);
+      else if (method === "PUT") response = await axios.put(urlToCall, data, reqConfig);
+      else if (method === "DELETE") response = await axios.delete(urlToCall, reqConfig);
       else throw new Error("Unsupported HTTP method");
       console.log("Headers from Networkcalls : ",response.headers)
       if (response.status === 200) return response.data;
