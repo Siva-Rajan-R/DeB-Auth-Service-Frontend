@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 export const LandingFooter = () => {
   return (
     <footer className="text-slate-600 py-16">
@@ -16,43 +18,44 @@ export const LandingFooter = () => {
           <p className="text-xs text-slate-600 leading-relaxed max-w-sm font-normal">
             Authentication without user lock-in. Developer-first authentication infrastructure for modern applications.
           </p>
-          <div className="text-xs font-mono text-slate-500">
+          <div className="text-xs text-slate-500">
             A product from <a href="https://debuggerstechnologies.com" target="_blank" rel="noreferrer" className="text-slate-900 font-bold hover:underline hover:text-cyan-600">debuggerstechnologies.com</a>
           </div>
         </div>
 
         {/* Product Column */}
         <div>
-          <h4 className="text-xs font-mono font-bold text-slate-900 uppercase tracking-wider mb-4">Product</h4>
+          <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-4">Product</h4>
           <ul className="space-y-2.5 text-xs font-medium">
             <li><a href="#features" className="hover:text-cyan-600 transition-colors">Features</a></li>
             <li><a href="#auth-flow" className="hover:text-cyan-600 transition-colors">How It Works</a></li>
             <li><a href="#pricing" className="hover:text-cyan-600 transition-colors">Pricing</a></li>
             <li><a href="#use-cases" className="hover:text-cyan-600 transition-colors">Use Cases</a></li>
+            <li><Link to="/contact" className="hover:text-cyan-600 transition-colors">Contact Us</Link></li>
           </ul>
         </div>
 
         {/* Developers Column */}
         <div>
-          <h4 className="text-xs font-mono font-bold text-slate-900 uppercase tracking-wider mb-4">Developers</h4>
+          <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-4">Developers</h4>
           <ul className="space-y-2.5 text-xs font-medium">
-            <li><a href="/auth-docs" className="hover:text-cyan-600 transition-colors">Documentation</a></li>
-            <li><a href="/dashboard" className="hover:text-cyan-600 transition-colors">Dashboard Portal</a></li>
+            <li><Link to="/auth-docs" className="hover:text-cyan-600 transition-colors">Documentation</Link></li>
+            <li><Link to="/dashboard" className="hover:text-cyan-600 transition-colors">Dashboard Portal</Link></li>
           </ul>
         </div>
 
         {/* Legal Column */}
         <div>
-          <h4 className="text-xs font-mono font-bold text-slate-900 uppercase tracking-wider mb-4">Legal</h4>
+          <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-4">Legal</h4>
           <ul className="space-y-2 text-xs font-medium">
-            <li><a href="#" className="hover:text-cyan-600 transition-colors">Security & Privacy</a></li>
-            <li><a href="#" className="hover:text-cyan-600 transition-colors">Terms of Service</a></li>
+            <li><Link to="/privacy" className="hover:text-cyan-600 transition-colors">Privacy Policy</Link></li>
+            <li><Link to="/terms" className="hover:text-cyan-600 transition-colors">Terms of Service</Link></li>
           </ul>
         </div>
 
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 pt-8 flex flex-col sm:flex-row justify-between items-center text-xs font-mono text-slate-500 gap-4">
+      <div className="max-w-7xl mx-auto px-6 pt-8 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 gap-4">
         <div>© 2026 DAuth. All rights reserved.</div>
         <div>Your Users. Your Database. Your Authentication.</div>
       </div>

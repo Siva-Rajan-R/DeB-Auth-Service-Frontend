@@ -88,41 +88,70 @@ const DEFAULT_ROLES = [
   { id: 'role-superadmin', name: 'Super Admin', isDefault: true },
 ];
 
+const mapLoadedMethods = (loadedMethods) => {
+  const loaded = loadedMethods || [];
+  const mapped = loaded.map((m) => {
+    const isLocked = (m.id === 'microsoft') ? true : !!m.isLocked;
+    return { 
+      id: m.id, 
+      name: m.name || m.id, 
+      enabled: isLocked ? false : !!m.enabled,
+      isLocked 
+    };
+  });
+  const oldOtpObj = mapped.find(m => m.id === 'otp');
+  const oldOtpEnabled = oldOtpObj ? !!oldOtpObj.enabled : false;
+  
+  DEFAULT_AUTH_METHODS.forEach(def => {
+    if (!mapped.some(m => m.id === def.id)) {
+      let enabled = def.enabled;
+      if (def.id === 'email_otp' && oldOtpEnabled) {
+        enabled = true;
+      }
+      mapped.push({ ...def, enabled: def.isLocked ? false : enabled });
+    }
+  });
+  return mapped;
+};
+
 export const useAuthConfigStore = create(
   persist(
     (set, get) => ({
       // Hydrate entire store from a backend config object
       hydrateFromConfig: (apiConfig) => {
-        const { project_name, ui, auth_methods, forgot_password_enabled, signup_fields, sso, redirect_urls, two_factor, location_based_auth } = apiConfig;
+        const {
+          project_name, ui, auth_methods, forgot_password_enabled, signup_fields,
+          sso, redirect_urls, two_factor, location_based_auth,
+          signin, signup, separate_config
+        } = apiConfig;
+
+        const isSeparate = separate_config !== undefined
+          ? !!separate_config
+          : (!!signin || !!signup);
+
+        const signinMethods = mapLoadedMethods(signin?.auth_methods || auth_methods);
+        const signupMethods = mapLoadedMethods(signup?.auth_methods || auth_methods);
+
+        const signinUI = { ...DEFAULT_UI_CONFIG, ...(ui || {}), ...(signin?.ui || {}) };
+        const signupUI = { ...DEFAULT_UI_CONFIG, ...(ui || {}), ...(signup?.ui || {}) };
+
+        const activeMode = get().activeMode || 'signin';
+        const activeMethods = isSeparate
+          ? (activeMode === 'signup' ? signupMethods : signinMethods)
+          : signinMethods;
+        const activeUI = isSeparate
+          ? (activeMode === 'signup' ? signupUI : signinUI)
+          : signinUI;
 
         set({
           projectName: project_name || 'Untitled Project',
-          uiConfig: { ...DEFAULT_UI_CONFIG, ...(ui || {}) },
-          authMethods: (() => {
-            const loaded = auth_methods || [];
-            const mapped = loaded.map((m) => {
-              const isLocked = (m.id === 'microsoft') ? true : !!m.isLocked;
-              return { 
-                id: m.id, 
-                name: m.name || m.id, 
-                enabled: isLocked ? false : !!m.enabled,
-                isLocked 
-              };
-            });
-            const oldOtpObj = mapped.find(m => m.id === 'otp');
-            const oldOtpEnabled = oldOtpObj ? !!oldOtpObj.enabled : false;
-            
-            DEFAULT_AUTH_METHODS.forEach(def => {
-              if (!mapped.some(m => m.id === def.id)) {
-                let enabled = def.enabled;
-                if (def.id === 'email_otp' && oldOtpEnabled) {
-                  enabled = true;
-                }
-                mapped.push({ ...def, enabled: def.isLocked ? false : enabled });
-              }
-            });
-            return mapped;
-          })(),
+          separateConfig: isSeparate,
+          signinAuthMethods: signinMethods,
+          signupAuthMethods: signupMethods,
+          signinUIConfig: signinUI,
+          signupUIConfig: signupUI,
+          authMethods: activeMethods.map((m) => ({ ...m })),
+          uiConfig: { ...activeUI },
           forgotPasswordEnabled: forgot_password_enabled !== undefined ? forgot_password_enabled : true,
           signupFields: signup_fields?.length
             ? signup_fields.map((f, i) => ({ id: f.id || `field-${i}`, ...f }))
@@ -135,36 +164,200 @@ export const useAuthConfigStore = create(
         });
       },
 
-
       hasUnsavedChanges: false,
       setHasUnsavedChanges: (val) => set({ hasUnsavedChanges: val }),
       projectName: 'Untitled Project',
       activeMode: 'signin',
-      setActiveMode: (mode) => set({ activeMode: mode }),
-      setProjectName: (name) => set({ projectName: name }),
+
+      // Mode-specific & Separation State
+      separateConfig: false,
+      signinAuthMethods: DEFAULT_AUTH_METHODS.map((m) => ({ ...m })),
+      signupAuthMethods: DEFAULT_AUTH_METHODS.map((m) => ({ ...m })),
+      signinUIConfig: { ...DEFAULT_UI_CONFIG },
+      signupUIConfig: { ...DEFAULT_UI_CONFIG },
+
+      setSeparateConfig: (val) => {
+        const currentMode = get().activeMode;
+        if (val) {
+          const signinMethods = get().signinAuthMethods.map((m) => ({ ...m }));
+          const signinUI = { ...get().signinUIConfig };
+          const signupMethods = get().signupAuthMethods.map((m) => ({ ...m }));
+          const signupUI = { ...get().signupUIConfig };
+          set({
+            separateConfig: true,
+            signupAuthMethods: signupMethods.length ? signupMethods : signinMethods,
+            signupUIConfig: Object.keys(signupUI).length ? signupUI : signinUI,
+            authMethods: currentMode === 'signup' ? signupMethods : signinMethods,
+            uiConfig: currentMode === 'signup' ? signupUI : signinUI,
+            hasUnsavedChanges: true,
+          });
+        } else {
+          const signinMethods = get().signinAuthMethods.map((m) => ({ ...m }));
+          const signinUI = { ...get().signinUIConfig };
+          set({
+            separateConfig: false,
+            signupAuthMethods: signinMethods.map((m) => ({ ...m })),
+            signupUIConfig: { ...signinUI },
+            authMethods: signinMethods.map((m) => ({ ...m })),
+            uiConfig: { ...signinUI },
+            hasUnsavedChanges: true,
+          });
+        }
+      },
+
+      toggleSeparateConfig: () => {
+        get().setSeparateConfig(!get().separateConfig);
+      },
+
+      copyModeConfig: (fromMode, toMode) => {
+        const s = get();
+        const sourceMethods = (fromMode === 'signup' ? s.signupAuthMethods : s.signinAuthMethods).map((m) => ({ ...m }));
+        const sourceUI = { ...(fromMode === 'signup' ? s.signupUIConfig : s.signinUIConfig) };
+
+        if (toMode === 'signup') {
+          set({
+            signupAuthMethods: sourceMethods,
+            signupUIConfig: sourceUI,
+            ...(s.activeMode === 'signup' ? { authMethods: sourceMethods.map((m) => ({ ...m })), uiConfig: { ...sourceUI } } : {}),
+            hasUnsavedChanges: true,
+          });
+        } else {
+          set({
+            signinAuthMethods: sourceMethods,
+            signinUIConfig: sourceUI,
+            ...(s.activeMode === 'signin' ? { authMethods: sourceMethods.map((m) => ({ ...m })), uiConfig: { ...sourceUI } } : {}),
+            hasUnsavedChanges: true,
+          });
+        }
+      },
+
+      setActiveMode: (mode) => {
+        const s = get();
+        const isSeparate = s.separateConfig;
+        const currentMethods = isSeparate
+          ? (mode === 'signup' ? s.signupAuthMethods : s.signinAuthMethods)
+          : s.signinAuthMethods;
+        const currentUI = isSeparate
+          ? (mode === 'signup' ? s.signupUIConfig : s.signinUIConfig)
+          : s.signinUIConfig;
+
+        set({
+          activeMode: mode,
+          authMethods: currentMethods.map((m) => ({ ...m })),
+          uiConfig: { ...currentUI },
+        });
+      },
+
+      setProjectName: (name) => set({ projectName: name, hasUnsavedChanges: true }),
 
       uiConfig: { ...DEFAULT_UI_CONFIG },
-      updateUIConfig: (key, value) =>
-        set((s) => ({ uiConfig: { ...s.uiConfig, [key]: value } })),
+      updateUIConfig: (key, value) => {
+        const s = get();
+        const isSeparate = s.separateConfig;
+        const mode = s.activeMode;
+
+        if (isSeparate) {
+          if (mode === 'signup') {
+            const newSignupUI = { ...s.signupUIConfig, [key]: value };
+            set({
+              signupUIConfig: newSignupUI,
+              uiConfig: newSignupUI,
+              hasUnsavedChanges: true,
+            });
+          } else {
+            const newSigninUI = { ...s.signinUIConfig, [key]: value };
+            set({
+              signinUIConfig: newSigninUI,
+              uiConfig: newSigninUI,
+              hasUnsavedChanges: true,
+            });
+          }
+        } else {
+          const newUI = { ...s.uiConfig, [key]: value };
+          set({
+            signinUIConfig: newUI,
+            signupUIConfig: newUI,
+            uiConfig: newUI,
+            hasUnsavedChanges: true,
+          });
+        }
+      },
 
       authMethods: DEFAULT_AUTH_METHODS.map((m) => ({ ...m })),
       toggleAuthMethod: (id) => {
-        const methods = get().authMethods;
-        const target = methods.find((m) => m.id === id);
+        const s = get();
+        const isSeparate = s.separateConfig;
+        const mode = s.activeMode;
+
+        const targetMethods = isSeparate
+          ? (mode === 'signup' ? s.signupAuthMethods : s.signinAuthMethods)
+          : s.signinAuthMethods;
+
+        const target = targetMethods.find((m) => m.id === id);
         if (target?.isLocked) return;
-        const enabledCount = methods.filter((m) => m.enabled).length;
+        const enabledCount = targetMethods.filter((m) => m.enabled).length;
         if (target?.enabled && enabledCount <= 1) return;
-        set((s) => ({
-          authMethods: s.authMethods.map((m) =>
-            m.id === id ? { ...m, enabled: !m.enabled } : m
-          ),
-        }));
+
+        const updated = targetMethods.map((m) =>
+          m.id === id ? { ...m, enabled: !m.enabled } : m
+        );
+
+        if (isSeparate) {
+          if (mode === 'signup') {
+            set({
+              signupAuthMethods: updated,
+              authMethods: updated,
+              hasUnsavedChanges: true,
+            });
+          } else {
+            set({
+              signinAuthMethods: updated,
+              authMethods: updated,
+              hasUnsavedChanges: true,
+            });
+          }
+        } else {
+          set({
+            signinAuthMethods: updated,
+            signupAuthMethods: updated,
+            authMethods: updated,
+            hasUnsavedChanges: true,
+          });
+        }
       },
-      reorderAuthMethods: (methods) => set({ authMethods: methods }),
+
+      reorderAuthMethods: (methods) => {
+        const s = get();
+        const isSeparate = s.separateConfig;
+        const mode = s.activeMode;
+
+        if (isSeparate) {
+          if (mode === 'signup') {
+            set({
+              signupAuthMethods: methods,
+              authMethods: methods,
+              hasUnsavedChanges: true,
+            });
+          } else {
+            set({
+              signinAuthMethods: methods,
+              authMethods: methods,
+              hasUnsavedChanges: true,
+            });
+          }
+        } else {
+          set({
+            signinAuthMethods: methods,
+            signupAuthMethods: methods,
+            authMethods: methods,
+            hasUnsavedChanges: true,
+          });
+        }
+      },
 
       forgotPasswordEnabled: true,
       toggleForgotPassword: () =>
-        set((s) => ({ forgotPasswordEnabled: !s.forgotPasswordEnabled })),
+        set((s) => ({ forgotPasswordEnabled: !s.forgotPasswordEnabled, hasUnsavedChanges: true })),
 
       signupFields: DEFAULT_SIGNUP_FIELDS.map((f) => ({ ...f })),
       addSignupField: () =>
@@ -173,37 +366,40 @@ export const useAuthConfigStore = create(
             ...s.signupFields,
             { id: `field-${Date.now()}`, label: 'New Field', name: 'new_field', type: 'text', required: false },
           ],
+          hasUnsavedChanges: true,
         })),
       removeSignupField: (id) =>
-        set((s) => ({ signupFields: s.signupFields.filter((f) => f.id !== id) })),
+        set((s) => ({ signupFields: s.signupFields.filter((f) => f.id !== id), hasUnsavedChanges: true })),
       updateSignupField: (id, updates) =>
         set((s) => ({
           signupFields: s.signupFields.map((f) => (f.id === id ? { ...f, ...updates } : f)),
+          hasUnsavedChanges: true,
         })),
-      reorderSignupFields: (fields) => set({ signupFields: fields }),
+      reorderSignupFields: (fields) => set({ signupFields: fields, hasUnsavedChanges: true }),
 
       sso: { enabled: false, isLocked: true, domains: [] },
-      toggleSSO: () => set((s) => ({ sso: { ...s.sso, enabled: s.sso.isLocked ? false : !s.sso.enabled } })),
+      toggleSSO: () => set((s) => ({ sso: { ...s.sso, enabled: s.sso.isLocked ? false : !s.sso.enabled }, hasUnsavedChanges: true })),
       addSSODomain: (domain) =>
         set((s) => ({
           sso: { ...s.sso, domains: s.sso.isLocked ? s.sso.domains : [...s.sso.domains, { id: `d-${Date.now()}`, domain }] },
+          hasUnsavedChanges: true,
         })),
       removeSSODomain: (id) =>
         set((s) => ({
           sso: { ...s.sso, domains: s.sso.isLocked ? s.sso.domains : s.sso.domains.filter((d) => d.id !== id) },
+          hasUnsavedChanges: true,
         })),
 
       twoFactor: { enabled: false },
-      updateTwoFactor: (updates) => set((s) => ({ twoFactor: { ...s.twoFactor, ...updates } })),
+      updateTwoFactor: (updates) => set((s) => ({ twoFactor: { ...s.twoFactor, ...updates }, hasUnsavedChanges: true })),
 
       locationAuth: false,
-      setLocationAuth: (val) => set({ locationAuth: val }),
-
+      setLocationAuth: (val) => set({ locationAuth: val, hasUnsavedChanges: true }),
 
       // Redirect URLs
       redirectURLs: { ...DEFAULT_REDIRECT_URLS },
       updateRedirectURL: (key, value) =>
-        set((s) => ({ redirectURLs: { ...s.redirectURLs, [key]: value } })),
+        set((s) => ({ redirectURLs: { ...s.redirectURLs, [key]: value }, hasUnsavedChanges: true })),
 
       // Admin — Users
       adminUsers: [],
@@ -246,26 +442,53 @@ export const useAuthConfigStore = create(
         set({
           projectName: 'Untitled Project',
           activeMode: 'signin',
+          separateConfig: false,
           theme: 'light',
           uiConfig: { ...DEFAULT_UI_CONFIG },
           authMethods: DEFAULT_AUTH_METHODS.map((m) => ({ ...m })),
+          signinAuthMethods: DEFAULT_AUTH_METHODS.map((m) => ({ ...m })),
+          signupAuthMethods: DEFAULT_AUTH_METHODS.map((m) => ({ ...m })),
+          signinUIConfig: { ...DEFAULT_UI_CONFIG },
+          signupUIConfig: { ...DEFAULT_UI_CONFIG },
           forgotPasswordEnabled: true,
           signupFields: DEFAULT_SIGNUP_FIELDS.map((f) => ({ ...f })),
           sso: { enabled: false, isLocked: true, domains: [] },
           twoFactor: { enabled: false },
           locationAuth: false,
           redirectURLs: { ...DEFAULT_REDIRECT_URLS },
+          hasUnsavedChanges: true,
 
           adminUsers: [],
           adminRoles: DEFAULT_ROLES.map((r) => ({ ...r })),
         }),
 
       getExportConfig: () => {
-        const { projectName, uiConfig, authMethods, forgotPasswordEnabled, signupFields, sso, redirectURLs, twoFactor, locationAuth } = get();
+        const {
+          projectName, uiConfig, authMethods,
+          signinUIConfig, signupUIConfig,
+          signinAuthMethods, signupAuthMethods,
+          separateConfig,
+          forgotPasswordEnabled, signupFields, sso, redirectURLs, twoFactor, locationAuth
+        } = get();
+
+        const exportSigninMethods = (separateConfig ? signinAuthMethods : authMethods).map(({ id, name, enabled }) => ({ id, name, enabled }));
+        const exportSignupMethods = (separateConfig ? signupAuthMethods : authMethods).map(({ id, name, enabled }) => ({ id, name, enabled }));
+        const exportSigninUI = separateConfig ? signinUIConfig : uiConfig;
+        const exportSignupUI = separateConfig ? signupUIConfig : uiConfig;
+
         return {
           project_name: projectName,
-          ui: { ...uiConfig },
-          auth_methods: authMethods.map(({ id, name, enabled }) => ({ id, name, enabled })),
+          ui: exportSigninUI,
+          auth_methods: exportSigninMethods,
+          separate_config: separateConfig,
+          signin: {
+            auth_methods: exportSigninMethods,
+            ui: exportSigninUI,
+          },
+          signup: {
+            auth_methods: exportSignupMethods,
+            ui: exportSignupUI,
+          },
           forgot_password_enabled: forgotPasswordEnabled,
           signup_fields: signupFields.map(({ label, name, type, required }) => ({ label, name, type, required })),
           sso: { enabled: false, is_locked: true, domains: sso.domains.map((d) => d.domain) },

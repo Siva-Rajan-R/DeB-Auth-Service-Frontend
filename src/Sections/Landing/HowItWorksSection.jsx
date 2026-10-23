@@ -152,7 +152,7 @@ const { auth_url } = await response.json();
                 }`}
               >
                 <div className="flex items-center gap-4 mb-2">
-                  <span className={`text-xs font-mono font-bold px-2.5 py-1 rounded-lg ${
+                  <span className={`text-xs font-bold px-2.5 py-1 rounded-lg ${
                     activeStep === idx ? 'bg-cyan-500 text-white' : 'bg-slate-100 text-slate-600'
                   }`}>
                     {step.num}
@@ -186,13 +186,13 @@ const { auth_url } = await response.json();
                 <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
                 <div className="w-3 h-3 rounded-full bg-amber-500/80"></div>
                 <div className="w-3 h-3 rounded-full bg-blue-500/80"></div>
-                <span className="text-xs font-mono text-slate-400 ml-2">
-                  Step {steps[activeStep].num} — {steps[activeStep].subtitle}
+                <span className="text-xs text-slate-400 ml-2 font-medium">
+                  Step {steps[activeStep].num} | {steps[activeStep].subtitle}
                 </span>
               </div>
               <button
                 onClick={() => handleCopy(steps[activeStep].code)}
-                className="text-xs font-mono text-slate-400 hover:text-cyan-400 flex items-center gap-1.5 bg-slate-800/80 hover:bg-slate-800 px-3 py-1 rounded-lg transition-colors"
+                className="text-xs text-slate-400 hover:text-cyan-400 font-medium flex items-center gap-1.5 bg-slate-800/80 hover:bg-slate-800 px-3 py-1 rounded-lg transition-colors"
               >
                 {copied ? <Check size={14} className="text-blue-400" /> : <Copy size={14} />}
                 <span>{copied ? 'Copied!' : 'Copy Code'}</span>
@@ -207,7 +207,7 @@ const { auth_url } = await response.json();
             </div>
 
             {/* Sandbox Footer Info */}
-            <div className="bg-slate-950 px-6 py-3 text-[11px] font-mono text-slate-400 flex items-center justify-between">
+            <div className="bg-slate-950 px-6 py-3 text-[11px] text-slate-400 font-medium flex items-center justify-between">
               <span>Standard OAuth 2.0 / OIDC Compliant</span>
               <span className="text-cyan-400 font-bold">DAuth Auth Engine</span>
             </div>

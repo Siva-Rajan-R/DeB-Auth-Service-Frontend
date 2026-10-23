@@ -2,7 +2,7 @@ import { DashboardCards } from '../Components/DashboardCards';
 import { CreateNewCard } from '../Components/CreateNewCard';
 import { useContext, useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
-import { useNetworkCalls } from '../Utils/NetworkCalls';
+import { useNetworkCalls, getValidAccessToken } from '../Utils/NetworkCalls';
 import { AuthContext } from '../Contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -25,11 +25,21 @@ export const DashboardPage = () => {
   };
 
   useEffect(() => {
-    if (!Cookies.get('access_token')) {
-      window.location.href = '/';
-      return;
-    }
-    getSecrets();
+    const initDashboard = async () => {
+      setLoading(true);
+      const token = await getValidAccessToken();
+      if (!token) {
+        Cookies.remove('user_name', { path: '/' });
+        Cookies.remove('user_profile', { path: '/' });
+        Cookies.remove('user_email', { path: '/' });
+        Cookies.remove('access_token', { path: '/' });
+        Cookies.remove('refresh_token', { path: '/' });
+        window.location.href = '/';
+        return;
+      }
+      await getSecrets();
+    };
+    initDashboard();
   }, [isSecretsAdded]);
 
   const handleCreateNew = () => navigate('/dashboard-detail');

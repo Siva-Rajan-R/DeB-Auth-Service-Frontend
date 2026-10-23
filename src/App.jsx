@@ -17,6 +17,9 @@ import { AnalyticsStandalone } from './Pages/AnalyticsStandalone'
 import { ToastContainer } from './Components/ToastContainer'
 import { PricingPage } from './Pages/Pricing'
 import { SettingsPage } from './Pages/Settings'
+import { PrivacyPolicy } from './Pages/LegalPrivacy'
+import { TermsOfService } from './Pages/TermsOfService'
+import { ContactPage } from './Pages/ContactPage'
 
 function App() {
   return (
@@ -24,6 +27,9 @@ function App() {
       <ToastContainer />
       <Routes>
         <Route path='/' element={<HomePage/>}></Route>
+        <Route path='/contact' element={<ContactPage/>}></Route>
+        <Route path='/privacy' element={<PrivacyPolicy/>}></Route>
+        <Route path='/terms' element={<TermsOfService/>}></Route>
         <Route path='/auth/request/:request_id/:flow_type' element={<LoginPortal/>}></Route>
         <Route path='/auth/reset-password/:token' element={<ResetPassword/>}></Route>
         

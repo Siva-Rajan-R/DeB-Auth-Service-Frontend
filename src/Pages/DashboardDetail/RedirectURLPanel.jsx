@@ -10,21 +10,21 @@ const FRONTEND_URL = APP_CONFIG.FRONTEND_URL;
 const SIGNIN_FIELDS = [
   {
     key: 'signin_success',
-    label: 'Sign In — Success',
+    label: 'Sign In | Success',
     hint: 'Redirect here after a successful sign-in',
     icon: <CheckCircle2 size={13} className='text-blue-600 flex-shrink-0' />,
     placeholder: 'http://127.0.0.1:8900/api/auth/callback',
   },
   {
     key: 'signin_failure',
-    label: 'Sign In — Failure',
+    label: 'Sign In | Failure',
     hint: 'Redirect here after a failed sign-in attempt (e.g. invalid credentials, verification rejected)',
     icon: <XCircle size={13} className='text-red-600 flex-shrink-0' />,
     placeholder: 'http://127.0.0.1:8900/api/auth/callback',
   },
   {
     key: 'signin_verification',
-    label: 'Sign In — Verification / Checking URL (Webhook)',
+    label: 'Sign In | Verification Webhook',
     hint: 'Called on submit to verify credentials against your database. Must return 2xx to succeed, or 4xx/5xx with { message, status_code } to reject and route to Failure URL.',
     icon: <ShieldCheck size={13} className='text-cyan-600 flex-shrink-0' />,
     placeholder: 'http://127.0.0.1:8900/api/auth/verify-signin',
@@ -34,21 +34,21 @@ const SIGNIN_FIELDS = [
 const SIGNUP_FIELDS = [
   {
     key: 'signup_success',
-    label: 'Sign Up — Success',
+    label: 'Sign Up | Success',
     hint: 'Redirect here after a successful registration',
     icon: <CheckCircle2 size={13} className='text-blue-600 flex-shrink-0' />,
     placeholder: 'http://127.0.0.1:8900/api/auth/callback',
   },
   {
     key: 'signup_failure',
-    label: 'Sign Up — Failure',
+    label: 'Sign Up | Failure',
     hint: 'Redirect here after a failed registration attempt',
     icon: <XCircle size={13} className='text-red-600 flex-shrink-0' />,
     placeholder: 'http://127.0.0.1:8900/api/auth/callback',
   },
   {
     key: 'signup_verification',
-    label: 'Sign Up — Verification / Checking URL (Webhook)',
+    label: 'Sign Up | Verification Webhook',
     hint: 'Called on submit to verify registration eligibility. Must return 2xx to succeed, or 4xx/5xx with error message to reject and route to Failure URL.',
     icon: <ShieldCheck size={13} className='text-cyan-600 flex-shrink-0' />,
     placeholder: 'http://127.0.0.1:8900/api/auth/verify-signup',

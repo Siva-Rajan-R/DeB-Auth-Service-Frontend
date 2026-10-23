@@ -8,6 +8,7 @@ import {
 import Select from 'react-select';
 import axios from 'axios';
 import { APP_CONFIG } from '../../config';
+import { getValidAccessToken } from '../../Utils/NetworkCalls';
 
 
 const rgbaToHex = (color) => {
@@ -173,10 +174,7 @@ const LogoUploader = () => {
     setUploading(true);
     try {
       const backendUrl = APP_CONFIG.BACKEND_URL;
-      const token = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('access_token='))
-        ?.split('=')[1];
+      const token = await getValidAccessToken();
 
       const res = await axios.post(`${backendUrl}/user/secrets/upload-logo`, formData, {
         headers: {

@@ -3,7 +3,7 @@ import { useAuthConfigStore } from '../../Store/useAuthConfigStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MdOutlineSms } from 'react-icons/md';
 import { RiLockPasswordLine } from 'react-icons/ri';
-import { Eye, EyeOff, Check } from 'lucide-react';
+import { Eye, EyeOff, Check, UserPlus2 } from 'lucide-react';
 import { GoogleLogo, GithubLogo, FacebookLogo, MicrosoftLogo } from '../../Components/BrandLogos';
 
 const PROVIDER_META = {
@@ -184,11 +184,13 @@ const FButton = ({ children, primary = '#0284c7', textColor, btnTextColor, butto
 };
 
 // ─── Password form (for when password is the ONLY or first method) ────────────
-const PasswordForm = ({ primary, textColor, btnTextColor, buttonStyle, inputStyle, inputBorderColor, borderRadius, showForgotPassword, onBack, isCardLight }) => (
+const PasswordForm = ({ primary, textColor, btnTextColor, buttonStyle, inputStyle, inputBorderColor, borderRadius, showForgotPassword, onBack, isCardLight, submitText, onSubmit }) => (
   <motion.div key='pwd-form' initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -15 }} className='space-y-3'>
     <FInput label='Email Address' type='email' placeholder='you@example.com' textColor={textColor} inputStyle={inputStyle} inputBorderColor={inputBorderColor} borderRadius={borderRadius} isCardLight={isCardLight} />
     <FInput label='Password' type='password' placeholder='••••••••' textColor={textColor} inputStyle={inputStyle} inputBorderColor={inputBorderColor} borderRadius={borderRadius} isCardLight={isCardLight} />
-    <FButton primary={primary} textColor={textColor} btnTextColor={btnTextColor} buttonStyle={buttonStyle} borderRadius={borderRadius}>Sign In</FButton>
+    <FButton primary={primary} textColor={textColor} btnTextColor={btnTextColor} buttonStyle={buttonStyle} borderRadius={borderRadius} onClick={onSubmit}>
+      {submitText || 'Sign In'}
+    </FButton>
     {showForgotPassword && (
       <p className='text-center pt-1 cursor-pointer hover:underline' style={{ color: '#ef4444', fontSize: 'var(--card-footer-size, 12px)' }}>Forgot password?</p>
     )}
@@ -199,7 +201,7 @@ const PasswordForm = ({ primary, textColor, btnTextColor, buttonStyle, inputStyl
 );
 
 // ─── OTP form ────────────────────────────────────────────────────────────────
-const OTPForm = ({ primary, textColor, btnTextColor, buttonStyle, inputStyle, inputBorderColor, borderRadius, onBack, mode = 'email', isCardLight }) => {
+const OTPForm = ({ primary, textColor, btnTextColor, buttonStyle, inputStyle, inputBorderColor, borderRadius, onBack, mode = 'email', isCardLight, onVerify }) => {
   const [step, setStep] = useState(0);
   return (
     <AnimatePresence mode='wait'>
@@ -225,7 +227,7 @@ const OTPForm = ({ primary, textColor, btnTextColor, buttonStyle, inputStyle, in
                 style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.1)', color: `${textColor}50`, borderRadius, fontSize: 'var(--card-input-size, 14px)' }}>_</div>
             ))}
           </div>
-          <FButton primary={primary} textColor={textColor} btnTextColor={btnTextColor} buttonStyle={buttonStyle} borderRadius={borderRadius}>Verify OTP</FButton>
+          <FButton primary={primary} textColor={textColor} btnTextColor={btnTextColor} buttonStyle={buttonStyle} borderRadius={borderRadius} onClick={onVerify}>Verify OTP</FButton>
           <button onClick={() => setStep(0)} className='w-full transition-colors' style={{ color: `${textColor}60`, fontSize: 'var(--card-footer-size, 12px)' }}>← Back</button>
         </motion.div>
       )}
@@ -234,18 +236,19 @@ const OTPForm = ({ primary, textColor, btnTextColor, buttonStyle, inputStyle, in
 };
 
 // ─── Social provider button (list layout) ────────────────────────────────────
-const SocialBtn = ({ method, textColor, borderRadius, providerBgColor, providerTextColor, isCardLight }) => {
+const SocialBtn = ({ method, textColor, borderRadius, providerBgColor, providerTextColor, isCardLight, onClick }) => {
   const meta = PROVIDER_META[method.id?.toLowerCase()] || {};
   const defaultBg = isCardLight ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.04)';
   const defaultBorder = isCardLight ? 'rgba(0,0,0,0.10)' : 'rgba(255,255,255,0.10)';
   return (
     <button
       type='button'
+      onClick={onClick}
       className='w-full flex items-center justify-center gap-3 py-3 font-bold border transition-all hover:opacity-90 active:scale-[0.99] group/social shadow-sm'
       style={{
         backgroundColor: providerBgColor || defaultBg,
         borderColor: defaultBorder,
-        color: providerTextColor || textColor,
+        color: providerTextColor || (isCardLight ? '#0F172A' : textColor),
         borderRadius,
         fontSize: 'var(--card-btn-size, 14px)'
       }}
@@ -259,7 +262,7 @@ const SocialBtn = ({ method, textColor, borderRadius, providerBgColor, providerT
 };
 
 // ─── Social compact (2-column layout) ─────────────────────────────────────────
-const SocialCompact = ({ methods, textColor, borderRadius, providerBgColor, providerTextColor, isCardLight }) => (
+const SocialCompact = ({ methods, textColor, borderRadius, providerBgColor, providerTextColor, isCardLight, onClick }) => (
   <div className='grid grid-cols-2 gap-2'>
     {methods.map((m, idx) => {
       const meta = PROVIDER_META[m.id?.toLowerCase()] || {};
@@ -270,13 +273,14 @@ const SocialCompact = ({ methods, textColor, borderRadius, providerBgColor, prov
         <button
           key={m.id}
           type='button'
+          onClick={onClick}
           className={`flex items-center justify-center gap-2 py-2.5 px-3 font-semibold border transition-all hover:opacity-90 active:scale-[0.98] group/soc shadow-sm ${
             isSingle ? 'col-span-2' : ''
           }`}
           style={{
             backgroundColor: providerBgColor || defaultBg,
             borderColor: defaultBorder,
-            color: providerTextColor || textColor,
+            color: providerTextColor || (isCardLight ? '#0F172A' : textColor),
             borderRadius,
             fontSize: 'var(--card-footer-size, 12px)',
           }}
@@ -292,7 +296,7 @@ const SocialCompact = ({ methods, textColor, borderRadius, providerBgColor, prov
 );
 
 // ─── Social icon grid ─────────────────────────────────────────────────────────
-const SocialGrid = ({ methods, textColor, borderRadius, providerBgColor, isCardLight }) => (
+const SocialGrid = ({ methods, textColor, borderRadius, providerBgColor, isCardLight, onClick }) => (
   <div className='flex justify-center gap-2.5 flex-wrap'>
     {methods.map(m => {
       const meta = PROVIDER_META[m.id?.toLowerCase()] || {};
@@ -302,6 +306,7 @@ const SocialGrid = ({ methods, textColor, borderRadius, providerBgColor, isCardL
         <div
           key={m.id}
           title={meta.label || m.name || m.id}
+          onClick={onClick}
           className='w-12 h-12 flex items-center justify-center text-xl cursor-pointer hover:opacity-80 transition-all group/soc border'
           style={{ backgroundColor: providerBgColor || defaultBg, borderColor: defaultBorder, color: meta.color, borderRadius }}
         >
@@ -313,7 +318,11 @@ const SocialGrid = ({ methods, textColor, borderRadius, providerBgColor, isCardL
 );
 
 // ─── Provider selection flow (exact match of real LoginPortal) ────────────────
-const ProviderSelectionFlow = ({ enabledMethods, socialLayout, textColor, btnTextColor, linkColor, borderRadius, primary, buttonStyle, inputStyle, inputBorderColor, showForgotPassword, providerBgColor, providerTextColor, isCardLight }) => {
+const ProviderSelectionFlow = ({
+  enabledMethods, socialLayout, textColor, btnTextColor, linkColor, borderRadius, primary,
+  buttonStyle, inputStyle, inputBorderColor, showForgotPassword, providerBgColor, providerTextColor,
+  isCardLight, submitText = 'Sign In', onAdvanceToFields
+}) => {
   const [step, setStep] = useState('select'); // 'select' | 'password' | 'email_otp' | 'mobile_otp'
 
   const socialMethods = enabledMethods.filter(m => m.id !== 'password' && m.id !== 'email_otp' && m.id !== 'mobile_otp' && m.id !== 'otp');
@@ -321,6 +330,9 @@ const ProviderSelectionFlow = ({ enabledMethods, socialLayout, textColor, btnTex
   const hasEmailOTP = enabledMethods.some(m => m.id === 'email_otp' || m.id === 'otp');
   const hasMobileOTP = enabledMethods.some(m => m.id === 'mobile_otp');
   const sharedProps = { primary, textColor, btnTextColor, linkColor, buttonStyle, inputStyle, inputBorderColor, borderRadius, isCardLight };
+  const defaultBg = isCardLight ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.04)';
+  const defaultBorder = isCardLight ? 'rgba(0,0,0,0.10)' : 'rgba(255,255,255,0.10)';
+  const resolvedProviderTextColor = providerTextColor || (isCardLight ? '#0F172A' : textColor);
 
   // Auto-advance if only one method
   useEffect(() => {
@@ -339,6 +351,8 @@ const ProviderSelectionFlow = ({ enabledMethods, socialLayout, textColor, btnTex
         <PasswordForm
           key='password'
           {...sharedProps}
+          submitText={submitText}
+          onSubmit={onAdvanceToFields}
           showForgotPassword={showForgotPassword}
           onBack={enabledMethods.length > 1 ? () => setStep('select') : null}
         />
@@ -347,6 +361,7 @@ const ProviderSelectionFlow = ({ enabledMethods, socialLayout, textColor, btnTex
           key='email_otp'
           mode='email'
           {...sharedProps}
+          onVerify={onAdvanceToFields}
           onBack={enabledMethods.length > 1 ? () => setStep('select') : null}
         />
       ) : step === 'mobile_otp' ? (
@@ -354,6 +369,7 @@ const ProviderSelectionFlow = ({ enabledMethods, socialLayout, textColor, btnTex
           key='mobile_otp'
           mode='mobile'
           {...sharedProps}
+          onVerify={onAdvanceToFields}
           onBack={enabledMethods.length > 1 ? () => setStep('select') : null}
         />
       ) : (
@@ -361,47 +377,47 @@ const ProviderSelectionFlow = ({ enabledMethods, socialLayout, textColor, btnTex
           {/* Social providers */}
           {socialMethods.length > 0 && (
             socialLayout === 'grid'
-              ? <SocialGrid methods={socialMethods} textColor={textColor} borderRadius={borderRadius} providerBgColor={providerBgColor} isCardLight={isCardLight} />
+              ? <SocialGrid methods={socialMethods} textColor={textColor} borderRadius={borderRadius} providerBgColor={providerBgColor} isCardLight={isCardLight} onClick={onAdvanceToFields} />
               : socialLayout === 'compact'
-                ? <SocialCompact methods={socialMethods} textColor={textColor} borderRadius={borderRadius} providerBgColor={providerBgColor} providerTextColor={providerTextColor} isCardLight={isCardLight} />
-                : socialMethods.map(m => <SocialBtn key={m.id} method={m} textColor={textColor} borderRadius={borderRadius} providerBgColor={providerBgColor} providerTextColor={providerTextColor} isCardLight={isCardLight} />)
+                ? <SocialCompact methods={socialMethods} textColor={textColor} borderRadius={borderRadius} providerBgColor={providerBgColor} providerTextColor={providerTextColor} isCardLight={isCardLight} onClick={onAdvanceToFields} />
+                : socialMethods.map(m => <SocialBtn key={m.id} method={m} textColor={textColor} borderRadius={borderRadius} providerBgColor={providerBgColor} providerTextColor={providerTextColor} isCardLight={isCardLight} onClick={onAdvanceToFields} />)
           )}
-          {/* Divider if social AND password/otp */}
+          {/* Divider if social AND (password or OTP) */}
           {socialMethods.length > 0 && (hasPassword || hasEmailOTP || hasMobileOTP) && (
-            <div className='relative flex items-center justify-center py-1'>
-              <div className='absolute inset-0 flex items-center'><div className='w-full ' style={{ borderColor: `${textColor}15` }} /></div>
-              <span className='relative px-3' style={{ color: `${textColor}40`, fontSize: 'var(--card-footer-size, 12px)' }}>or continue with</span>
+            <div className='relative flex items-center justify-center py-2'>
+              <div className='absolute inset-0 flex items-center'><div className='w-full border-t' style={{ borderColor: `${textColor}20` }} /></div>
+              <span className='relative px-3 text-xs' style={{ color: `${textColor}60`, fontSize: 'var(--card-footer-size, 12px)' }}>or continue with</span>
             </div>
           )}
           {/* Email/Mobile OTP buttons */}
           {hasEmailOTP && hasMobileOTP ? (
             <div className='space-y-2'>
-              <p className='font-bold text-center uppercase tracking-wider' style={{ color: `${textColor}50`, fontSize: 'var(--card-footer-size, 11px)' }}>
+              <p className='font-bold text-center uppercase tracking-wider text-xs' style={{ color: `${textColor}50`, fontSize: 'var(--card-footer-size, 11px)' }}>
                 Continue with OTP
               </p>
               <div className='flex gap-2'>
-                <button onClick={() => setStep('email_otp')} className='flex-1 flex items-center justify-center gap-2 py-2.5 font-bold hover:opacity-80 transition-all'
-                  style={{ backgroundColor: 'rgba(34,197,94,0.08)', borderColor: 'rgba(34,197,94,0.2)', color: btnTextColor || textColor, borderRadius, fontSize: 'var(--card-footer-size, 12px)' }}>
-                  <span className='text-blue-500 text-sm'><MdOutlineSms /></span>
+                <button onClick={() => setStep('email_otp')} className='flex-1 flex items-center justify-center gap-2 py-2.5 font-bold hover:opacity-80 transition-all border shadow-sm'
+                  style={{ backgroundColor: providerBgColor || defaultBg, borderColor: defaultBorder, color: resolvedProviderTextColor, borderRadius, fontSize: 'var(--card-footer-size, 12px)' }}>
+                  <span className='text-emerald-500 text-sm'><MdOutlineSms /></span>
                   Email
                 </button>
-                <button onClick={() => setStep('mobile_otp')} className='flex-1 flex items-center justify-center gap-2 py-2.5 font-bold hover:opacity-80 transition-all'
-                  style={{ backgroundColor: 'rgba(6,182,212,0.08)', borderColor: 'rgba(6,182,212,0.2)', color: btnTextColor || textColor, borderRadius, fontSize: 'var(--card-footer-size, 12px)' }}>
-                  <span className='text-cyan-600 text-sm'><MdOutlineSms /></span>
+                <button onClick={() => setStep('mobile_otp')} className='flex-1 flex items-center justify-center gap-2 py-2.5 font-bold hover:opacity-80 transition-all border shadow-sm'
+                  style={{ backgroundColor: providerBgColor || defaultBg, borderColor: defaultBorder, color: resolvedProviderTextColor, borderRadius, fontSize: 'var(--card-footer-size, 12px)' }}>
+                  <span className='text-cyan-500 text-sm'><MdOutlineSms /></span>
                   Mobile
                 </button>
               </div>
             </div>
           ) : hasEmailOTP ? (
-            <button onClick={() => setStep('email_otp')} className='w-full flex items-center justify-center gap-2.5 py-3 font-bold hover:opacity-80 transition-all'
-              style={{ backgroundColor: 'rgba(34,197,94,0.08)', borderColor: 'rgba(34,197,94,0.2)', color: btnTextColor || textColor, borderRadius, fontSize: 'var(--card-btn-size, 14px)' }}>
-              <span className='text-blue-500 text-lg'><MdOutlineSms /></span>
+            <button onClick={() => setStep('email_otp')} className='w-full flex items-center justify-center gap-2.5 py-3 font-bold hover:opacity-80 transition-all border shadow-sm'
+              style={{ backgroundColor: providerBgColor || defaultBg, borderColor: defaultBorder, color: resolvedProviderTextColor, borderRadius, fontSize: 'var(--card-btn-size, 14px)' }}>
+              <span className='text-emerald-500 text-lg'><MdOutlineSms /></span>
               Continue with OTP
             </button>
           ) : hasMobileOTP ? (
-            <button onClick={() => setStep('mobile_otp')} className='w-full flex items-center justify-center gap-2.5 py-3 font-bold hover:opacity-80 transition-all'
-              style={{ backgroundColor: 'rgba(6,182,212,0.08)', borderColor: 'rgba(6,182,212,0.2)', color: btnTextColor || textColor, borderRadius, fontSize: 'var(--card-btn-size, 14px)' }}>
-              <span className='text-cyan-600 text-lg'><MdOutlineSms /></span>
+            <button onClick={() => setStep('mobile_otp')} className='w-full flex items-center justify-center gap-2.5 py-3 font-bold hover:opacity-80 transition-all border shadow-sm'
+              style={{ backgroundColor: providerBgColor || defaultBg, borderColor: defaultBorder, color: resolvedProviderTextColor, borderRadius, fontSize: 'var(--card-btn-size, 14px)' }}>
+              <span className='text-cyan-500 text-lg'><MdOutlineSms /></span>
               Continue with OTP
             </button>
           ) : null}
@@ -411,6 +427,8 @@ const ProviderSelectionFlow = ({ enabledMethods, socialLayout, textColor, btnTex
               <PasswordForm
                 key='password-inline'
                 {...sharedProps}
+                submitText={submitText}
+                onSubmit={onAdvanceToFields}
                 showForgotPassword={showForgotPassword}
                 onBack={null}
               />
@@ -422,125 +440,206 @@ const ProviderSelectionFlow = ({ enabledMethods, socialLayout, textColor, btnTex
   );
 };
 
-// ─── Signup flow ──────────────────────────────────────────────────────────────
-const SignupFlow = ({ enabledMethods, signupFields, primary, textColor, buttonStyle, inputStyle, inputBorderColor, borderRadius, socialLayout, providerBgColor, providerTextColor, isCardLight }) => {
-  const [authDone, setAuthDone] = useState(false);
-  const [step, setStep] = useState(0);
-  const perPage = 4;
-  const totalSteps = Math.max(1, Math.ceil(signupFields.length / perPage));
-  const visibleFields = signupFields.slice(step * perPage, (step + 1) * perPage);
-  const isLastStep = step === totalSteps - 1;
+// ─── Additional Fields (exact mirror of real LoginPortal AdditionalFieldsFlow) ──
+const AdditionalFieldsPreviewFlow = ({
+  signupFields, primary, textColor, btnTextColor, buttonStyle, inputStyle, inputBorderColor,
+  borderRadius, isCardLight, onBack
+}) => {
+  const [formData, setFormData] = useState({});
 
-  const hasPwd = enabledMethods.some(m => m.id === 'password');
-  const hasEmailOTP = enabledMethods.some(m => m.id === 'email_otp' || m.id === 'otp');
-  const hasMobileOTP = enabledMethods.some(m => m.id === 'mobile_otp');
-  const socialMethods = enabledMethods.filter(m => m.id !== 'password' && m.id !== 'email_otp' && m.id !== 'mobile_otp' && m.id !== 'otp');
-  const sharedProps = { primary, textColor, buttonStyle, inputStyle, inputBorderColor, borderRadius, isCardLight };
+  const handleChange = (name, val) => {
+    setFormData(prev => ({ ...prev, [name]: val }));
+  };
 
-  if (!authDone) {
+  if (!signupFields || signupFields.length === 0) {
     return (
-      <div className='space-y-2.5'>
-        {hasPwd && (
-          <>
-            <FInput label='Email' type='email' placeholder='you@example.com' {...sharedProps} />
-            <FInput label='Password' type='password' placeholder='Create a password' {...sharedProps} />
-            <FButton {...sharedProps} onClick={() => setAuthDone(true)}>Continue with Password</FButton>
-          </>
-        )}
-        {(socialMethods.length > 0 || hasEmailOTP || hasMobileOTP) && (
-          <>
-            {hasPwd && (
-              <div className='relative flex items-center justify-center py-1'>
-                <div className='absolute inset-0 flex items-center'><div className='w-full ' style={{ borderColor: `${textColor}15` }} /></div>
-                <span className='relative px-3' style={{ color: `${textColor}40`, fontSize: 'var(--card-footer-size, 12px)' }}>or sign up with</span>
-              </div>
-            )}
-            {socialMethods.length > 0 && (
-              socialLayout === 'grid'
-                ? <SocialGrid methods={socialMethods} textColor={textColor} borderRadius={borderRadius} providerBgColor={providerBgColor} isCardLight={isCardLight} />
-                : socialLayout === 'compact'
-                  ? <SocialCompact methods={socialMethods} textColor={textColor} borderRadius={borderRadius} providerBgColor={providerBgColor} providerTextColor={providerTextColor} isCardLight={isCardLight} />
-                  : socialMethods.map(m => <SocialBtn key={m.id} method={m} textColor={textColor} borderRadius={borderRadius} providerBgColor={providerBgColor} providerTextColor={providerTextColor} isCardLight={isCardLight} />)
-            )}
-            {hasEmailOTP && hasMobileOTP ? (
-              <div className='space-y-1.5 w-full'>
-                <p className='font-bold text-center uppercase tracking-wider' style={{ color: `${textColor}40`, fontSize: 'var(--card-footer-size, 10px)' }}>
-                  Sign up with OTP
-                </p>
-                <div className='flex gap-2'>
-                  <button onClick={() => setAuthDone(true)} className='flex-1 flex items-center justify-center gap-2 py-2.5 font-bold hover:opacity-80 transition-all'
-                    style={{ backgroundColor: 'rgba(34,197,94,0.08)', borderColor: 'rgba(34,197,94,0.2)', color: textColor, borderRadius, fontSize: 'var(--card-footer-size, 12px)' }}>
-                    <span className='text-blue-500 text-sm'><MdOutlineSms /></span>
-                    Email
-                  </button>
-                  <button onClick={() => setAuthDone(true)} className='flex-1 flex items-center justify-center gap-2 py-2.5 font-bold hover:opacity-80 transition-all'
-                    style={{ backgroundColor: 'rgba(6,182,212,0.08)', borderColor: 'rgba(6,182,212,0.2)', color: textColor, borderRadius, fontSize: 'var(--card-footer-size, 12px)' }}>
-                    <span className='text-cyan-600 text-sm'><MdOutlineSms /></span>
-                    Mobile
-                  </button>
-                </div>
-              </div>
-            ) : hasEmailOTP ? (
-              <button onClick={() => setAuthDone(true)} className='w-full flex items-center justify-center gap-2.5 py-2.5 font-bold hover:opacity-80 transition-all'
-                style={{ backgroundColor: 'rgba(34,197,94,0.08)', borderColor: 'rgba(34,197,94,0.2)', color: textColor, borderRadius, fontSize: 'var(--card-btn-size, 14px)' }}>
-                <span className='text-blue-500'><MdOutlineSms /></span>
-                Continue with OTP
-              </button>
-            ) : hasMobileOTP ? (
-              <button onClick={() => setAuthDone(true)} className='w-full flex items-center justify-center gap-2.5 py-2.5 font-bold hover:opacity-80 transition-all'
-                style={{ backgroundColor: 'rgba(6,182,212,0.08)', borderColor: 'rgba(6,182,212,0.2)', color: textColor, borderRadius, fontSize: 'var(--card-btn-size, 14px)' }}>
-                <span className='text-cyan-600'><MdOutlineSms /></span>
-                Continue with OTP
-              </button>
-            ) : null}
-          </>
-        )}
-      </div>
-    );
-  }
-
-  if (signupFields.length === 0) {
-    return (
-      <div className='text-center space-y-3 py-4'>
-        <div className='w-12 h-12 mx-auto rounded-full bg-blue-500/20 flex items-center justify-center'>
-          <span className='text-blue-500 text-2xl'>✓</span>
+      <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} className='text-center space-y-3 py-6'>
+        <div className='w-12 h-12 mx-auto rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400'>
+          <UserPlus2 size={24} />
         </div>
-        <p style={{ color: textColor, fontSize: 'var(--card-input-size, 14px)' }}>Almost done! Click below to complete.</p>
-        <FButton {...sharedProps}>Create Account</FButton>
-      </div>
+        <p className='font-semibold text-xs' style={{ color: textColor }}>No custom signup fields configured</p>
+        <p className='text-xs leading-relaxed max-w-[240px] mx-auto' style={{ color: `${textColor}60` }}>
+          Add custom fields in the <strong style={{ color: textColor }}>Fields</strong> tab to require extra information on signup.
+        </p>
+        {onBack && (
+          <button
+            type='button'
+            onClick={onBack}
+            className='text-xs transition-colors hover:underline pt-2 font-medium'
+            style={{ color: `${textColor}80` }}
+          >
+            ← Back to signup options
+          </button>
+        )}
+      </motion.div>
     );
   }
 
   return (
-    <div className='space-y-3'>
-      <p className='text-center mb-2' style={{ color: `${textColor}50`, fontSize: 'var(--card-subtitle-size, 12px)' }}>Just a few more details…</p>
-      <AnimatePresence mode='wait'>
-        <motion.div key={step} initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -15 }} className='space-y-3'>
-          {visibleFields.map(f => <FInput key={f.id} label={f.label} type={f.type} {...sharedProps} />)}
-        </motion.div>
-      </AnimatePresence>
-      <div className='flex gap-2 pt-1'>
-        {step > 0 && (
-          <button onClick={() => setStep(s => s - 1)} className='px-4 py-2.5 font-medium transition-colors'
-            style={{ borderRadius, borderColor: `${textColor}20`, color: `${textColor}70`, backgroundColor: 'transparent', fontSize: 'var(--card-btn-size, 14px)' }}>Back</button>
-        )}
-        <FButton {...sharedProps} onClick={() => !isLastStep && setStep(s => s + 1)}>
-          {isLastStep ? 'Create Account' : 'Next'}
+    <motion.div initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -15 }} className='space-y-3'>
+      <p className='text-xs text-center mb-4' style={{ color: `${textColor}80`, fontSize: 'var(--card-subtitle-size, 12px)' }}>
+        Just a few more details to complete your registration...
+      </p>
+
+      {signupFields.map(f => {
+        const fieldName = f.name || f.id;
+        const fieldLabel = f.label || f.name || 'Field';
+        const isRequired = !!f.required;
+
+        if (f.type === 'boolean') {
+          return (
+            <label
+              key={fieldName}
+              className='flex items-center gap-3 p-3 border cursor-pointer select-none transition-all'
+              style={{
+                borderColor: inputBorderColor || (isCardLight ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.12)'),
+                backgroundColor: isCardLight ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.03)',
+                borderRadius,
+              }}
+            >
+              <input
+                type="checkbox"
+                name={fieldName}
+                checked={!!formData[fieldName]}
+                onChange={(e) => handleChange(fieldName, e.target.checked)}
+                className="w-4 h-4 rounded accent-indigo-500 cursor-pointer"
+              />
+              <span className="text-xs font-medium" style={{ color: textColor, fontSize: 'var(--card-input-size, 14px)' }}>
+                {fieldLabel} {isRequired && <span className="text-red-400">*</span>}
+              </span>
+            </label>
+          );
+        }
+
+        return (
+          <FInput
+            key={fieldName}
+            label={`${fieldLabel} ${isRequired ? '*' : ''}`}
+            name={fieldName}
+            type={f.type || 'text'}
+            placeholder={f.placeholder || `Enter ${fieldLabel.toLowerCase()}`}
+            textColor={textColor}
+            inputStyle={inputStyle}
+            inputBorderColor={inputBorderColor}
+            borderRadius={borderRadius}
+            isCardLight={isCardLight}
+            value={formData[fieldName] || ''}
+            onChange={(e) => handleChange(fieldName, e.target.value)}
+          />
+        );
+      })}
+
+      <div className='pt-2'>
+        <FButton primary={primary} textColor={textColor} btnTextColor={btnTextColor} buttonStyle={buttonStyle} borderRadius={borderRadius}>
+          Create Account
         </FButton>
       </div>
-      {totalSteps > 1 && (
-        <div className='flex justify-center gap-1.5'>
-          {Array(totalSteps).fill(0).map((_, i) => (
-            <div key={i} className='w-1.5 h-1.5 rounded-full transition-all' style={{ backgroundColor: i === step ? primary : `${textColor}20` }} />
-          ))}
+
+      {onBack && (
+        <button
+          type='button'
+          onClick={onBack}
+          className='w-full text-xs transition-colors mt-2 text-center hover:underline'
+          style={{ color: `${textColor}60`, fontSize: 'var(--card-footer-size, 12px)' }}
+        >
+          ← Back to signup options
+        </button>
+      )}
+    </motion.div>
+  );
+};
+
+// ─── Signup flow (exact mirror of real LoginPortal signup architecture) ──────
+const SignupFlow = ({
+  enabledMethods, signupFields, primary, textColor, btnTextColor, linkColor,
+  buttonStyle, inputStyle, inputBorderColor, borderRadius, socialLayout,
+  providerBgColor, providerTextColor, isCardLight, activeTab
+}) => {
+  const [signupStep, setSignupStep] = useState('options'); // 'options' | 'fields'
+
+  // Auto-switch to custom fields preview when developer is on the 'Fields' configuration tab
+  useEffect(() => {
+    if (activeTab === 'fields') {
+      setSignupStep('fields');
+    } else {
+      setSignupStep('options');
+    }
+  }, [activeTab]);
+
+  return (
+    <div className='space-y-3'>
+      {/* Sleek Step Switcher when custom fields exist */}
+      {signupFields && signupFields.length > 0 && (
+        <div className='flex items-center justify-center gap-1.5 pb-1'>
+          <button
+            type='button'
+            onClick={() => setSignupStep('options')}
+            className={`px-2.5 py-1 text-[11px] font-bold rounded-full transition-all border ${
+              signupStep === 'options'
+                ? 'bg-blue-500/15 text-blue-400 border-blue-500/30 shadow-sm'
+                : 'text-slate-400 hover:text-slate-200 border-transparent hover:bg-white/5'
+            }`}
+          >
+            1. Auth Options
+          </button>
+          <span className='text-[10px] opacity-30'>•</span>
+          <button
+            type='button'
+            onClick={() => setSignupStep('fields')}
+            className={`px-2.5 py-1 text-[11px] font-bold rounded-full transition-all border ${
+              signupStep === 'fields'
+                ? 'bg-blue-500/15 text-blue-400 border-blue-500/30 shadow-sm'
+                : 'text-slate-400 hover:text-slate-200 border-transparent hover:bg-white/5'
+            }`}
+          >
+            2. Custom Fields ({signupFields.length})
+          </button>
         </div>
       )}
+
+      <AnimatePresence mode='wait'>
+        {signupStep === 'fields' ? (
+          <AdditionalFieldsPreviewFlow
+            key='signup-fields'
+            signupFields={signupFields}
+            primary={primary}
+            textColor={textColor}
+            btnTextColor={btnTextColor}
+            buttonStyle={buttonStyle}
+            inputStyle={inputStyle}
+            inputBorderColor={inputBorderColor}
+            borderRadius={borderRadius}
+            isCardLight={isCardLight}
+            onBack={() => setSignupStep('options')}
+          />
+        ) : (
+          <ProviderSelectionFlow
+            key='signup-options'
+            enabledMethods={enabledMethods}
+            socialLayout={socialLayout}
+            textColor={textColor}
+            btnTextColor={btnTextColor}
+            linkColor={linkColor}
+            borderRadius={borderRadius}
+            primary={primary}
+            buttonStyle={buttonStyle}
+            inputStyle={inputStyle}
+            inputBorderColor={inputBorderColor}
+            showForgotPassword={false}
+            submitText='Create Account'
+            providerBgColor={providerBgColor}
+            providerTextColor={providerTextColor}
+            isCardLight={isCardLight}
+            onAdvanceToFields={signupFields && signupFields.length > 0 ? () => setSignupStep('fields') : null}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };
 
 // ─── Main LivePreview ─────────────────────────────────────────────────────────
-export const LivePreview = () => {
+export const LivePreview = ({ activeTab }) => {
   const { uiConfig, authMethods, signupFields, activeMode, forgotPasswordEnabled } = useAuthConfigStore();
   const {
     screen_bg_color, login_card_bg_color, primary_color, text_color, btn_text_color, link_color, brand_name, brand_logo,
@@ -651,7 +750,7 @@ export const LivePreview = () => {
 
   return (
     <div
-      className='w-full h-full flex items-center justify-center overflow-y-auto relative transition-all duration-500 py-8'
+      className='w-full h-full flex flex-col items-center overflow-y-auto overflow-x-hidden relative transition-all duration-500 py-10 px-4 custom-scrollbar'
       style={bgStyle}
     >
       {/* Background pattern overlay */}
@@ -675,7 +774,7 @@ export const LivePreview = () => {
         initial={{ opacity: 0, scale: 0.97, y: 8 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.3, ease: 'easeOut' }}
-        className='relative w-full mx-4 p-8 z-10 flex-shrink-0'
+        className='relative w-full mx-auto my-auto p-8 z-10 shrink-0'
         style={{
           maxWidth: '384px',
           background: finalCardBg,
@@ -731,6 +830,7 @@ export const LivePreview = () => {
               enabledMethods={enabledMethods}
               signupFields={signupFields}
               socialLayout={social_layout}
+              activeTab={activeTab}
               {...sharedFormProps}
             />
           ) : (
@@ -738,6 +838,7 @@ export const LivePreview = () => {
               enabledMethods={enabledMethods}
               socialLayout={social_layout}
               showForgotPassword={forgotPasswordEnabled}
+              submitText='Sign In'
               {...sharedFormProps}
             />
           )}

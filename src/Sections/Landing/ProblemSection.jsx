@@ -74,7 +74,7 @@ export const ProblemSection = () => {
                   <div className="p-3 rounded-2xl neu-flat">
                     {prob.icon}
                   </div>
-                  <span className="px-3 py-1 rounded-full text-[11px] font-mono text-slate-600 font-semibold neu-flat">
+                  <span className="px-3 py-1 rounded-full text-[11px] text-slate-600 font-bold neu-flat">
                     {prob.badge}
                   </span>
                 </div>
@@ -88,7 +88,7 @@ export const ProblemSection = () => {
                 </p>
               </div>
 
-              <div className="mt-8 pt-4 text-xs font-mono text-slate-400">
+              <div className="mt-8 pt-4 text-xs font-semibold text-slate-400">
                 0{i + 1} / Problem
               </div>
             </motion.div>

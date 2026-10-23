@@ -35,7 +35,7 @@ export const ApproachSection = () => {
             viewport={{ once: true }}
             className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-100 -cyan-200 text-cyan-800 text-xs font-semibold"
           >
-            <Sparkles size={14} /> The DAuth Philosophy
+            <ShieldCheck size={14} /> The DAuth Philosophy
           </motion.div>
 
           <motion.h2
@@ -70,7 +70,7 @@ export const ApproachSection = () => {
               className="rounded-3xl p-8 hover:-cyan-400/40 transition-all neu-flat group"
             >
               <div className="flex items-center justify-between mb-6">
-                <span className="text-xs font-mono text-cyan-800 font-bold bg-cyan-100 -cyan-300 px-3 py-1 rounded-full">
+                <span className="text-xs text-cyan-800 font-bold bg-cyan-100 -cyan-300 px-3 py-1 rounded-full">
                   PILLAR {pillar.step}
                 </span>
                 <div className="p-3 rounded-2xl group-hover:scale-110 transition-transform">

@@ -1,6 +1,6 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { MdOutlineKeyboardBackspace, MdDashboard, MdAddBox } from "react-icons/md";
-import { Sun, BookOpen, Lock, FileText, AlertTriangle, Settings, Crown, ChevronRight, Zap, LogOut, Code, Copy, Check, BarChart2 } from 'lucide-react';
+import { MdOutlineKeyboardBackspace, MdDashboard } from "react-icons/md";
+import { Sun, BookOpen, Lock, FileText, AlertTriangle, Settings, Crown, ChevronRight, Zap, LogOut, Code, Copy, Check, BarChart2, FolderKanban } from 'lucide-react';
 import { useAuthConfigStore } from '../Store/useAuthConfigStore';
 import { useEffect, useState } from 'react';
 import { useNetworkCalls } from '../Utils/NetworkCalls';
@@ -14,7 +14,142 @@ export const DashboardLayout = () => {
   const [copiedSdk, setCopiedSdk] = useState(false);
   const { call } = useNetworkCalls();
 
+  const [isLoggedIn, setIsLoggedIn] = useState(() => Boolean(Cookies.get('access_token') || Cookies.get('refresh_token')));
+  const [userData, setUserData] = useState(() => {
+    const name = Cookies.get('user_name') || '';
+    const email = Cookies.get('user_email') || '';
+    const profile = Cookies.get('user_profile') || null;
+    return { name, email, profile };
+  });
+  const [profileImgError, setProfileImgError] = useState(false);
+
   useEffect(() => {
+    const loggedIn = Boolean(Cookies.get('access_token') || Cookies.get('refresh_token'));
+    setIsLoggedIn(loggedIn);
+    if (!loggedIn) return;
+
+    const cookieName = Cookies.get('user_name');
+    const cookieEmail = Cookies.get('user_email');
+    const cookieProfile = Cookies.get('user_profile');
+
+    if (cookieName || cookieEmail || cookieProfile) {
+      setUserData({
+        name: cookieName || '',
+        email: cookieEmail || '',
+        profile: (cookieProfile && cookieProfile !== 'null' && cookieProfile !== 'undefined' && cookieProfile !== 'None') ? cookieProfile : null
+      });
+    }
+
+    const fetchUserProfile = async () => {
+      try {
+        const res = await call({ method: 'GET', path: '/user/profile', withCred: true });
+        if (res) {
+          const freshName = res.name || cookieName || '';
+          const freshEmail = res.email || cookieEmail || '';
+          const freshProfile = res.profile_picture || cookieProfile || null;
+
+          if (freshName) Cookies.set('user_name', freshName, { expires: 7, path: '/' });
+          if (freshEmail) Cookies.set('user_email', freshEmail, { expires: 7, path: '/' });
+          if (freshProfile && freshProfile !== 'null' && freshProfile !== 'undefined' && freshProfile !== 'None') {
+            Cookies.set('user_profile', freshProfile, { expires: 7, path: '/' });
+          }
+
+          setUserData({
+            name: freshName,
+            email: freshEmail,
+            profile: (freshProfile && freshProfile !== 'null' && freshProfile !== 'undefined' && freshProfile !== 'None') ? freshProfile : null
+          });
+        }
+      } catch (_) {
+        // Silently catch
+      }
+    };
+
+    fetchUserProfile();
+  }, [location.pathname, isLoggedIn]);
+
+  const getCleanName = (nameVal, emailVal) => {
+    if (nameVal && nameVal !== 'null' && nameVal !== 'undefined' && nameVal !== 'None' && nameVal.trim() !== '') {
+      if (nameVal.includes('@')) {
+        return nameVal.split('@')[0];
+      }
+      return nameVal.trim();
+    }
+    if (emailVal && emailVal !== 'null' && emailVal !== 'undefined' && emailVal !== 'None' && emailVal.trim() !== '') {
+      const parts = emailVal.split('@');
+      if (parts[0]) return parts[0];
+    }
+    return 'Developer';
+  };
+
+  const displayName = getCleanName(userData.name, userData.email);
+  const displayEmail = userData.email || Cookies.get('user_email') || '';
+
+  const getInitials = (name) => {
+    if (!name || name === 'Developer') return 'DA';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name.slice(0, 2).toUpperCase();
+  };
+
+  const initials = getInitials(displayName);
+
+  const isDocsLoggedOut = !isLoggedIn && location.pathname === '/auth-docs';
+
+  const DEFAULT_SIDEBAR_WIDTH = 288;
+  const MIN_SIDEBAR_WIDTH = 230;
+  const MAX_SIDEBAR_WIDTH = 480;
+
+  const [sidebarWidth, setSidebarWidth] = useState(() => {
+    const saved = localStorage.getItem('dauth_sidebar_width');
+    if (saved) {
+      const parsed = parseInt(saved, 10);
+      if (!isNaN(parsed) && parsed >= MIN_SIDEBAR_WIDTH && parsed <= MAX_SIDEBAR_WIDTH) {
+        return parsed;
+      }
+    }
+    return DEFAULT_SIDEBAR_WIDTH;
+  });
+  const [isDraggingSidebar, setIsDraggingSidebar] = useState(false);
+
+  useEffect(() => {
+    if (!isDraggingSidebar) return;
+
+    const handleMouseMove = (e) => {
+      const newWidth = Math.min(Math.max(e.clientX, MIN_SIDEBAR_WIDTH), MAX_SIDEBAR_WIDTH);
+      setSidebarWidth(newWidth);
+      localStorage.setItem('dauth_sidebar_width', String(newWidth));
+    };
+
+    const handleMouseUp = () => {
+      setIsDraggingSidebar(false);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isDraggingSidebar]);
+
+  const resetSidebarWidth = () => {
+    setSidebarWidth(DEFAULT_SIDEBAR_WIDTH);
+    localStorage.setItem('dauth_sidebar_width', String(DEFAULT_SIDEBAR_WIDTH));
+  };
+
+  useEffect(() => {
+    if (!Cookies.get('access_token') && !Cookies.get('refresh_token')) return;
     const fetchSub = async () => {
       const res = await call({ method: 'GET', path: '/billing/subscription', withCred: true });
       if (res) {
@@ -32,24 +167,22 @@ export const DashboardLayout = () => {
   }, [theme, toggleTheme]);
 
   const handleLogout = () => {
-    Cookies.remove('access_token');
+    Cookies.remove('user_name', { path: '/' });
+    Cookies.remove('user_email', { path: '/' });
+    Cookies.remove('user_profile', { path: '/' });
+    Cookies.remove('access_token', { path: '/' });
+    Cookies.remove('refresh_token', { path: '/' });
     window.location.href = '/';
   };
 
-  const copySdkCommand = () => {
-    navigator.clipboard.writeText('npm i @dauth/react');
-    setCopiedSdk(true);
-    setTimeout(() => setCopiedSdk(false), 2000);
-  };
-
   const navItems = [
-    { name: 'Auth Projects',  path: '/dashboard',        icon: <MdDashboard size={18} />, badge: null },
-    { name: 'Analytics',      path: '/analytics',        icon: <BarChart2 size={17} />,   badge: null },
-    { name: 'Create Project', path: '/dashboard-detail',  icon: <MdAddBox size={18} />, badge: 'NEW' },
-    { name: 'API Docs & SDK', path: '/auth-docs',         icon: <BookOpen size={17} />, badge: null },
-    { name: 'Settings',       path: '/settings',          icon: <Settings size={17} />, badge: null },
-    { name: 'Invoices',       path: '/invoices',          icon: <FileText size={17} />, badge: null },
-    { name: 'Upgrade Plan',   path: '/pricing',           icon: <Crown size={17} />, badge: 'PRO', isUpgrade: true },
+    { name: 'Auth Projects',     mobileLabel: 'Projects',  path: '/dashboard',        icon: <MdDashboard size={18} />, badge: null },
+    { name: 'Analytics',         mobileLabel: 'Analytics', path: '/analytics',        icon: <BarChart2 size={17} />,   badge: null },
+    { name: 'Create Project',    mobileLabel: 'Create',    path: '/dashboard-detail',  icon: <FolderKanban size={17} />, badge: 'NEW' },
+    { name: 'API Documentation', mobileLabel: 'Docs',      path: '/auth-docs',         icon: <BookOpen size={17} />,    badge: null },
+    { name: 'Settings',          mobileLabel: 'Settings',  path: '/settings',          icon: <Settings size={17} />,    badge: null },
+    { name: 'Invoices',          mobileLabel: 'Invoices',  path: '/invoices',          icon: <FileText size={17} />,    badge: null },
+    { name: 'Upgrade Plan',      mobileLabel: 'Upgrade',   path: '/pricing',           icon: <Crown size={17} />,       badge: 'PRO', isUpgrade: true },
   ];
 
   const getPageTitle = () => {
@@ -68,6 +201,9 @@ export const DashboardLayout = () => {
   return (
     <div className="h-[100dvh] overflow-hidden w-full bg-[var(--bg-deep)] text-[var(--text-main)] transition-colors duration-300 flex relative">
       
+      {/* Global drag overlay to prevent pointer capture issues */}
+      {isDraggingSidebar && <div className="fixed inset-0 z-[9999] cursor-col-resize select-none" />}
+
       {/* Decorative Glow Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-[-10%] right-[-5%] w-[45%] h-[45%] bg-cyan-200/20 blur-[130px] rounded-full" />
@@ -75,88 +211,130 @@ export const DashboardLayout = () => {
       </div>
 
       {/* LEFT SIDEBAR (Desktop) */}
-      <aside className="hidden lg:flex w-72 h-full flex-col bg-[var(--bg-card)]/90 backdrop-blur-2xl border-r border-slate-200/80 shadow-[4px_0_24px_rgba(0,0,0,0.02)] z-30 shrink-0 select-none">
-        
-        {/* Brand Header */}
-        <div className="p-5 border-b border-slate-200/70 flex items-center justify-between">
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/dashboard')}>
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 p-0.5 shadow-md shadow-cyan-500/20 flex items-center justify-center">
-              <div className="w-full h-full bg-white rounded-[14px] flex items-center justify-center">
-                <img src="/dauth_logo.png" alt="DAuth Logo" className="w-6 h-6 object-contain" />
-              </div>
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-lg font-black text-slate-900 tracking-tight">DAuth</span>
-                <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full bg-cyan-100 text-cyan-800 border border-cyan-300/80">v2.4</span>
-              </div>
-              <span className="text-[10px] font-bold text-slate-700 tracking-wide block">Authentication Platform</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Navigation Items */}
-        <div className="flex-1 overflow-y-auto px-4 py-5 space-y-6 custom-scrollbar">
+      {!isDocsLoggedOut && (
+        <aside 
+          style={{ width: `${sidebarWidth}px` }}
+          className="hidden lg:flex h-full flex-col bg-[var(--bg-card)]/90 backdrop-blur-2xl border-r border-slate-200/80 shadow-[4px_0_24px_rgba(0,0,0,0.02)] z-30 shrink-0 select-none relative"
+        >
           
-          <div>
-            <span className="text-[10px] font-black text-slate-700 uppercase tracking-widest px-3 block mb-2">Platform Navigation</span>
-            <nav className="space-y-1.5">
-              {navItems.map((item) => {
-                const isActive = location.pathname === item.path;
-                return (
-                  <button
-                    key={item.name}
-                    onClick={() => navigate(item.path)}
-                    className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-extrabold transition-all duration-200 group relative ${
-                      isActive
-                        ? 'bg-cyan-500/15 text-cyan-800 border border-cyan-300/80 shadow-sm font-black'
-                        : 'text-slate-700 hover:text-slate-900 hover:bg-slate-200/50 border border-transparent'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className={`transition-transform group-hover:scale-110 ${isActive ? 'text-cyan-600' : 'text-slate-600'}`}>
-                        {item.icon}
-                      </span>
-                      <span className={isActive ? 'text-cyan-800 font-black' : ''}>{item.name}</span>
-                    </div>
-
-                    {item.badge && (
-                      <span className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider ${
-                        item.isUpgrade 
-                          ? 'bg-cyan-100 text-cyan-800 border border-cyan-300/80' 
-                          : 'bg-cyan-100 text-cyan-800 border border-cyan-300/60'
-                      }`}>
-                        {item.badge}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
-        </div>
-
-        {/* Sidebar Footer: User Profile & Logout */}
-        <div className="p-4 border-t border-slate-200/70 bg-slate-100/50 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-cyan-600 text-white font-black flex items-center justify-center text-xs shadow-sm">
-              DA
+          {/* Brand Header */}
+          <div className="p-5 border-b border-slate-200/70 flex items-center justify-between">
+            <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/dashboard')}>
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 p-0.5 shadow-md shadow-cyan-500/20 flex items-center justify-center">
+                <div className="w-full h-full bg-white rounded-[14px] flex items-center justify-center">
+                  <img src="/dauth_logo.png" alt="DAuth Logo" className="w-6 h-6 object-contain" />
+                </div>
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-lg font-black text-slate-900 tracking-tight">DAuth</span>
+                  <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full bg-cyan-100 text-cyan-800 border border-cyan-300/80">v2.4</span>
+                </div>
+                <span className="text-[10px] font-bold text-slate-700 tracking-wide block">Authentication Platform</span>
+              </div>
             </div>
+          </div>
+
+          {/* Navigation Items */}
+          <div className="flex-1 overflow-y-auto px-4 py-5 space-y-6 custom-scrollbar">
+            
             <div>
-              <span className="text-xs font-extrabold text-slate-900 block leading-tight">Developer</span>
-              <span className="text-[10px] font-bold text-slate-600">Active Session</span>
+              <span className="text-[10px] font-black text-slate-700 uppercase tracking-widest px-3 block mb-2">Platform Navigation</span>
+              <nav className="space-y-1.5">
+                {navItems.map((item) => {
+                  const isActive = location.pathname === item.path;
+                  return (
+                    <button
+                      key={item.name}
+                      onClick={() => navigate(item.path)}
+                      className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-extrabold transition-all duration-200 group relative ${
+                        isActive
+                          ? 'bg-cyan-500/15 text-cyan-800 border border-cyan-300/80 shadow-sm font-black'
+                          : 'text-slate-700 hover:text-slate-900 hover:bg-slate-200/50 border border-transparent'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <span className={`shrink-0 transition-transform group-hover:scale-110 ${isActive ? 'text-cyan-600' : 'text-slate-600'}`}>
+                          {item.icon}
+                        </span>
+                        <span className={`truncate whitespace-nowrap ${isActive ? 'text-cyan-800 font-black' : ''}`}>{item.name}</span>
+                      </div>
+
+                      {item.badge && (
+                        <span className={`shrink-0 ml-2 text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider whitespace-nowrap ${
+                          item.isUpgrade 
+                            ? 'bg-cyan-100 text-cyan-800 border border-cyan-300/80' 
+                            : 'bg-cyan-100 text-cyan-800 border border-cyan-300/60'
+                        }`}>
+                          {item.badge}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </nav>
             </div>
           </div>
 
-          <button
-            onClick={handleLogout}
-            className="p-2 text-slate-700 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all border border-transparent hover:border-red-200"
-            title="Sign Out"
-          >
-            <LogOut size={16} />
-          </button>
+          {/* Sidebar Footer: User Profile & Logout */}
+          <div className="p-4 border-t border-slate-200/70 bg-slate-100/50 flex items-center justify-between">
+            <div className="flex items-center gap-3 min-w-0 flex-1 mr-2">
+              {userData.profile && !profileImgError ? (
+                <img
+                  src={userData.profile}
+                  alt={displayName}
+                  className="w-8 h-8 rounded-xl object-cover border border-slate-300 shadow-sm shrink-0"
+                  onError={() => setProfileImgError(true)}
+                />
+              ) : (
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-600 to-blue-600 text-white font-black flex items-center justify-center text-xs shadow-sm shrink-0">
+                  {initials}
+                </div>
+              )}
+              <div className="min-w-0 flex-1">
+                <span className="text-xs font-extrabold text-slate-900 block leading-tight truncate" title={displayName}>
+                  {displayName}
+                </span>
+                <span className="text-[10px] font-bold text-slate-600 block leading-tight truncate" title={displayEmail || 'Active Session'}>
+                  {displayEmail || 'Active Session'}
+                </span>
+              </div>
+            </div>
+
+            <button
+              onClick={handleLogout}
+              className="p-2 text-slate-700 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all border border-transparent hover:border-red-200 shrink-0"
+              title="Sign Out"
+            >
+              <LogOut size={16} />
+            </button>
+          </div>
+        </aside>
+      )}
+
+      {/* DRAGGABLE RESIZER HANDLE FOR SIDEBAR */}
+      {!isDocsLoggedOut && (
+        <div
+          onMouseDown={(e) => {
+            e.preventDefault();
+            setIsDraggingSidebar(true);
+          }}
+          onDoubleClick={resetSidebarWidth}
+          className={`hidden lg:flex items-center justify-center w-2 -ml-1 -mr-1 h-full z-40 cursor-col-resize select-none group transition-all shrink-0 relative ${
+            isDraggingSidebar ? 'bg-cyan-500/20' : 'hover:bg-cyan-500/10'
+          }`}
+          title="Drag to resize sidebar • Double-click to reset"
+        >
+          <div className={`w-[2px] h-full transition-colors ${
+            isDraggingSidebar ? 'bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.8)]' : 'bg-transparent group-hover:bg-cyan-400'
+          }`} />
+          <div className={`absolute top-1/2 -translate-y-1/2 w-1.5 h-10 rounded-full transition-all shadow-sm flex items-center justify-center ${
+            isDraggingSidebar ? 'bg-cyan-600 scale-y-110' : 'bg-slate-300 group-hover:bg-cyan-500 group-hover:scale-110'
+          }`}>
+            <div className="w-0.5 h-4 bg-white/60 rounded-full" />
+          </div>
         </div>
-      </aside>
+      )}
 
       {/* MAIN RIGHT CONTAINER */}
       <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden relative z-10">
@@ -179,38 +357,57 @@ export const DashboardLayout = () => {
         {/* Top Header Bar */}
         <header className="flex h-16 shrink-0 bg-[var(--bg-card)]/80 backdrop-blur-xl border-b border-slate-200/80 px-4 md:px-8 justify-between items-center w-full relative z-20 shadow-sm">
           
-          {/* Left: Back Button + Breadcrumb Title */}
+          {/* Left: Back Button + Breadcrumb Title / Brand */}
           <div className="flex items-center gap-3">
             <button
-              onClick={() => navigate(-1)}
+              onClick={() => navigate(isDocsLoggedOut ? '/' : -1)}
               className="p-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 transition-all cursor-pointer group shadow-sm active:scale-95 text-slate-700"
-              title="Go Back"
+              title={isDocsLoggedOut ? "Back to Home" : "Go Back"}
             >
               <MdOutlineKeyboardBackspace size={20} className="group-hover:text-cyan-600 transition-colors" />
             </button>
 
-            {/* Mobile Logo */}
-            <div className="flex lg:hidden items-center gap-2">
-              <img src="/dauth_logo.png" alt="DAuth Logo" className="w-6 h-6 object-contain" />
-              <span className="text-base font-extrabold text-slate-900 tracking-tight">DAuth</span>
-            </div>
+            {isDocsLoggedOut ? (
+              <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => navigate('/')}>
+                <img src="/dauth_logo.png" alt="DAuth Logo" className="w-7 h-7 object-contain" />
+                <span className="text-lg font-black text-slate-900 tracking-tight">DAuth</span>
+                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-800 border border-cyan-300">Docs</span>
+              </div>
+            ) : (
+              <>
+                {/* Mobile Logo */}
+                <div className="flex lg:hidden items-center gap-2">
+                  <img src="/dauth_logo.png" alt="DAuth Logo" className="w-6 h-6 object-contain" />
+                  <span className="text-base font-extrabold text-slate-900 tracking-tight">DAuth</span>
+                </div>
 
-            <div className="hidden lg:flex items-center gap-2 text-slate-700 text-sm font-bold">
-              <span>Platform</span>
-              <ChevronRight size={14} className="text-slate-400" />
-              <span className="text-slate-900 font-extrabold">{getPageTitle()}</span>
-            </div>
+                <div className="hidden lg:flex items-center gap-2 text-slate-700 text-sm font-bold">
+                  <span>Platform</span>
+                  <ChevronRight size={14} className="text-slate-400" />
+                  <span className="text-slate-900 font-extrabold">{getPageTitle()}</span>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Right Header Actions */}
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate('/dashboard-detail')}
-              className="neu-button-primary px-5 py-2.5 text-xs font-black flex items-center gap-2 shadow-lg shadow-cyan-500/30 active:scale-95"
-            >
-              <Zap size={14} className="fill-white" />
-              <span>+ Create Project</span>
-            </button>
+            {isDocsLoggedOut ? (
+              <button
+                onClick={() => navigate('/auth')}
+                className="neu-button-primary px-5 py-2.5 text-xs font-black flex items-center gap-2 shadow-lg shadow-cyan-500/30 active:scale-95"
+              >
+                <span>Sign In</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => navigate('/dashboard-detail')}
+                className="neu-button-primary px-5 py-2.5 text-xs font-black flex items-center gap-2 shadow-lg shadow-cyan-500/30 active:scale-95"
+              >
+                <Zap size={14} className="fill-white" />
+                <span>Create Project</span>
+              </button>
+            )}
 
             <button
               disabled
@@ -228,27 +425,44 @@ export const DashboardLayout = () => {
         </header>
 
         {/* Main Content Area */}
-        <main className="flex-1 w-full relative pb-20 lg:pb-0 overflow-x-hidden overflow-y-auto flex flex-col min-h-0 custom-scrollbar">
+        <main className={`flex-1 w-full relative ${isDocsLoggedOut ? 'pb-0' : 'pb-20 lg:pb-0'} overflow-x-hidden overflow-y-auto flex flex-col min-h-0 custom-scrollbar`}>
           <Outlet />
         </main>
 
         {/* Mobile Bottom Bar */}
-        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-2xl border-t border-slate-200 pb-safe pt-2 px-4 flex justify-between items-center shadow-lg">
-          {navItems.map((item) => (
-            <button
-              key={item.name}
-              onClick={() => navigate(item.path)}
-              className={`flex flex-col items-center p-2 rounded-xl transition-all ${
-                location.pathname === item.path ? 'text-cyan-600 font-black' : 'text-slate-500 font-bold'
-              }`}
-            >
-              <div className={`mb-1 transition-transform ${location.pathname === item.path ? 'scale-110 text-cyan-600' : 'scale-100'}`}>
-                {item.icon}
-              </div>
-              <span className="text-[9px]">{item.name}</span>
-            </button>
-          ))}
-        </nav>
+        {!isDocsLoggedOut && (
+          <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-2xl border-t border-slate-200/90 pb-safe pt-1.5 px-2 flex items-center justify-between shadow-[0_-4px_20px_rgba(0,0,0,0.06)] overflow-x-auto no-scrollbar">
+            {navItems.map((item) => {
+              const isActive = location.pathname === item.path;
+              return (
+                <button
+                  key={item.name}
+                  onClick={() => navigate(item.path)}
+                  className={`flex-1 min-w-[48px] max-w-[68px] flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all relative ${
+                    isActive
+                      ? 'text-cyan-700 bg-cyan-50/90 font-black shadow-xs'
+                      : 'text-slate-500 hover:text-slate-800 font-bold hover:bg-slate-50'
+                  }`}
+                  title={item.name}
+                >
+                  <div className={`relative mb-0.5 transition-transform ${isActive ? 'scale-110 text-cyan-600' : 'scale-100'}`}>
+                    {item.icon}
+                    {item.badge && (
+                      <span className={`absolute -top-1 -right-2 text-[8px] font-black px-1 py-0.2 rounded-full uppercase leading-none ${
+                        item.isUpgrade ? 'bg-amber-500 text-white' : 'bg-cyan-500 text-white'
+                      }`}>
+                        {item.badge}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-[10px] tracking-tight leading-tight truncate w-full text-center">
+                    {item.mobileLabel || item.name}
+                  </span>
+                </button>
+              );
+            })}
+          </nav>
+        )}
       </div>
     </div>
   );

@@ -11,6 +11,7 @@ const FIELD_TYPE_OPTIONS = [
   { value: 'email',    label: 'Email'    },
   { value: 'number',   label: 'Number'   },
   { value: 'password', label: 'Password' },
+  { value: 'boolean',  label: 'Boolean'  },
 ];
 
 const selectStyles = {

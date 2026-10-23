@@ -53,7 +53,7 @@ export const FinalCtaSection = () => {
             onClick={() => navigate('/dashboard')}
             className="w-full sm:w-auto px-8 py-4 rounded-2xl font-extrabold text-base text-white bg-cyan-500 hover:bg-cyan-600 neu-flat shadow-cyan-500/25 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-3"
           >
-            Start Building — Free
+            Start Building | Free
             <ArrowRight size={18} />
           </button>
           <button

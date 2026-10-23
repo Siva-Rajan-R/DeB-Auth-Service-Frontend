@@ -17,6 +17,7 @@ export const PricingPage = () => {
   const [currentPlan, setCurrentPlan] = useState('Free');
   const [billingInfo, setBillingInfo] = useState(null);
   const [loading, setLoading] = useState(null);
+  const [otpExempt, setOtpExempt] = useState(false);
 
   const apiKey = Cookies.get('selected_project_api_key') || Cookies.get('api_key') || 'default_key';
 
@@ -32,6 +33,14 @@ export const PricingPage = () => {
         const plan = subRes.plan || subRes.current_plan;
         setCurrentPlan(plan);
       }
+
+      // Check OTP cost whitelist exemption
+      try {
+        const otpStatus = await call({ method: 'GET', path: '/billing/otp-cost-status', withCred: true });
+        if (otpStatus?.is_otp_cost_exempt) {
+          setOtpExempt(true);
+        }
+      } catch (_) {}
 
       // Also fetch billing info for detailed info
       const res = await call({ method: 'GET', path: `/billing/info?api_key=${apiKey}`, withCred: true });
@@ -315,27 +324,39 @@ export const PricingPage = () => {
           {/* Enterprise Plan */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
-            className="bg-slate-900 rounded-3xl p-8 border border-slate-800 shadow-xl flex flex-col justify-between text-white"
+            className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between"
           >
             <div>
               <div className="mb-6">
-                <h3 className="text-xl font-bold text-white mb-2">Enterprise</h3>
-                <p className="text-xs text-slate-400 min-h-[36px]">Custom infrastructure for organizations.</p>
+                <h3 className="text-xl font-black text-slate-900 mb-2">Enterprise</h3>
+                <p className="text-xs text-slate-500 min-h-[36px] font-medium leading-relaxed">Custom infrastructure for organizations.</p>
               </div>
               <div className="mb-8">
-                <span className="text-4xl font-black text-white">Custom</span>
+                <span className="text-4xl font-black text-slate-900">Custom</span>
               </div>
               <button 
-                onClick={() => window.open('mailto:contact@debuggerstechnologies.com', '_blank')}
-                className="w-full py-3 px-4 rounded-xl font-bold text-xs bg-slate-800 hover:bg-slate-700 text-white transition-colors mb-8"
+                onClick={() => navigate('/contact')}
+                className="w-full py-3 px-4 rounded-xl font-bold text-xs bg-slate-900 hover:bg-slate-800 text-white transition-all shadow-sm active:scale-95 mb-8"
               >
                 Contact Sales
               </button>
-              <ul className="space-y-3 text-xs text-slate-300">
-                <li className="flex items-start gap-3"><Check size={18} className="text-cyan-400 flex-shrink-0 mt-0.5" /> Custom Request Limits</li>
-                <li className="flex items-start gap-3"><Check size={18} className="text-cyan-400 flex-shrink-0 mt-0.5" /> Dedicated Infrastructure</li>
-                <li className="flex items-start gap-3"><Check size={18} className="text-cyan-400 flex-shrink-0 mt-0.5" /> Unlimited Custom Fields</li>
-                <li className="flex items-start gap-3"><Check size={18} className="text-cyan-400 flex-shrink-0 mt-0.5" /> SLA & Priority Response</li>
+              <ul className="space-y-3.5 text-xs text-slate-700">
+                <li className="flex items-start gap-3">
+                  <Check size={18} className="text-cyan-600 flex-shrink-0 mt-0.5" />
+                  <span className="font-semibold text-slate-800">Custom Request Limits</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Check size={18} className="text-cyan-600 flex-shrink-0 mt-0.5" />
+                  <span className="font-semibold text-slate-800">Dedicated Infrastructure</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Check size={18} className="text-cyan-600 flex-shrink-0 mt-0.5" />
+                  <span className="font-semibold text-slate-800">Unlimited Custom Fields</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Check size={18} className="text-cyan-600 flex-shrink-0 mt-0.5" />
+                  <span className="font-semibold text-slate-800">SLA & Priority Response</span>
+                </li>
               </ul>
             </div>
           </motion.div>
@@ -357,12 +378,18 @@ export const PricingPage = () => {
           </div>
           
           <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-2xl px-5 py-3 shrink-0">
-            <span className="text-xs font-mono font-bold bg-white px-2.5 py-1 border border-slate-200 rounded-lg text-slate-800">
+            <span className="text-xs font-bold bg-white px-2.5 py-1 border border-slate-200 rounded-lg text-slate-800">
               IN India
             </span>
-            <span className="text-sm font-extrabold text-cyan-600">
-              ₹0.40 per SMS OTP
-            </span>
+            {otpExempt ? (
+              <span className="text-sm font-extrabold text-emerald-600 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-xl">
+                ₹0.00 (Exempt / Whitelisted)
+              </span>
+            ) : (
+              <span className="text-sm font-extrabold text-cyan-600">
+                ₹0.40 per SMS OTP
+              </span>
+            )}
           </div>
         </div>
 

@@ -67,9 +67,9 @@ export const OneTimeUrlSection = () => {
             {flowSteps.map((s, idx) => (
               <div key={s.step} className="flex items-center gap-2 flex-1">
                 <div className="flex flex-col items-center text-center p-3 rounded-2xl hover:-cyan-400 transition-colors w-full">
-                  <span className="text-[10px] font-mono text-cyan-700 font-bold mb-1">{s.step}</span>
+                  <span className="text-[10px] text-cyan-700 font-bold mb-1">{s.step}</span>
                   <span className="text-xs font-bold text-slate-900 tracking-tight">{s.name}</span>
-                  <span className="text-[10px] text-slate-500 font-mono mt-0.5">{s.sub}</span>
+                  <span className="text-[10px] text-slate-500 font-medium mt-0.5">{s.sub}</span>
                 </div>
                 {idx < flowSteps.length - 1 && (
                   <ArrowRight size={14} className="text-cyan-500 flex-shrink-0" />

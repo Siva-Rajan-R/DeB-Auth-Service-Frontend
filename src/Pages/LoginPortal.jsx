@@ -217,19 +217,37 @@ const FButton = ({ children, primary = '#0284c7', textColor, btnTextColor, butto
   );
 };
 
+// ─── Method normalization ──────────────────────────────────────────────────
+const normalizeMethod = (m) => {
+  if (!m) return null;
+  if (typeof m === 'string') {
+    const meta = PROVIDER_META[m.toLowerCase()] || {};
+    return { id: m.toLowerCase(), name: meta.label || m, enabled: true };
+  }
+  const id = m.id || m.name?.toLowerCase() || '';
+  const meta = PROVIDER_META[id.toLowerCase()] || {};
+  return {
+    ...m,
+    id,
+    name: m.name || meta.label || id,
+  };
+};
+
 // ─── Social provider buttons ──────────────────────────────────────────────────
 const SocialButton = ({ method, textColor, borderRadius, auth_token, providerBgColor, providerTextColor, isCardLight }) => {
-  const meta = PROVIDER_META[method.id?.toLowerCase()] || {};
+  const norm = normalizeMethod(method) || {};
+  const meta = PROVIDER_META[norm.id?.toLowerCase()] || {};
+  const label = meta.label || norm.name || norm.id || 'Provider';
   const defaultBg = isCardLight ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.04)';
   const defaultBorder = isCardLight ? 'rgba(0,0,0,0.10)' : 'rgba(255,255,255,0.10)';
   return (
     <button
-      onClick={() => window.location.href = `${backend_url}/auth/${method.id}/login/${auth_token}`}
+      onClick={() => window.location.href = `${backend_url}/auth/${norm.id}/login/${auth_token}`}
       className='w-full flex items-center justify-center gap-3 py-3 font-bold border transition-all hover:opacity-90 active:scale-[0.99] group/social shadow-sm'
       style={{
         backgroundColor: providerBgColor || defaultBg,
         borderColor: defaultBorder,
-        color: providerTextColor || textColor,
+        color: providerTextColor || (isCardLight ? '#0F172A' : textColor),
         borderRadius,
         fontSize: 'var(--card-btn-size, 14px)'
       }}
@@ -237,25 +255,27 @@ const SocialButton = ({ method, textColor, borderRadius, auth_token, providerBgC
       <span className='text-lg transition-transform group-hover/social:scale-110 flex items-center justify-center' style={{ color: meta.color }}>
         {meta.icon}
       </span>
-      <span>Continue with {meta.label || method.name || method.id}</span>
+      <span>Continue with {label}</span>
     </button>
   );
 };
 
 const SocialCompactButton = ({ method, textColor, borderRadius, auth_token, providerBgColor, providerTextColor, isSingle, isCardLight }) => {
-  const meta = PROVIDER_META[method.id?.toLowerCase()] || {};
+  const norm = normalizeMethod(method) || {};
+  const meta = PROVIDER_META[norm.id?.toLowerCase()] || {};
+  const label = meta.label || norm.name || norm.id || 'Provider';
   const defaultBg = isCardLight ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.04)';
   const defaultBorder = isCardLight ? 'rgba(0,0,0,0.10)' : 'rgba(255,255,255,0.10)';
   return (
     <button
-      onClick={() => window.location.href = `${backend_url}/auth/${method.id}/login/${auth_token}`}
+      onClick={() => window.location.href = `${backend_url}/auth/${norm.id}/login/${auth_token}`}
       className={`flex items-center justify-center gap-2 py-2.5 px-3 font-semibold border transition-all hover:opacity-90 active:scale-[0.98] group/soc shadow-sm ${
         isSingle ? 'col-span-2' : ''
       }`}
       style={{
         backgroundColor: providerBgColor || defaultBg,
         borderColor: defaultBorder,
-        color: providerTextColor || textColor,
+        color: providerTextColor || (isCardLight ? '#0F172A' : textColor),
         borderRadius,
         fontSize: 'var(--card-footer-size, 12px)',
       }}
@@ -263,19 +283,21 @@ const SocialCompactButton = ({ method, textColor, borderRadius, auth_token, prov
       <span className='text-base group-hover/soc:scale-110 transition-transform flex items-center justify-center' style={{ color: meta.color }}>
         {meta.icon}
       </span>
-      <span className='truncate'>{meta.label || method.name || method.id}</span>
+      <span className='truncate'>{label}</span>
     </button>
   );
 };
 
 const SocialIcon = ({ method, borderRadius, auth_token, isCardLight }) => {
-  const meta = PROVIDER_META[method.id?.toLowerCase()] || {};
+  const norm = normalizeMethod(method) || {};
+  const meta = PROVIDER_META[norm.id?.toLowerCase()] || {};
+  const label = meta.label || norm.name || norm.id || 'Provider';
   const defaultBg = isCardLight ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.04)';
   const defaultBorder = isCardLight ? 'rgba(0,0,0,0.10)' : 'rgba(255,255,255,0.08)';
   return (
     <div
-      title={meta.label || method.name || method.id}
-      onClick={() => window.location.href = `${backend_url}/auth/${method.id}/login/${auth_token}`}
+      title={label}
+      onClick={() => window.location.href = `${backend_url}/auth/${norm.id}/login/${auth_token}`}
       className='w-12 h-12 flex items-center justify-center text-xl cursor-pointer border hover:opacity-80 transition-all group/soc'
       style={{ backgroundColor: defaultBg, borderColor: defaultBorder, color: meta.color, borderRadius }}
     >
@@ -285,18 +307,19 @@ const SocialIcon = ({ method, borderRadius, auth_token, isCardLight }) => {
 };
 
 const SocialMethods = ({ methods, socialLayout, textColor, borderRadius, auth_token, providerBgColor, providerTextColor, isCardLight }) => {
-  if (!methods.length) return null;
+  const validMethods = (methods || []).map(normalizeMethod).filter(Boolean);
+  if (!validMethods.length) return null;
   if (socialLayout === 'grid') {
     return (
       <div className='flex justify-center gap-2.5 flex-wrap'>
-        {methods.map(m => <SocialIcon key={m.id} method={m} borderRadius={borderRadius} auth_token={auth_token} isCardLight={isCardLight} />)}
+        {validMethods.map(m => <SocialIcon key={m.id} method={m} borderRadius={borderRadius} auth_token={auth_token} isCardLight={isCardLight} />)}
       </div>
     );
   }
   if (socialLayout === 'compact') {
     return (
       <div className='grid grid-cols-2 gap-2'>
-        {methods.map((m, idx) => (
+        {validMethods.map((m, idx) => (
           <SocialCompactButton
             key={m.id}
             method={m}
@@ -305,7 +328,7 @@ const SocialMethods = ({ methods, socialLayout, textColor, borderRadius, auth_to
             auth_token={auth_token}
             providerBgColor={providerBgColor}
             providerTextColor={providerTextColor}
-            isSingle={methods.length % 2 !== 0 && idx === methods.length - 1}
+            isSingle={validMethods.length % 2 !== 0 && idx === validMethods.length - 1}
             isCardLight={isCardLight}
           />
         ))}
@@ -314,7 +337,7 @@ const SocialMethods = ({ methods, socialLayout, textColor, borderRadius, auth_to
   }
   return (
     <div className='space-y-2'>
-      {methods.map(m => (
+      {validMethods.map(m => (
         <SocialButton
           key={m.id}
           method={m}
@@ -497,6 +520,7 @@ const PasswordFlow = ({
   request_id, onComplete, onSuccess, onBack, onForgotPassword, forgotPasswordEnabled,
   primary, textColor, btnTextColor, linkColor, buttonStyle, inputStyle, inputBorderColor, borderRadius,
   prefillEmail, lockedEmail, isCardLight,          // ← autofill & theme props
+  isSignup,
 }) => {
   const [formData, setFormData] = useState({ email: prefillEmail || '', password: '' });
   const [loading, setLoading] = useState(false);
@@ -565,9 +589,9 @@ const PasswordFlow = ({
         value={formData.password} onChange={handleChange}
       />
       <FButton disabled={loading} primary={primary} textColor={textColor} btnTextColor={btnTextColor} buttonStyle={buttonStyle} borderRadius={borderRadius} onClick={handleLogin}>
-        {loading ? 'Authenticating…' : 'Sign In'}
+        {loading ? 'Authenticating…' : (isSignup ? 'Create Account' : 'Sign In')}
       </FButton>
-      {forgotPasswordEnabled && (
+      {forgotPasswordEnabled && !isSignup && (
         <button onClick={onForgotPassword} className='w-full text-xs transition-colors mt-1 hover:underline' style={{ color: '#ef4444' }}>
           Forgot password?
         </button>
@@ -640,10 +664,14 @@ const ForgotPasswordFlow = ({ request_id, onBack, primary, textColor, buttonStyl
 
 // ─── Provider Selection Flow ──────────────────────────────────────────────────
 const ProviderSelectionFlow = ({ enabledMethods, socialLayout, textColor, btnTextColor, borderRadius, auth_token, onSelectEmailOTP, onSelectMobileOTP, passwordForm, providerBgColor, providerTextColor, isCardLight }) => {
-  const socialMethods = enabledMethods.filter(m => m.id !== 'password' && m.id !== 'email_otp' && m.id !== 'mobile_otp' && m.id !== 'otp');
-  const hasEmailOTP = enabledMethods.some(m => m.id === 'email_otp' || m.id === 'otp');
-  const hasMobileOTP = enabledMethods.some(m => m.id === 'mobile_otp');
-  const hasPassword = enabledMethods.some(m => m.id === 'password');
+  const normalized = (enabledMethods || []).map(normalizeMethod).filter(Boolean);
+  const socialMethods = normalized.filter(m => m.id !== 'password' && m.id !== 'email_otp' && m.id !== 'mobile_otp' && m.id !== 'otp');
+  const hasEmailOTP = normalized.some(m => m.id === 'email_otp' || m.id === 'otp');
+  const hasMobileOTP = normalized.some(m => m.id === 'mobile_otp');
+  const hasPassword = normalized.some(m => m.id === 'password');
+  const defaultBg = isCardLight ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.04)';
+  const defaultBorder = isCardLight ? 'rgba(0,0,0,0.10)' : 'rgba(255,255,255,0.10)';
+  const resolvedProviderTextColor = providerTextColor || (isCardLight ? '#0F172A' : textColor);
 
   return (
     <div className='space-y-3'>
@@ -669,28 +697,28 @@ const ProviderSelectionFlow = ({ enabledMethods, socialLayout, textColor, btnTex
             Continue with OTP
           </p>
           <div className='flex gap-2.5'>
-            <button onClick={onSelectEmailOTP} className='flex-1 flex items-center justify-center gap-2 py-3 text-sm font-bold border hover:opacity-80 transition-all'
-              style={{ backgroundColor: 'rgba(34,197,94,0.08)', borderColor: 'rgba(34,197,94,0.2)', color: btnTextColor || textColor, borderRadius }}>
-              <span className='text-blue-500 text-base'><MdOutlineSms /></span>
+            <button onClick={onSelectEmailOTP} className='flex-1 flex items-center justify-center gap-2 py-3 text-sm font-bold border hover:opacity-80 transition-all shadow-sm'
+              style={{ backgroundColor: providerBgColor || defaultBg, borderColor: defaultBorder, color: resolvedProviderTextColor, borderRadius }}>
+              <span className='text-emerald-500 text-base'><MdOutlineSms /></span>
               Email
             </button>
-            <button onClick={onSelectMobileOTP} className='flex-1 flex items-center justify-center gap-2 py-3 text-sm font-bold border hover:opacity-80 transition-all'
-              style={{ backgroundColor: 'rgba(6,182,212,0.08)', borderColor: 'rgba(6,182,212,0.2)', color: btnTextColor || textColor, borderRadius }}>
-              <span className='text-cyan-400 text-base'><MdOutlineSms /></span>
+            <button onClick={onSelectMobileOTP} className='flex-1 flex items-center justify-center gap-2 py-3 text-sm font-bold border hover:opacity-80 transition-all shadow-sm'
+              style={{ backgroundColor: providerBgColor || defaultBg, borderColor: defaultBorder, color: resolvedProviderTextColor, borderRadius }}>
+              <span className='text-cyan-500 text-base'><MdOutlineSms /></span>
               Mobile
             </button>
           </div>
         </div>
       ) : hasEmailOTP ? (
-        <button onClick={onSelectEmailOTP} className='w-full flex items-center justify-center gap-2 py-3 text-sm font-bold border hover:opacity-80 transition-all'
-          style={{ backgroundColor: 'rgba(34,197,94,0.08)', borderColor: 'rgba(34,197,94,0.2)', color: btnTextColor || textColor, borderRadius }}>
-          <span className='text-blue-500 text-lg'><MdOutlineSms /></span>
+        <button onClick={onSelectEmailOTP} className='w-full flex items-center justify-center gap-2 py-3 text-sm font-bold border hover:opacity-80 transition-all shadow-sm'
+          style={{ backgroundColor: providerBgColor || defaultBg, borderColor: defaultBorder, color: resolvedProviderTextColor, borderRadius }}>
+          <span className='text-emerald-500 text-lg'><MdOutlineSms /></span>
           Continue with OTP
         </button>
       ) : hasMobileOTP ? (
-        <button onClick={onSelectMobileOTP} className='w-full flex items-center justify-center gap-2 py-3 text-sm font-bold border hover:opacity-80 transition-all'
-          style={{ backgroundColor: 'rgba(6,182,212,0.08)', borderColor: 'rgba(6,182,212,0.2)', color: btnTextColor || textColor, borderRadius }}>
-          <span className='text-cyan-400 text-lg'><MdOutlineSms /></span>
+        <button onClick={onSelectMobileOTP} className='w-full flex items-center justify-center gap-2 py-3 text-sm font-bold border hover:opacity-80 transition-all shadow-sm'
+          style={{ backgroundColor: providerBgColor || defaultBg, borderColor: defaultBorder, color: resolvedProviderTextColor, borderRadius }}>
+          <span className='text-cyan-500 text-lg'><MdOutlineSms /></span>
           Continue with OTP
         </button>
       ) : null}
@@ -709,10 +737,13 @@ const AdditionalFieldsFlow = ({ request_id, signupFields, onSuccess, primary, te
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleChange = (e) => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleChange = (e) => {
+    const { name, type, checked, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+  };
 
   const handleComplete = async () => {
-    const missing = signupFields.filter(f => f.required && !formData[f.name]);
+    const missing = signupFields.filter(f => f.required && (f.type === 'boolean' ? !formData[f.name] : (!formData[f.name] || String(formData[f.name]).trim() === '')));
     if (missing.length > 0) { setError('Please fill all required fields.'); return; }
     setError('');
     setLoading(true);
@@ -749,16 +780,42 @@ const AdditionalFieldsFlow = ({ request_id, signupFields, onSuccess, primary, te
     <div className='space-y-3'>
       <p className='text-xs text-center mb-4' style={{ color: `${textColor}80` }}>Just a few more details to complete your registration...</p>
       {error && <p className='text-red-400 text-xs text-center'>{error}</p>}
-      {signupFields.map(f => (
-        <FInput
-          key={f.name}
-          label={`${f.label || f.name} ${f.required ? '*' : ''}`}
-          name={f.name} type={f.type || 'text'}
-          textColor={textColor} inputStyle={inputStyle} inputBorderColor={inputBorderColor} borderRadius={borderRadius}
-          isCardLight={isCardLight}
-          value={formData[f.name] || ''} onChange={handleChange}
-        />
-      ))}
+      {signupFields.map(f => {
+        if (f.type === 'boolean') {
+          return (
+            <label
+              key={f.name}
+              className='flex items-center gap-3 p-3 border cursor-pointer select-none transition-all'
+              style={{
+                borderColor: inputBorderColor || 'rgba(255,255,255,0.12)',
+                backgroundColor: isCardLight ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.03)',
+                borderRadius,
+              }}
+            >
+              <input
+                type="checkbox"
+                name={f.name}
+                checked={!!formData[f.name]}
+                onChange={handleChange}
+                className="w-4 h-4 rounded accent-indigo-500 cursor-pointer"
+              />
+              <span className="text-xs font-medium" style={{ color: textColor }}>
+                {f.label || f.name} {f.required && <span className="text-red-400">*</span>}
+              </span>
+            </label>
+          );
+        }
+        return (
+          <FInput
+            key={f.name}
+            label={`${f.label || f.name} ${f.required ? '*' : ''}`}
+            name={f.name} type={f.type || 'text'}
+            textColor={textColor} inputStyle={inputStyle} inputBorderColor={inputBorderColor} borderRadius={borderRadius}
+            isCardLight={isCardLight}
+            value={formData[f.name] || ''} onChange={handleChange}
+          />
+        );
+      })}
       <div className='pt-2'>
         <FButton disabled={loading} primary={primary} textColor={textColor} buttonStyle={buttonStyle} borderRadius={borderRadius} onClick={handleComplete}>
           {loading ? 'Completing…' : 'Create Account'}
@@ -795,7 +852,12 @@ const DEFAULT_CONFIG_FALLBACK = {
       gradient_direction: '135deg',
     }
   },
-  enabled_methods: ['password', 'google', 'github', 'otp', 'email_otp', 'mobile_otp'],
+  enabled_methods: [
+    { id: 'google', name: 'Google', enabled: true },
+    { id: 'github', name: 'GitHub', enabled: true },
+    { id: 'otp', name: 'OTP', enabled: true },
+    { id: 'password', name: 'Password', enabled: true },
+  ],
   signup_fields: []
 };
 
@@ -973,6 +1035,7 @@ export const LoginPortal = () => {
     document.head.appendChild(link);
   }, [configData]);
 
+
   if (error) {
     const isLocationError = error.includes("location permissions");
 
@@ -1070,12 +1133,19 @@ export const LoginPortal = () => {
     );
   }
 
+  if (loading || !configData) {
+    return null;
+  }
+
   const activeConfigData = configData || DEFAULT_CONFIG_FALLBACK;
 
-  const { ui, branding } = activeConfigData.config || {};
-  const { enabled_methods = ['password', 'google', 'github', 'otp'], signup_fields = [] } = activeConfigData;
-
-  const uiConfig = ui || {};
+  const flow = flow_type === 'signup' ? 'signup' : 'signin';
+  const flowSpecific = activeConfigData.config?.[flow] || {};
+  const branding = activeConfigData.branding || activeConfigData.config?.branding || 'DAuth';
+  const uiConfig = { ...(activeConfigData.config?.ui || {}), ...(flowSpecific.ui || {}) };
+  const rawFlowMethods = flowSpecific.auth_methods || activeConfigData.config?.auth_methods || [];
+  const enabled_methods = activeConfigData.enabled_methods || rawFlowMethods.filter(m => m.enabled !== false);
+  const { signup_fields = [] } = activeConfigData;
   const {
     screen_bg_color = '#000000',
     login_card_bg_color = '#ffffff14',
@@ -1313,6 +1383,7 @@ export const LoginPortal = () => {
                 onBack={lockedEmail ? null : () => setCurrentStep('provider_selection')}
                 onForgotPassword={() => setCurrentStep('forgot_password')}
                 forgotPasswordEnabled={configData?.config?.forgot_password_enabled !== false}
+                isSignup={flow_type === 'signup'}
                 {...sharedFormProps}
               />
             ) : currentStep === 'forgot_password' ? (
@@ -1346,6 +1417,7 @@ export const LoginPortal = () => {
                     forgotPasswordEnabled={configData?.config?.forgot_password_enabled !== false}
                     prefillEmail={prefillEmail}
                     lockedEmail={lockedEmail}
+                    isSignup={flow_type === 'signup'}
                     {...sharedFormProps}
                   />
                 }

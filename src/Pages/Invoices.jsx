@@ -7,6 +7,7 @@ export const InvoicesPage = () => {
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('pending');
+  const [otpExempt, setOtpExempt] = useState(false);
   const { call } = useNetworkCalls();
 
   useEffect(() => {
@@ -16,6 +17,12 @@ export const InvoicesPage = () => {
       if (res) {
         setInvoices(res);
       }
+      try {
+        const otpStatus = await call({ method: 'GET', path: '/billing/otp-cost-status', withCred: true });
+        if (otpStatus?.is_otp_cost_exempt) {
+          setOtpExempt(true);
+        }
+      } catch (_) {}
       setLoading(false);
     };
     fetchInvoices();
@@ -37,6 +44,13 @@ export const InvoicesPage = () => {
             Billing & <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-sky-400">Invoices</span>
           </h1>
           <p className="text-slate-500 text-lg">Manage your SMS OTP usage and subscription payments.</p>
+
+          {otpExempt && (
+            <div className="mt-4 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center gap-3 text-emerald-800 text-xs font-bold">
+              <CheckCircle2 size={18} className="text-emerald-600 shrink-0" />
+              <span>SMS OTP Cost Exemption Active: Your email is whitelisted from SMS OTP costs. No SMS usage invoices will be generated for your account.</span>
+            </div>
+          )}
         </div>
 
         {/* Tabs */}

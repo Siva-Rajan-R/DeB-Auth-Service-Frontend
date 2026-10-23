@@ -3,7 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ArrowRight, LayoutDashboard, LogOut, ChevronDown, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import { useNetworkCalls } from '../../Utils/NetworkCalls';
+import { useNetworkCalls, getValidAccessToken } from '../../Utils/NetworkCalls';
+import { APP_CONFIG } from '../../config';
+
+const backend_url = APP_CONFIG.BACKEND_URL;
 
 export const LandingNavbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -19,9 +22,10 @@ export const LandingNavbar = () => {
   const navLinks = [
     { name: 'Features', href: '#features', id: 'features' },
     { name: 'How It Works', href: '#auth-flow', id: 'auth-flow' },
-    { name: 'Docs', href: '#auth-docs', id: 'auth-docs', isRoute: true },
+    { name: 'Docs', href: '#auth-docs', id: 'auth-docs', isRoute: true, routePath: '/auth-docs' },
     { name: 'Pricing', href: '#pricing', id: 'pricing' },
     { name: 'Use Cases', href: '#use-cases', id: 'use-cases' },
+    { name: 'Contact', href: '/contact', id: 'contact', isRoute: true, routePath: '/contact' },
   ];
 
   // Active section scroll observer
@@ -45,30 +49,44 @@ export const LandingNavbar = () => {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+    const urlTokenId = params.get('token_id');
+    if (urlTokenId) {
+      window.location.href = `${backend_url}/user/create?token_id=${urlTokenId}`;
+      return;
+    }
+
     const urlName = params.get('name');
     const urlEmail = params.get('email');
     const urlProfile = params.get('profile');
     const urlAccessToken = params.get('access_token');
     const urlRefreshToken = params.get('refresh_token');
 
-    if (urlAccessToken) Cookies.set('access_token', urlAccessToken);
-    if (urlRefreshToken) Cookies.set('refresh_token', urlRefreshToken);
-    if (urlName) Cookies.set('user_name', urlName);
-    if (urlEmail) Cookies.set('user_email', urlEmail);
+    const cookieOptions = { expires: 7, path: '/' };
+
+    if (urlAccessToken) Cookies.set('access_token', urlAccessToken, cookieOptions);
+    if (urlRefreshToken) Cookies.set('refresh_token', urlRefreshToken, cookieOptions);
+    if (urlName) Cookies.set('user_name', urlName, cookieOptions);
+    if (urlEmail) Cookies.set('user_email', urlEmail, cookieOptions);
     if (urlProfile && urlProfile !== 'null' && urlProfile !== 'undefined') {
-      Cookies.set('user_profile', urlProfile);
+      Cookies.set('user_profile', urlProfile, cookieOptions);
     }
 
     const finalName = urlName || Cookies.get('user_name');
     const finalEmail = urlEmail || Cookies.get('user_email');
     const finalProfile = urlProfile || Cookies.get('user_profile');
+    const hasAnyToken = Boolean(urlAccessToken || urlRefreshToken || Cookies.get('access_token') || Cookies.get('refresh_token'));
 
-    if (finalName || finalEmail) {
+    if ((finalName || finalEmail) && hasAnyToken) {
       setUser({
         name: finalName || 'Developer',
         email: finalEmail || 'user@dauth.dev',
         profile: (finalProfile && finalProfile !== 'null' && finalProfile !== 'undefined') ? finalProfile : null
       });
+    } else if (!hasAnyToken) {
+      Cookies.remove('user_name', { path: '/' });
+      Cookies.remove('user_email', { path: '/' });
+      Cookies.remove('user_profile', { path: '/' });
+      setUser(null);
     }
 
     // Clean URL bar query params smoothly after storing cookies
@@ -89,16 +107,18 @@ export const LandingNavbar = () => {
   }, []);
 
   const handleSignIn = async () => {
-    if (user || Cookies.get('access_token')) {
+    setLoading(true);
+    const token = await getValidAccessToken();
+    if (token) {
+      setLoading(false);
       navigate('/dashboard');
       return;
     }
 
-    setLoading(true);
     try {
       const res = await call({ method: 'GET', path: '/user/auth', withCred: false });
       if (res) {
-        Cookies.set('isInitiated', true);
+        Cookies.set('isInitiated', true, { expires: 1, path: '/' });
         const targetUrl = res.signin_url || res.login_url || res.data?.signin_url || res.data?.login_url;
         if (targetUrl) {
           window.location.href = targetUrl;
@@ -114,11 +134,11 @@ export const LandingNavbar = () => {
   };
 
   const handleLogout = () => {
-    Cookies.remove('user_name');
-    Cookies.remove('user_email');
-    Cookies.remove('user_profile');
-    Cookies.remove('access_token');
-    Cookies.remove('refresh_token');
+    Cookies.remove('user_name', { path: '/' });
+    Cookies.remove('user_email', { path: '/' });
+    Cookies.remove('user_profile', { path: '/' });
+    Cookies.remove('access_token', { path: '/' });
+    Cookies.remove('refresh_token', { path: '/' });
     setUser(null);
     setProfileDropdownOpen(false);
     navigate('/');
@@ -148,7 +168,7 @@ export const LandingNavbar = () => {
               <div key={link.name} className="relative py-1">
                 {link.isRoute ? (
                   <button
-                    onClick={() => navigate('/auth-docs')}
+                    onClick={() => navigate(link.routePath || '/auth-docs')}
                     className={`text-sm font-semibold transition-colors ${
                       isActive ? 'text-cyan-600 font-bold' : 'text-slate-600 hover:text-cyan-600'
                     }`}
@@ -211,7 +231,7 @@ export const LandingNavbar = () => {
                   <span className="text-xs font-bold text-slate-900 leading-tight group-hover:text-cyan-600 transition-colors">
                     {user.name}
                   </span>
-                  <span className="text-[10px] text-slate-500 font-mono">Dashboard</span>
+                  <span className="text-[10px] text-slate-500 font-medium">Dashboard</span>
                 </div>
                 <ChevronDown size={14} className="text-slate-400 group-hover:text-cyan-600 transition-transform group-hover:rotate-180" />
               </button>
@@ -243,7 +263,7 @@ export const LandingNavbar = () => {
                       )}
                       <div className="overflow-hidden">
                         <div className="text-xs font-extrabold text-slate-900 truncate">{user.name}</div>
-                        <div className="text-[10px] text-slate-500 truncate font-mono">{user.email}</div>
+                        <div className="text-[10px] text-slate-500 truncate font-medium">{user.email}</div>
                       </div>
                     </div>
 
@@ -282,7 +302,7 @@ export const LandingNavbar = () => {
                 disabled={loading}
                 className="neu-button relative group px-5 py-2.5 font-extrabold text-sm text-cyan-600 transition-all flex items-center gap-2 disabled:opacity-50"
               >
-                {loading ? <Loader2 size={16} className="animate-spin text-cyan-600" /> : 'Get Started — Free'}
+                {loading ? <Loader2 size={16} className="animate-spin text-cyan-600" /> : 'Get Started | Free'}
                 <ArrowRight className="w-4 h-4 text-cyan-600 group-hover:translate-x-0.5 transition-transform" />
               </button>
             </>
@@ -313,7 +333,9 @@ export const LandingNavbar = () => {
                 href={link.href}
                 onClick={() => {
                   setMobileMenuOpen(false);
-                  if (link.isRoute) navigate('/auth-docs');
+                  if (link.isRoute) {
+                    navigate(link.routePath || '/auth-docs');
+                  }
                 }}
                 className="block text-base font-medium text-slate-700 hover:text-cyan-600 py-1"
               >
@@ -330,7 +352,7 @@ export const LandingNavbar = () => {
                     </div>
                     <div>
                       <div className="text-xs font-bold text-slate-900">{user.name}</div>
-                      <div className="text-[10px] text-slate-500 font-mono">{user.email}</div>
+                      <div className="text-[10px] text-slate-500 font-medium">{user.email}</div>
                     </div>
                   </div>
                   <button
@@ -360,7 +382,7 @@ export const LandingNavbar = () => {
                     disabled={loading}
                     className="w-full text-center py-3 font-bold text-white bg-cyan-500 rounded-xl neu-flat shadow-cyan-500/20"
                   >
-                    Get Started — Free
+                    Get Started | Free
                   </button>
                 </>
               )}

@@ -76,8 +76,8 @@ export const CustomExperienceSection = () => {
               <div className="grid grid-cols-2 gap-3">
                 {brandControls.map((c) => (
                   <div key={c.label} className="p-3 rounded-xl neu-flat">
-                    <span className="text-[10px] font-mono text-slate-400 block">{c.label}</span>
-                    <span className="text-xs font-bold text-slate-900 font-mono mt-0.5 block">{c.value}</span>
+                    <span className="text-[10px] text-slate-400 font-medium block">{c.label}</span>
+                    <span className="text-xs font-bold text-slate-900 mt-0.5 block">{c.value}</span>
                   </div>
                 ))}
               </div>
@@ -107,7 +107,7 @@ export const CustomExperienceSection = () => {
 
           {/* Live Preview Card (Right Column) */}
           <div className="bg-gradient-to-br from-cyan-50 via-white to-sky-50 -cyan-200 rounded-3xl p-8 neu-flat relative">
-            <div className="absolute top-4 right-4 px-3 py-1 bg-cyan-100 -cyan-300 rounded-full text-[10px] font-mono text-cyan-900 font-bold">
+            <div className="absolute top-4 right-4 px-3 py-1 bg-cyan-100 -cyan-300 rounded-full text-[10px] text-cyan-900 font-bold">
               PREVIEW MATCHING YOUR BRAND
             </div>
 
@@ -118,18 +118,18 @@ export const CustomExperienceSection = () => {
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-slate-900 leading-none">Acme Corp</h4>
-                  <span className="text-[10px] text-slate-500">Sign in to your workspace</span>
+                  <span className="text-[10px] text-slate-500 font-medium">Sign in to your workspace</span>
                 </div>
               </div>
 
               <div className="space-y-3 pt-2">
                 <div>
-                  <label className="text-[11px] font-mono text-slate-600 block mb-1">Company Email</label>
-                  <input disabled value="user@acmecorp.com" className="w-full text-xs text-slate-700 rounded-lg px-3 py-2 outline-none font-mono" />
+                  <label className="text-[11px] text-slate-600 font-medium block mb-1">Company Email</label>
+                  <input disabled value="user@acmecorp.com" className="w-full text-xs text-slate-700 rounded-lg px-3 py-2 outline-none font-medium" />
                 </div>
                 <div>
-                  <label className="text-[11px] font-mono text-slate-600 block mb-1">Workspace Name</label>
-                  <input disabled value="engineering-team" className="w-full text-xs text-slate-700 rounded-lg px-3 py-2 outline-none font-mono" />
+                  <label className="text-[11px] text-slate-600 font-medium block mb-1">Workspace Name</label>
+                  <input disabled value="engineering-team" className="w-full text-xs text-slate-700 rounded-lg px-3 py-2 outline-none font-medium" />
                 </div>
                 <button className="w-full py-2.5 bg-cyan-500 text-white font-bold rounded-lg text-xs neu-flat shadow-cyan-500/20">
                   Continue to App →

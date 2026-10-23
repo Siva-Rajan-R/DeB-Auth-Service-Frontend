@@ -5,13 +5,82 @@
     <link rel="icon" type="image/png" href="/dauth_logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="/config.js"></script>
-    <title>DAuth</title>
+    <title>DAuth — Modern Non-Custodial Authentication Platform & OAuth2 Service</title>
+    <meta name="description" content="DAuth is a modern, developer-first non-custodial authentication platform. Implement secure social logins, passwordless OTP, TOTP 2FA, and branded hosted login portals in minutes with pure HTTP/OAuth2 APIs." />
+    <meta name="keywords" content="authentication, auth service, oauth2 provider, social login, passwordless authentication, google login, github oauth, 2fa otp, totp authentication, non-custodial auth, hosted login portal, developer authentication, dauth" />
+    <meta name="author" content="DAuth Technologies" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <link rel="canonical" href="https://dauth.dev/" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://dauth.dev/" />
+    <meta property="og:title" content="DAuth — Next-Gen Non-Custodial Authentication Platform" />
+    <meta property="og:description" content="Implement secure social logins, passwordless OTP, TOTP 2FA, and fully customized hosted login portals in under 10 minutes with pure REST APIs." />
+    <meta property="og:image" content="https://dauth.dev/dauth_logo.png" />
+    <meta property="og:site_name" content="DAuth" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://dauth.dev/" />
+    <meta name="twitter:title" content="DAuth — Next-Gen Non-Custodial Authentication Platform" />
+    <meta name="twitter:description" content="Implement secure social logins, passwordless OTP, TOTP 2FA, and fully customized hosted login portals in under 10 minutes with pure REST APIs." />
+    <meta name="twitter:image" content="https://dauth.dev/dauth_logo.png" />
+
+    <!-- JSON-LD Structured Data for Google Rich Snippets -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://dauth.dev/#software",
+          "name": "DAuth",
+          "applicationCategory": "SecurityApplication",
+          "operatingSystem": "All",
+          "description": "Enterprise-grade, non-custodial authentication platform providing OAuth 2.0 social login, passwordless OTP, TOTP 2FA, and customizable hosted login portals with zero SDK overhead.",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "url": "https://dauth.dev/",
+          "author": {
+            "@type": "Organization",
+            "name": "DAuth",
+            "url": "https://dauth.dev/"
+          }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://dauth.dev/#organization",
+          "name": "DAuth",
+          "url": "https://dauth.dev/",
+          "logo": "https://dauth.dev/dauth_logo.png",
+          "sameAs": [
+            "https://twitter.com/dauth",
+            "https://github.com/dauth"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://dauth.dev/#website",
+          "url": "https://dauth.dev/",
+          "name": "DAuth",
+          "publisher": {
+            "@id": "https://dauth.dev/#organization"
+          }
+        }
+      ]
+    }
+    </script>
+
     <!-- Plus Jakarta Sans Google Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
   </head>
-  <body className="font-sans antialiased">
+  <body class="font-sans antialiased">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

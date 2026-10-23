@@ -6,7 +6,7 @@ import {
   LineChart, Line
 } from 'recharts';
 import { format, subMonths } from 'date-fns';
-import { Calendar, CreditCard, Activity, Zap, ChevronDown, Check, ShieldAlert, FileClock, Search, Filter, Mail, Phone } from 'lucide-react';
+import { Calendar, CreditCard, Activity, Zap, ChevronDown, Check, ShieldAlert, FileClock, Search, Filter, Mail, Phone, Copy } from 'lucide-react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
@@ -20,6 +20,15 @@ export const AnalyticsPanel = ({ apikey }) => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [copiedIdentifier, setCopiedIdentifier] = useState(null);
+
+  const copyIdentifier = (identifier, e) => {
+    e?.stopPropagation();
+    if (!identifier) return;
+    navigator.clipboard.writeText(identifier);
+    setCopiedIdentifier(identifier);
+    setTimeout(() => setCopiedIdentifier(null), 2000);
+  };
   
   const [selectedMonth, setSelectedMonth] = useState(format(new Date(), 'yyyy-MM'));
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -207,11 +216,30 @@ export const AnalyticsPanel = ({ apikey }) => {
     count: data.methods[key]
   })) : [];
 
-  const dailyData = data?.daily ? Object.keys(data.daily).sort().map(date => ({
-    date: date.slice(8, 10), // just the day
-    requests: data.daily[date].total_requests || 0,
-    sms: data.daily[date].sms_otp_count || 0
-  })) : [];
+  const dailyData = data?.daily ? Object.keys(data.daily).sort().map(dateStr => {
+    let fullDateFormatted = dateStr;
+    let axisLabel = dateStr;
+    try {
+      const parts = dateStr.split('-');
+      if (parts.length === 3) {
+        const [year, month, day] = parts.map(Number);
+        const dateObj = new Date(year, month - 1, day);
+        fullDateFormatted = format(dateObj, 'EEEE, MMMM d, yyyy'); // e.g. "Friday, October 23, 2026"
+        axisLabel = format(dateObj, 'MMM d'); // e.g. "Oct 23"
+      }
+    } catch (_) {
+      fullDateFormatted = dateStr;
+      axisLabel = dateStr;
+    }
+
+    return {
+      rawDate: dateStr,
+      date: axisLabel,
+      fullDate: fullDateFormatted,
+      requests: data.daily[dateStr].total_requests || 0,
+      sms: data.daily[dateStr].sms_otp_count || 0
+    };
+  }) : [];
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
@@ -352,11 +380,27 @@ export const AnalyticsPanel = ({ apikey }) => {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={dailyData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94a3b8' }} />
+                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#64748b', fontWeight: 600 }} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94a3b8' }} />
-                <RechartsTooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                <Line type="monotone" dataKey="requests" name="Auth Requests" stroke="var(--accent-cyan)" strokeWidth={3} dot={false} />
-                <Line type="monotone" dataKey="sms" name="SMS OTPs" stroke="var(--accent-emerald)" strokeWidth={3} dot={false} />
+                <RechartsTooltip
+                  cursor={{ stroke: '#06b6d4', strokeWidth: 1.5, strokeDasharray: '4 4' }}
+                  labelFormatter={(label, payload) => {
+                    const item = payload?.[0]?.payload;
+                    return item?.fullDate || label;
+                  }}
+                  contentStyle={{
+                    backgroundColor: '#ffffff',
+                    borderRadius: '14px',
+                    border: '1px solid #e2e8f0',
+                    boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)',
+                    padding: '10px 14px',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    color: '#0f172a'
+                  }}
+                />
+                <Line type="monotone" dataKey="requests" name="Auth Requests" stroke="var(--accent-cyan)" strokeWidth={3} dot={false} activeDot={{ r: 5, fill: 'var(--accent-cyan)' }} />
+                <Line type="monotone" dataKey="sms" name="SMS OTPs" stroke="var(--accent-emerald)" strokeWidth={3} dot={false} activeDot={{ r: 5, fill: 'var(--accent-emerald)' }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -380,16 +424,22 @@ export const AnalyticsPanel = ({ apikey }) => {
 
       </div>
 
-      {/* Logs and Security Tables */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+      {/* Logs and Security Tables — Full Width Layout */}
+      <div className="space-y-6 mt-6">
         
-        {/* Audit Logs Table */}
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col">
+        {/* Audit Logs Table — Takes Full Width */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="w-full bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col">
           
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-            <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2 uppercase tracking-wider">
-              <FileClock className="text-cyan-500" size={16} /> Recent Audit Logs
-            </h3>
+            <div className="flex items-center gap-3">
+              <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2 uppercase tracking-wider">
+                <FileClock className="text-cyan-500" size={16} /> Recent Audit Logs
+              </h3>
+              <span className="text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-200/80">
+                {logs.length} events logged
+              </span>
+            </div>
+            <p className="text-xs text-slate-400 font-medium">Click copy icon on any user identifier to copy directly</p>
           </div>
 
           {/* Filters Bar */}
@@ -481,23 +531,23 @@ export const AnalyticsPanel = ({ apikey }) => {
             </div>
           </div>
 
-          {/* Fixed Height Scrollable Table Container with Infinite Scroll */}
+          {/* Full Width Fixed Height Scrollable Table Container */}
           <div 
             onScroll={handleScroll}
-            className="overflow-y-auto h-[360px] border border-slate-100 rounded-xl relative custom-scrollbar"
+            className="overflow-x-auto overflow-y-auto h-[380px] border border-slate-100 rounded-xl relative custom-scrollbar w-full"
           >
-            <table className="w-full text-left text-sm text-slate-600">
+            <table className="w-full min-w-[760px] lg:min-w-full text-left text-sm text-slate-600">
               <thead className="text-xs uppercase bg-slate-100/90 backdrop-blur-sm text-slate-600 sticky top-0 z-10 shadow-sm">
                 <tr>
-                  <th className="px-4 py-3">Time</th>
-                  <th className="px-4 py-3">IP Address</th>
-                  <th className="px-4 py-3">Method</th>
-                  <th className="px-4 py-3">Identifier</th>
-                  <th className="px-4 py-3">Event</th>
-                  <th className="px-4 py-3 text-center">Count</th>
+                  <th className="px-4 py-3 w-[20%]">Time</th>
+                  <th className="px-4 py-3 w-[14%]">IP Address</th>
+                  <th className="px-4 py-3 w-[12%]">Method</th>
+                  <th className="px-4 py-3 w-[32%]">Identifier</th>
+                  <th className="px-4 py-3 w-[14%]">Event</th>
+                  <th className="px-4 py-3 w-[8%] text-center">Count</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-slate-100">
                 {loadingLogs ? (
                   <tr>
                     <td colSpan="6" className="text-center py-12 text-slate-400 text-sm">
@@ -515,23 +565,55 @@ export const AnalyticsPanel = ({ apikey }) => {
                   </tr>
                 ) : (
                   logs.map((log, i) => (
-                    <tr key={i} className="border-b border-slate-50 last:border-0 hover:bg-slate-50/50 transition-colors">
-                      <td className="px-4 py-3 whitespace-nowrap text-xs">{new Date(log.timestamp * 1000).toLocaleString()}</td>
-                      <td className="px-4 py-3 font-mono text-xs text-slate-600">{log.ip_address}</td>
-                      <td className="px-4 py-3"><span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs font-medium">{log.method}</span></td>
-                      <td className="px-4 py-3 truncate max-w-[150px] font-medium text-slate-800" title={log.identifier}>{log.identifier}</td>
+                    <tr key={i} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="px-4 py-3 whitespace-nowrap text-xs font-medium text-slate-600">
+                        {new Date(log.timestamp * 1000).toLocaleString()}
+                      </td>
+                      <td className="px-4 py-3 font-mono text-xs text-slate-600 font-semibold">
+                        {log.ip_address}
+                      </td>
                       <td className="px-4 py-3">
-                        <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${
-                          log.event_type.includes('SUCCESS') ? 'bg-blue-50 text-blue-600 border border-emerald-200/50' :
-                          log.event_type.includes('FAILED') ? 'bg-red-50 text-red-600 border border-red-200/50' :
-                          'bg-cyan-50 text-cyan-600 border border-cyan-200/50'
+                        <span className="bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-lg text-xs font-bold border border-slate-200/60">
+                          {log.method}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 font-medium text-slate-800">
+                        <div className="flex items-center gap-2 group max-w-full">
+                          <span className="font-semibold text-slate-800 text-xs select-all break-all" title={log.identifier}>
+                            {log.identifier}
+                          </span>
+                          <button
+                            onClick={(e) => copyIdentifier(log.identifier, e)}
+                            className={`p-1.5 rounded-lg transition-all shrink-0 cursor-pointer ${
+                              copiedIdentifier === log.identifier
+                                ? 'bg-emerald-50 text-emerald-600 border border-emerald-200 shadow-xs'
+                                : 'text-slate-400 hover:text-cyan-700 hover:bg-slate-100 border border-transparent'
+                            }`}
+                            title={copiedIdentifier === log.identifier ? "Copied!" : "Copy identifier"}
+                          >
+                            {copiedIdentifier === log.identifier ? (
+                              <Check size={13} className="text-emerald-600" />
+                            ) : (
+                              <Copy size={13} />
+                            )}
+                          </button>
+                          {copiedIdentifier === log.identifier && (
+                            <span className="text-[10px] font-bold text-emerald-600 shrink-0">Copied!</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`px-2.5 py-1 rounded-lg text-[11px] font-black border ${
+                          log.event_type.includes('SUCCESS') ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                          log.event_type.includes('FAILED') ? 'bg-rose-50 text-rose-700 border-rose-200' :
+                          'bg-cyan-50 text-cyan-700 border-cyan-200'
                         }`}>
                           {log.event_type}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-center">
                         {log.count > 1 || (log.count === 1 && log.method && log.method.includes('otp')) ? (
-                          <span className="bg-cyan-100 text-cyan-700 px-2 py-0.5 rounded-full text-xs font-bold">
+                          <span className="bg-cyan-100 text-cyan-800 px-2.5 py-0.5 rounded-full text-xs font-black border border-cyan-200">
                             {log.count || 1}
                           </span>
                         ) : (
@@ -557,25 +639,28 @@ export const AnalyticsPanel = ({ apikey }) => {
         </motion.div>
 
         {/* IP Tracking / OTP Breakdown by Identifier */}
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col">
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="w-full bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col">
           <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-3">
-            <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2 uppercase tracking-wider">
-              <ShieldAlert className="text-red-500" size={16} /> OTP Breakdown
-            </h3>
+            <div>
+              <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2 uppercase tracking-wider">
+                <ShieldAlert className="text-red-500" size={16} /> OTP Breakdown
+              </h3>
+              <p className="text-xs text-slate-400 mt-0.5">High-frequency OTP tracking by client IP and user identifier</p>
+            </div>
             {/* View Switcher */}
             <div className="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200/60">
               <button
                 onClick={() => setRightCardTab('ip')}
-                className={`px-2.5 py-1 text-[11px] font-bold rounded-md transition-all ${
-                  rightCardTab === 'ip' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${
+                  rightCardTab === 'ip' ? 'bg-white text-slate-900 shadow-sm font-black' : 'text-slate-500 hover:text-slate-800'
                 }`}
               >
                 By IP
               </button>
               <button
                 onClick={() => setRightCardTab('user')}
-                className={`px-2.5 py-1 text-[11px] font-bold rounded-md transition-all ${
-                  rightCardTab === 'user' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${
+                  rightCardTab === 'user' ? 'bg-white text-slate-900 shadow-sm font-black' : 'text-slate-500 hover:text-slate-800'
                 }`}
               >
                 By User
@@ -588,17 +673,17 @@ export const AnalyticsPanel = ({ apikey }) => {
             <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
-              placeholder={rightCardTab === 'ip' ? "Filter by IP..." : "Filter by email / phone..."}
+              placeholder={rightCardTab === 'ip' ? "Filter by IP address..." : "Filter by email or phone number..."}
               value={otpSearch}
               onChange={(e) => setOtpSearch(e.target.value)}
-              className="w-full pl-8 pr-3 py-1 text-xs bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all text-slate-700"
+              className="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all text-slate-700"
             />
           </div>
 
           {/* Fixed Height Content with Infinite Scroll */}
           <div 
             onScroll={handleOtpScroll}
-            className="overflow-y-auto h-[340px] pr-1 custom-scrollbar"
+            className="overflow-y-auto h-[300px] pr-1 custom-scrollbar"
           >
             {loadingOtp ? (
               <div className="h-full flex items-center justify-center text-slate-400 text-sm gap-2">
@@ -608,27 +693,51 @@ export const AnalyticsPanel = ({ apikey }) => {
             ) : otpItems.length === 0 ? (
               <div className="h-full flex items-center justify-center text-slate-400 text-sm">No OTP breakdown data found.</div>
             ) : (
-              <div className="space-y-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {otpItems.map((item, i) => (
-                  <div key={i} className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100 hover:border-slate-200 transition-colors">
+                  <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100 hover:border-slate-200 hover:bg-slate-100/60 transition-colors">
                     {rightCardTab === 'ip' ? (
-                      <div className="font-mono text-xs font-semibold text-slate-700">{item.key}</div>
+                      <div className="flex items-center gap-2 overflow-hidden mr-2">
+                        <span className="font-mono text-xs font-bold text-slate-700 truncate select-all">{item.key}</span>
+                        <button
+                          onClick={(e) => copyIdentifier(item.key, e)}
+                          className="p-1 rounded text-slate-400 hover:text-cyan-700 hover:bg-white transition-all shrink-0 cursor-pointer"
+                          title="Copy IP"
+                        >
+                          {copiedIdentifier === item.key ? (
+                            <Check size={12} className="text-emerald-600" />
+                          ) : (
+                            <Copy size={12} />
+                          )}
+                        </button>
+                      </div>
                     ) : (
                       <div className="flex items-center gap-2 overflow-hidden mr-2">
                         {item.key.includes('@') ? (
-                          <Mail size={14} className="text-cyan-500 flex-shrink-0" />
+                          <Mail size={14} className="text-cyan-600 flex-shrink-0" />
                         ) : (
-                          <Phone size={14} className="text-blue-500 flex-shrink-0" />
+                          <Phone size={14} className="text-blue-600 flex-shrink-0" />
                         )}
-                        <span className="text-xs font-semibold text-slate-800 truncate" title={item.key}>
+                        <span className="text-xs font-semibold text-slate-800 truncate select-all" title={item.key}>
                           {item.key}
                         </span>
+                        <button
+                          onClick={(e) => copyIdentifier(item.key, e)}
+                          className="p-1 rounded text-slate-400 hover:text-cyan-700 hover:bg-white transition-all shrink-0 cursor-pointer"
+                          title="Copy User Identifier"
+                        >
+                          {copiedIdentifier === item.key ? (
+                            <Check size={12} className="text-emerald-600" />
+                          ) : (
+                            <Copy size={12} />
+                          )}
+                        </button>
                       </div>
                     )}
-                    <div className={`px-2 py-0.5 rounded-full text-xs font-bold flex-shrink-0 ${
+                    <div className={`px-2.5 py-1 rounded-full text-xs font-black flex-shrink-0 ${
                       rightCardTab === 'ip'
-                        ? item.count > 10 ? 'bg-red-100 text-red-600' : item.count > 5 ? 'bg-amber-100 text-amber-600' : 'bg-slate-200 text-slate-600'
-                        : 'bg-cyan-100 text-cyan-700'
+                        ? item.count > 10 ? 'bg-rose-100 text-rose-700 border border-rose-200' : item.count > 5 ? 'bg-amber-100 text-amber-700 border border-amber-200' : 'bg-slate-200 text-slate-700'
+                        : 'bg-cyan-100 text-cyan-800 border border-cyan-200'
                     }`}>
                       {item.count} {rightCardTab === 'ip' ? (item.count === 1 ? 'hit' : 'hits') : 'OTPs'}
                     </div>
@@ -636,7 +745,7 @@ export const AnalyticsPanel = ({ apikey }) => {
                 ))}
 
                 {loadingMoreOtp && (
-                  <div className="py-2 text-center text-slate-500 text-xs font-medium flex items-center justify-center gap-2">
+                  <div className="py-2 text-center text-slate-500 text-xs font-medium flex items-center justify-center gap-2 col-span-full">
                     <div className="w-3.5 h-3.5 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
                     <span>Loading more...</span>
                   </div>

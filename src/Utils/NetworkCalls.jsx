@@ -6,60 +6,76 @@ import Cookies from "js-cookie";
 import { useLocation } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 
+export const getValidAccessToken = async () => {
+  const backend_url = APP_CONFIG.BACKEND_URL;
+  const accessToken = Cookies.get('access_token') || '';
+  const refreshToken = Cookies.get('refresh_token') || '';
 
+  // 1. Check if access token is valid and not expired (with 30s buffer)
+  if (accessToken) {
+    try {
+      const decoded = jwtDecode(accessToken);
+      if (decoded && decoded.exp && decoded.exp > Math.floor(Date.now() / 1000) + 30) {
+        return accessToken;
+      }
+    } catch (e) {
+      console.warn("Error decoding access token:", e);
+    }
+  }
+
+  // 2. If access token is missing or expired, attempt to refresh using refresh token
+  if (refreshToken) {
+    try {
+      const decodedRefresh = jwtDecode(refreshToken);
+      if (decodedRefresh && decodedRefresh.exp && decodedRefresh.exp > Math.floor(Date.now() / 1000)) {
+        const res = await axios.get(`${backend_url}/user/token`, {
+          headers: { Authorization: `Bearer ${refreshToken}` },
+          timeout: 12000
+        });
+        const newToken = res.data?.access_token;
+        if (newToken) {
+          Cookies.set('access_token', newToken, { expires: 7, path: '/' });
+          return newToken;
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to refresh access token with refresh token:", e);
+    }
+  }
+
+  return null;
+};
 
 export const useNetworkCalls = () => {
   const { setIsLoggedIn } = useContext(AuthContext);
-  const location =useLocation()
+  const location = useLocation();
   const backend_url = APP_CONFIG.BACKEND_URL;
 
   const call = async ({ method, path, data = null, withCred = true }) => {
     const urlToCall = `${backend_url}${path}`;
     method = method.toUpperCase();
 
-    var accessToken=Cookies.get('access_token') || ''
-    const refreshToken=Cookies.get('refresh_token') || ''
+    let access_headers = {};
 
+    if (withCred) {
+      const token = await getValidAccessToken();
+      if (!token) {
+        console.warn("No valid access or refresh token found. User needs to re-authenticate.");
+        Cookies.remove('user_name', { path: '/' });
+        Cookies.remove('user_profile', { path: '/' });
+        Cookies.remove('user_email', { path: '/' });
+        Cookies.remove('access_token', { path: '/' });
+        Cookies.remove('refresh_token', { path: '/' });
+        setIsLoggedIn(false);
 
-    var decodedAccessToken=null
-    const decodedRefreshToken = refreshToken!=='' ? jwtDecode(refreshToken) : null
-
-    if (accessToken!==''){
-      decodedAccessToken=jwtDecode(accessToken)
-    }
-
-    var access_headers={
-      Authorization:`Bearer ${accessToken}`
-    }
-
-    console.log("Before access token headers : ",access_headers);
-    
-    
-    console.warn('broo is this true or false ;',decodedAccessToken?.exp < Math.floor(Date.now() / 1000),'ohhh',decodedAccessToken);
-    if (decodedRefreshToken?.exp < Math.floor(Date.now() / 1000)){
-      console.warn("Refresh Token Expired....Please login again");
-      return;
-    }
-
-    if (decodedAccessToken?.exp < Math.floor(Date.now() / 1000)){
-      console.warn("Access Token Expired....Geting new token");
-      
-      const refresh_headers={
-        Authorization:`Bearer ${refreshToken}`
+        const publicRoutes = ['/', '/contact', '/auth-docs', '/pricing', '/privacy', '/terms'];
+        if (!publicRoutes.includes(location.pathname)) {
+          window.location.href = '/';
+        }
+        return null;
       }
-      const res=await axios.get(`${backend_url}/user/token`,{headers:refresh_headers})
-      console.log("Log For getting New Access TOken From NetWorkCalls : ",res.data);
-      
-      const new_access_token=res.data['access_token']
-      console.log("New Accesst token from NetworkCalls : ",new_access_token);
-      access_headers={
-        Authorization:`Bearer ${new_access_token}`
-      }
-      Cookies.set('access_token',new_access_token)
-      
+      access_headers = { Authorization: `Bearer ${token}` };
     }
-
-    console.log("After access token headers : ",access_headers);
 
     try {
       let response;
@@ -69,25 +85,31 @@ export const useNetworkCalls = () => {
       else if (method === "PUT") response = await axios.put(urlToCall, data, reqConfig);
       else if (method === "DELETE") response = await axios.delete(urlToCall, reqConfig);
       else throw new Error("Unsupported HTTP method");
-      console.log("Headers from Networkcalls : ",response.headers)
-      if (response.status === 200) return response.data;
-    } catch (error) {
-      const response = error.response;
 
-      if (response?.status === 401 && response.data?.detail?.logout) {
-        console.warn("Your token is expired. Please login again.");
-        Cookies.remove('user_name')
-        Cookies.remove('user_profile')
-        Cookies.remove('access_token')
-        Cookies.remove('refresh_token')
-        if (location.pathname!='/'){
-          window.location.href='/'
-          console.warn("You  need to go back to home page and sigin in again");
-          
-        }
+      if (response.status === 200 || response.status === 201) return response.data;
+      return response.data || null;
+    } catch (error) {
+      const response = error?.response;
+
+      if (response?.status === 401 && (response.data?.detail?.logout || response.data?.detail === "Invalid token or token expierd")) {
+        console.warn("Your token has expired. Please sign in again.");
+        Cookies.remove('user_name', { path: '/' });
+        Cookies.remove('user_profile', { path: '/' });
+        Cookies.remove('user_email', { path: '/' });
+        Cookies.remove('access_token', { path: '/' });
+        Cookies.remove('refresh_token', { path: '/' });
         setIsLoggedIn(false);
+
+        const publicRoutes = ['/', '/contact', '/auth-docs', '/pricing', '/privacy', '/terms'];
+        if (!publicRoutes.includes(location.pathname)) {
+          window.location.href = '/';
+        }
       }
-      console.error(`Error From NetworkCalls\n\nCatched Error : ${error}\n\nRespone Error : ${response.status} ${response?.data?.detail} Headers : ${response.headers}`)
+      console.error(
+        `Error from NetworkCalls [${method} ${path}]:`,
+        error?.message || error,
+        response ? `Status: ${response.status}` : 'No response from server'
+      );
       return null;
     }
   };

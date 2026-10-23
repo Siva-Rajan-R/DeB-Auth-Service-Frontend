@@ -7,7 +7,7 @@ import Lottie from 'lottie-react';
 import FingerprintLottie from '../../assets/lotties/Fingerprint Scanning-2.json';
 
 import { useState } from 'react';
-import { useNetworkCalls } from '../../Utils/NetworkCalls';
+import { useNetworkCalls, getValidAccessToken } from '../../Utils/NetworkCalls';
 import Cookies from 'js-cookie';
 
 export const LandingHero = () => {
@@ -16,15 +16,18 @@ export const LandingHero = () => {
   const [loading, setLoading] = useState(false);
 
   const handleStartBuilding = async () => {
-    if (Cookies.get('access_token')) {
+    setLoading(true);
+    const token = await getValidAccessToken();
+    if (token) {
+      setLoading(false);
       navigate('/dashboard');
       return;
     }
-    setLoading(true);
+
     try {
       const res = await call({ method: 'GET', path: '/user/auth', withCred: false });
       if (res) {
-        Cookies.set('isInitiated', true);
+        Cookies.set('isInitiated', true, { expires: 1, path: '/' });
         const targetUrl = res.signin_url || res.login_url || res.data?.signin_url || res.data?.login_url;
         if (targetUrl) {
           window.location.href = targetUrl;
@@ -147,7 +150,7 @@ export const LandingHero = () => {
             disabled={loading}
             className="neu-button w-full sm:w-auto px-8 py-4 rounded-2xl font-extrabold text-base text-cyan-600 transition-all flex items-center justify-center gap-3 disabled:opacity-60"
           >
-            {loading ? 'Launching...' :"Start Building — It's Free"}
+            {loading ? 'Launching...' : "Start Building | Free"}
             <ArrowRight size={18} />
           </button>
           <button

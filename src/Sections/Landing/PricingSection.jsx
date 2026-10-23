@@ -94,7 +94,7 @@ export const PricingSection = () => {
             viewport={{ once: true }}
             className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-100 -cyan-200 text-cyan-800 text-xs font-semibold"
           >
-            <Sparkles size={14} /> Transparent Pricing
+            <ShieldCheck size={14} /> Transparent Pricing
           </motion.div>
 
           <motion.h2
@@ -118,7 +118,7 @@ export const PricingSection = () => {
 
         {/* Definition Highlight Box */}
         <div className="max-w-3xl mx-auto bg-[#f8fafc] -cyan-300 rounded-2xl p-6 mb-16 neu-flat text-center">
-          <span className="text-xs font-mono text-cyan-800 uppercase font-bold tracking-widest block mb-2">
+          <span className="text-xs text-cyan-800 uppercase font-bold tracking-widest block mb-2">
             FAIR PRICING DEFINITION
           </span>
           <p className="text-base font-extrabold text-slate-900">
@@ -170,11 +170,17 @@ export const PricingSection = () => {
 
                 <div className="flex items-baseline gap-1 mb-6">
                   <span className="text-4xl font-black text-slate-900">{plan.price}</span>
-                  <span className="text-xs text-slate-500 font-mono">{plan.period}</span>
+                  <span className="text-xs text-slate-500 font-semibold">{plan.period}</span>
                 </div>
 
                 <button
-                  onClick={() => navigate('/auth')}
+                  onClick={() => {
+                    if (plan.cta === 'Contact Sales' || plan.name === 'Enterprise') {
+                      navigate('/contact');
+                    } else {
+                      navigate('/auth');
+                    }
+                  }}
                   className={`w-full py-3 px-4 rounded-xl font-extrabold text-xs transition-all mb-6 ${
                     plan.popular
                       ? 'bg-cyan-500 text-white hover:bg-cyan-600 shadow-lg shadow-cyan-500/20'
@@ -195,7 +201,7 @@ export const PricingSection = () => {
               </div>
 
               {plan.period && (
-                <div className="text-[10px] text-slate-500 font-mono text-center mt-6 pt-4">
+                <div className="text-[10px] text-slate-500 font-medium text-center mt-6 pt-4">
                   Payment gateway charges may apply.
                 </div>
               )}
@@ -207,7 +213,7 @@ export const PricingSection = () => {
         <div className="bg-[#f8fafc] rounded-3xl p-8 max-w-4xl mx-auto neu-flat">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div>
-              <div className="inline-flex items-center gap-2 text-cyan-800 text-xs font-mono font-bold uppercase tracking-wider mb-2">
+              <div className="inline-flex items-center gap-2 text-cyan-800 text-xs font-bold uppercase tracking-wider mb-2">
                 <AlertCircle size={14} /> Mobile OTP Usage Billing
               </div>
               <h4 className="text-xl font-bold text-slate-900 tracking-tight mb-1">
@@ -219,9 +225,9 @@ export const PricingSection = () => {
             </div>
 
             <div className="p-4 rounded-2xl text-center min-w-[200px] neu-flat">
-              <span className="text-[10px] text-slate-500 font-mono uppercase block">INDIA SMS RATE</span>
+              <span className="text-[10px] text-slate-500 font-semibold uppercase block">INDIA SMS RATE</span>
               <span className="text-2xl font-black text-cyan-700 tracking-tight">₹0.40</span>
-              <span className="text-[10px] text-slate-500 block font-mono">per successful OTP delivery</span>
+              <span className="text-[10px] text-slate-500 block font-medium">per successful OTP delivery</span>
             </div>
           </div>
         </div>

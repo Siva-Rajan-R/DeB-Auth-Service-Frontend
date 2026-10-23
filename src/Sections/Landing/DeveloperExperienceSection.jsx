@@ -4,7 +4,7 @@ import { Terminal, Code, Cpu, ArrowRight, CheckCircle2, Webhook, FileText, Setti
 export const DeveloperExperienceSection = () => {
   const devFeatures = [
     { title: "REST API", desc: "Clean HTTP API with predictable request/response JSON models" },
-    { title: "SDK-Ready Architecture", desc: "Easily wrap endpoints for Python, Node.js, Go, or Ruby" },
+    { title: "Universal REST & OAuth", desc: "Zero SDK lock-in — integrate directly with HTTP requests in any language" },
     { title: "OAuth 2.0 Compatible Flows", desc: "Uses standard authorization code exchange pattern" },
     { title: "Secure Authorization Code", desc: "Short-lived one-time code verification on backend" },
     { title: "Client ID + Client Secret", desc: "Standard app credentials for authentication requests" },
@@ -53,7 +53,7 @@ export const DeveloperExperienceSection = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="bg-[#f8fafc] rounded-3xl p-8 mb-16 font-mono text-xs text-slate-800 neu-flat relative overflow-hidden"
+          className="bg-[#f8fafc] rounded-3xl p-8 mb-16 text-xs text-slate-800 neu-flat relative overflow-hidden"
         >
           <div className="text-cyan-700 font-bold mb-4 flex items-center gap-2">
             <Cpu size={16} /> ARCHITECTURE SIMPLIFICATION

@@ -96,7 +96,7 @@ export const WhyDauthSection = () => {
         {/* SECURITY PHILOSOPHY SECTION */}
         <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-8 sm:p-12 neu-flat relative text-white">
           <div className="max-w-3xl mb-8">
-            <div className="inline-flex items-center gap-2 text-cyan-400 font-mono text-xs font-bold uppercase mb-2">
+            <div className="inline-flex items-center gap-2 text-cyan-400 text-xs font-bold uppercase mb-2">
               <Lock size={14} /> Security Philosophy
             </div>
             <h3 className="text-3xl font-black text-white tracking-tight mb-3">
