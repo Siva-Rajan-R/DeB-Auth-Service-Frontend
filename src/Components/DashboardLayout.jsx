@@ -1,6 +1,7 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { MdOutlineKeyboardBackspace, MdDashboard } from "react-icons/md";
-import { Sun, BookOpen, Lock, FileText, AlertTriangle, Settings, Crown, ChevronRight, Zap, LogOut, Code, Copy, Check, BarChart2, FolderKanban } from 'lucide-react';
+import { Sun, BookOpen, Lock, FileText, AlertTriangle, Settings, Crown, ChevronRight, Zap, LogOut, Code, Copy, Check, BarChart2, FolderKanban, MoreHorizontal, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthConfigStore } from '../Store/useAuthConfigStore';
 import { useEffect, useState } from 'react';
 import { useNetworkCalls } from '../Utils/NetworkCalls';
@@ -12,6 +13,7 @@ export const DashboardLayout = () => {
   const { theme, toggleTheme, projectName } = useAuthConfigStore();
   const [subscriptionState, setSubscriptionState] = useState(null);
   const [copiedSdk, setCopiedSdk] = useState(false);
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
   const { call } = useNetworkCalls();
 
   const [isLoggedIn, setIsLoggedIn] = useState(() => Boolean(Cookies.get('access_token') || Cookies.get('refresh_token')));
@@ -166,6 +168,10 @@ export const DashboardLayout = () => {
     document.documentElement.setAttribute('data-theme', 'light');
   }, [theme, toggleTheme]);
 
+  useEffect(() => {
+    setShowMoreMenu(false);
+  }, [location.pathname]);
+
   const handleLogout = () => {
     Cookies.remove('user_name', { path: '/' });
     Cookies.remove('user_email', { path: '/' });
@@ -176,13 +182,13 @@ export const DashboardLayout = () => {
   };
 
   const navItems = [
-    { name: 'Auth Projects',     mobileLabel: 'Projects',  path: '/dashboard',        icon: <MdDashboard size={18} />, badge: null },
-    { name: 'Analytics',         mobileLabel: 'Analytics', path: '/analytics',        icon: <BarChart2 size={17} />,   badge: null },
-    { name: 'Create Project',    mobileLabel: 'Create',    path: '/dashboard-detail',  icon: <FolderKanban size={17} />, badge: 'NEW' },
-    { name: 'API Documentation', mobileLabel: 'Docs',      path: '/auth-docs',         icon: <BookOpen size={17} />,    badge: null },
-    { name: 'Settings',          mobileLabel: 'Settings',  path: '/settings',          icon: <Settings size={17} />,    badge: null },
-    { name: 'Invoices',          mobileLabel: 'Invoices',  path: '/invoices',          icon: <FileText size={17} />,    badge: null },
-    { name: 'Upgrade Plan',      mobileLabel: 'Upgrade',   path: '/pricing',           icon: <Crown size={17} />,       badge: 'PRO', isUpgrade: true },
+    { name: 'Auth Projects',     mobileLabel: 'Projects',  path: '/dashboard',        icon: <MdDashboard size={18} />, badge: null, desc: 'Manage your client apps & tokens' },
+    { name: 'Analytics',         mobileLabel: 'Analytics', path: '/analytics',        icon: <BarChart2 size={17} />,   badge: null, desc: 'Sign-in logs, trends & usage metrics' },
+    { name: 'Create Project',    mobileLabel: 'Create',    path: '/dashboard-detail',  icon: <FolderKanban size={17} />, badge: 'NEW', desc: 'Design auth styles & registration' },
+    { name: 'API Documentation', mobileLabel: 'Docs',      path: '/auth-docs',         icon: <BookOpen size={17} />,    badge: null, desc: 'SDKs, endpoints & integration guides' },
+    { name: 'Settings',          mobileLabel: 'Settings',  path: '/settings',          icon: <Settings size={17} />,    badge: null, desc: 'Account profile & security settings' },
+    { name: 'Invoices',          mobileLabel: 'Invoices',  path: '/invoices',          icon: <FileText size={17} />,    badge: null, desc: 'Billing history & transaction receipts' },
+    { name: 'Upgrade Plan',      mobileLabel: 'Upgrade',   path: '/pricing',           icon: <Crown size={17} />,       badge: 'PRO', isUpgrade: true, desc: 'Unlock unlimited projects & SSO' },
   ];
 
   const getPageTitle = () => {
@@ -429,16 +435,19 @@ export const DashboardLayout = () => {
           <Outlet />
         </main>
 
-        {/* Mobile Bottom Bar */}
+        {/* Mobile Bottom Bar (4 primary items + More) */}
         {!isDocsLoggedOut && (
-          <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-2xl border-t border-slate-200/90 pb-safe pt-1.5 px-2 flex items-center justify-between shadow-[0_-4px_20px_rgba(0,0,0,0.06)] overflow-x-auto no-scrollbar">
-            {navItems.map((item) => {
+          <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-2xl border-t border-slate-200/90 pb-safe pt-1.5 px-3 flex items-center justify-around shadow-[0_-4px_25px_rgba(0,0,0,0.06)] select-none">
+            {navItems.slice(0, 4).map((item) => {
               const isActive = location.pathname === item.path;
               return (
                 <button
                   key={item.name}
-                  onClick={() => navigate(item.path)}
-                  className={`flex-1 min-w-[48px] max-w-[68px] flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all relative ${
+                  onClick={() => {
+                    setShowMoreMenu(false);
+                    navigate(item.path);
+                  }}
+                  className={`flex-1 flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all relative ${
                     isActive
                       ? 'text-cyan-700 bg-cyan-50/90 font-black shadow-xs'
                       : 'text-slate-500 hover:text-slate-800 font-bold hover:bg-slate-50'
@@ -461,8 +470,144 @@ export const DashboardLayout = () => {
                 </button>
               );
             })}
+
+            {/* 5th Tab: More Button */}
+            {(() => {
+              const isOtherActive = !navItems.slice(0, 4).some((item) => item.path === location.pathname);
+              return (
+                <button
+                  onClick={() => setShowMoreMenu((prev) => !prev)}
+                  className={`flex-1 flex flex-col items-center justify-center py-1.5 px-1 rounded-2xl transition-all relative ${
+                    showMoreMenu || isOtherActive
+                      ? 'text-cyan-700 bg-cyan-50/90 font-black shadow-xs'
+                      : 'text-slate-500 hover:text-slate-800 font-bold hover:bg-slate-50'
+                  }`}
+                  title="More Navigation"
+                >
+                  <div className={`relative mb-0.5 transition-transform ${showMoreMenu || isOtherActive ? 'scale-110 text-cyan-600' : 'scale-100'}`}>
+                    <MoreHorizontal size={18} />
+                    {isOtherActive && (
+                      <span className="absolute -top-0.5 -right-1 w-2 h-2 rounded-full bg-cyan-500 ring-2 ring-white" />
+                    )}
+                  </div>
+                  <span className="text-[10px] tracking-tight leading-tight truncate w-full text-center">
+                    More
+                  </span>
+                </button>
+              );
+            })()}
           </nav>
         )}
+
+        {/* Mobile "More" Full Navigation Drawer */}
+        <AnimatePresence>
+          {showMoreMenu && (
+            <>
+              {/* Dimmed backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setShowMoreMenu(false)}
+                className="lg:hidden fixed inset-0 bg-slate-950/50 backdrop-blur-sm z-[70]"
+              />
+
+              {/* Bottom Sheet Menu */}
+              <motion.div
+                initial={{ opacity: 0, y: '100%' }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: '100%' }}
+                transition={{ type: 'spring', damping: 28, stiffness: 320 }}
+                className="lg:hidden fixed bottom-0 left-0 right-0 z-[80] bg-white rounded-t-[28px] shadow-[0_-20px_50px_rgba(0,0,0,0.2)] border-t border-slate-200/90 pb-safe pt-3 px-4 max-h-[85vh] flex flex-col"
+              >
+                {/* Pull handle indicator */}
+                <div className="w-12 h-1.5 bg-slate-300 rounded-full mx-auto mb-3 shrink-0" />
+
+                {/* Header */}
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100 shrink-0">
+                  <div>
+                    <h3 className="text-sm font-black text-slate-900 tracking-tight">All Navigation Options</h3>
+                    <p className="text-[11px] font-medium text-slate-500">Quick access to all platform areas</p>
+                  </div>
+                  <button
+                    onClick={() => setShowMoreMenu(false)}
+                    className="p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+
+                {/* Navigation Items List */}
+                <div className="overflow-y-auto py-3 space-y-1.5 custom-scrollbar flex-1">
+                  {navItems.map((item) => {
+                    const isActive = location.pathname === item.path;
+                    return (
+                      <button
+                        key={item.name}
+                        onClick={() => {
+                          setShowMoreMenu(false);
+                          navigate(item.path);
+                        }}
+                        className={`w-full flex items-center justify-between p-3 rounded-2xl text-left transition-all ${
+                          isActive
+                            ? 'bg-cyan-50/90 border border-cyan-200 text-cyan-900 shadow-xs'
+                            : 'hover:bg-slate-50 border border-transparent text-slate-700'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className={`p-2.5 rounded-xl shrink-0 transition-colors ${
+                            isActive
+                              ? 'bg-cyan-500 text-white shadow-md shadow-cyan-500/20'
+                              : 'bg-slate-100 text-slate-600'
+                          }`}>
+                            {item.icon}
+                          </div>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-black tracking-tight truncate">{item.name}</span>
+                              {item.badge && (
+                                <span className={`text-[9px] font-black px-1.5 py-0.5 rounded-full uppercase leading-none ${
+                                  item.isUpgrade ? 'bg-amber-500 text-white' : 'bg-cyan-500 text-white'
+                                }`}>
+                                  {item.badge}
+                                </span>
+                              )}
+                            </div>
+                            {item.desc && (
+                              <p className="text-[10px] text-slate-500 font-medium truncate mt-0.5">{item.desc}</p>
+                            )}
+                          </div>
+                        </div>
+                        <ChevronRight size={15} className={isActive ? 'text-cyan-600 shrink-0' : 'text-slate-300 shrink-0'} />
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Account row at bottom of sheet */}
+                {isLoggedIn && (
+                  <div className="pt-3 pb-2 border-t border-slate-100 flex items-center justify-between shrink-0">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-600 text-white font-black text-xs flex items-center justify-center shrink-0">
+                        {userData.name?.[0]?.toUpperCase() || 'U'}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-bold text-slate-800 truncate">{userData.name || 'User'}</p>
+                        <p className="text-[10px] text-slate-400 truncate">{userData.email}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 transition-colors"
+                    >
+                      <LogOut size={13} /> Logout
+                    </button>
+                  </div>
+                )}
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

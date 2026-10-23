@@ -29,8 +29,14 @@ const selectStyles = {
     backgroundColor: 'var(--bg-card)', 
     borderRadius: '0.75rem', 
     border: '1px solid var(--border-glass)',
-    backdropFilter: 'blur(12px)',
+    backdropFilter: 'blur(16px)',
     overflow: 'hidden',
+    boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.25)',
+    zIndex: 9999,
+  }),
+  menuPortal: (b) => ({
+    ...b,
+    zIndex: 9999,
   }),
   option: (b, s) => ({
     ...b, 
@@ -91,6 +97,8 @@ const SortableField = ({ field }) => {
             onChange={(opt) => updateSignupField(field.id, { type: opt.value })}
             styles={selectStyles}
             isSearchable={false}
+            menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
+            menuPosition='fixed'
           />
         </div>
         <div className='flex items-center pt-4'>

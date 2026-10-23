@@ -750,7 +750,7 @@ export const LivePreview = ({ activeTab }) => {
 
   return (
     <div
-      className='w-full h-full flex flex-col items-center overflow-y-auto overflow-x-hidden relative transition-all duration-500 py-10 px-4 custom-scrollbar'
+      className='w-full h-full flex flex-col items-center overflow-y-auto overflow-x-hidden relative py-10 px-4 custom-scrollbar'
       style={bgStyle}
     >
       {/* Background pattern overlay */}
@@ -770,10 +770,10 @@ export const LivePreview = ({ activeTab }) => {
       />
 
       <motion.div
-        key={`${activeMode}-${rawCardBg}-${primary_color}-${border_radius}-${card_variant}`}
-        initial={{ opacity: 0, scale: 0.97, y: 8 }}
+        key={activeMode}
+        initial={false}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 0.3, ease: 'easeOut' }}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
         className='relative w-full mx-auto my-auto p-8 z-10 shrink-0'
         style={{
           maxWidth: '384px',

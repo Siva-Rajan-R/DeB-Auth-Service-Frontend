@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import Select from 'react-select';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 import { APP_CONFIG } from '../../config';
 import { getValidAccessToken } from '../../Utils/NetworkCalls';
 
@@ -143,13 +144,13 @@ const Section = ({ title, icon, sectionKey, openSections, toggleSection, childre
 
 // ─── Component: Logo Uploader Widget ─────────────────────────────────────────
 const LogoUploader = () => {
-  const { updateUIConfig } = useAuthConfigStore();
+  const { uiConfig, updateUIConfig } = useAuthConfigStore();
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
   const handleFileChange = async (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (!file) return;
 
     setError('');
@@ -157,24 +158,26 @@ const LogoUploader = () => {
 
     if (file.size > 2 * 1024 * 1024) {
       setError('File size must be under 2MB.');
+      e.target.value = '';
       return;
     }
 
     if (!file.type.startsWith('image/')) {
       setError('Only image files are allowed.');
+      e.target.value = '';
       return;
     }
 
     const formData = new FormData();
     formData.append('file', file);
-    if (uiConfig.brand_logo) {
+    if (uiConfig?.brand_logo) {
       formData.append('old_logo_url', uiConfig.brand_logo);
     }
 
     setUploading(true);
     try {
       const backendUrl = APP_CONFIG.BACKEND_URL;
-      const token = await getValidAccessToken();
+      const token = (await getValidAccessToken()) || Cookies.get('access_token') || Cookies.get('token');
 
       const res = await axios.post(`${backendUrl}/user/secrets/upload-logo`, formData, {
         headers: {
@@ -184,15 +187,17 @@ const LogoUploader = () => {
         withCredentials: true,
       });
 
-      if (res.data.logo_url) {
+      if (res.data?.logo_url) {
         updateUIConfig('brand_logo', res.data.logo_url);
         setSuccess(true);
       }
     } catch (err) {
-      const msg = err.response?.data?.detail || 'Failed to upload image. Ensure server configuration is active.';
-      setError(msg);
+      console.error('Logo upload error:', err);
+      const msg = err.response?.data?.detail || err.message || 'Failed to upload image. Ensure server configuration is active.';
+      setError(typeof msg === 'string' ? msg : JSON.stringify(msg));
     } finally {
       setUploading(false);
+      if (e.target) e.target.value = '';
     }
   };
 
@@ -248,6 +253,11 @@ const selectStyles = {
     overflow: 'hidden',
     boxShadow: 'var(--glass-shadow)',
     padding: '4px',
+    zIndex: 9999,
+  }),
+  menuPortal: (b) => ({
+    ...b,
+    zIndex: 9999,
   }),
   option: (b, s) => ({
     ...b, 
@@ -763,6 +773,7 @@ export const SignInCustomizer = () => {
               onChange={(opt) => updateUIConfig('font_family', opt.value)}
               styles={selectStyles}
               isSearchable={false}
+              menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
               menuPosition='fixed'
             />
           </div>

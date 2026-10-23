@@ -405,12 +405,12 @@ export const DashboardDetail = () => {
 
       {/* Floating Action Pill Button for Live Preview (Mobile/Tablet only - desktop already has the dedicated preview panel) */}
       {!showMobilePreview && (
-        <div className="lg:hidden fixed bottom-6 right-6 z-40">
+        <div className="lg:hidden fixed bottom-20 sm:bottom-22 right-4 sm:right-6 z-[60]">
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowMobilePreview(true)}
-            className="neu-button-primary flex items-center gap-2 px-4 py-3 text-white rounded-full font-black text-xs shadow-xl transition-all cursor-pointer"
+            className="neu-button-primary flex items-center gap-2 px-4 py-3 text-white rounded-full font-black text-xs shadow-2xl transition-all cursor-pointer ring-2 ring-white/20"
             title="Open Live Preview"
           >
             <div className="relative flex items-center justify-center">
@@ -439,7 +439,7 @@ export const DashboardDetail = () => {
             className={`fixed z-[100] flex flex-col bg-[#e8ecf4] rounded-3xl shadow-[0_25px_70px_-15px_rgba(15,23,42,0.45)] border border-slate-300/80 overflow-hidden ${
               isMaximized
                 ? 'inset-3 sm:inset-8 w-auto h-auto'
-                : 'bottom-6 right-6 w-[390px] sm:w-[430px] max-w-[calc(100vw-2rem)] h-[590px] max-h-[82vh]'
+                : 'bottom-20 sm:bottom-6 right-3 sm:right-6 w-[390px] sm:w-[430px] max-w-[calc(100vw-1.5rem)] h-[590px] max-h-[calc(100vh-6.5rem)]'
             }`}
           >
             {/* Window Titlebar */}
