@@ -201,6 +201,50 @@ const AutofillURLBuilder = () => {
   );
 };
 
+// ─── Error Code Toggle Field ──────────────────────────────────────────────────
+const ErrorCodeToggleField = ({ enabled, onToggle }) => (
+  <div className='flex items-start justify-between gap-4 p-4 rounded-xl border border-[var(--border-glass)] bg-[var(--bg-deep)] hover:bg-[var(--bg-card)] transition-colors'>
+    <div className='space-y-1.5'>
+      <div className='flex items-center gap-2'>
+        <div className='p-1.5 rounded-lg bg-cyan-100/70 border border-cyan-300/70 text-cyan-700'>
+          <Code2 size={14} />
+        </div>
+        <span className='text-slate-900 text-xs font-bold'>Show Error Codes on Login Portal</span>
+        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold border transition-colors ${
+          enabled 
+            ? 'bg-cyan-100 text-cyan-800 border-cyan-300' 
+            : 'bg-slate-200 text-slate-700 border-slate-300'
+        }`}>
+          {enabled ? 'Enabled' : 'Disabled'}
+        </span>
+      </div>
+      <p className='text-slate-600 text-xs font-medium leading-relaxed max-w-xl'>
+        When enabled, failure responses and verification webhook errors will include HTTP error codes on the portal (e.g.{' '}
+        <code className='px-1.5 py-0.5 rounded bg-cyan-100/80 text-cyan-800 border border-cyan-300/70 font-mono text-[11px] font-bold'>[401] Invalid credentials</code>). When disabled, only the clean error message is displayed (e.g.{' '}
+        <code className='px-1.5 py-0.5 rounded bg-slate-200/80 text-slate-800 border border-slate-300/70 font-mono text-[11px] font-bold'>Invalid credentials</code>).
+      </p>
+    </div>
+    <button
+      type='button'
+      role='switch'
+      aria-checked={enabled}
+      onClick={onToggle}
+      className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 ease-in-out border-2 border-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50 mt-1 ${
+        enabled
+          ? 'bg-cyan-600 shadow-[0_0_10px_rgba(8,145,178,0.3)]'
+          : 'bg-slate-300 hover:bg-slate-400'
+      }`}
+    >
+      <span className='sr-only'>Toggle Show Error Codes</span>
+      <span
+        className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+          enabled ? 'translate-x-4' : 'translate-x-0'
+        }`}
+      />
+    </button>
+  </div>
+);
+
 // ─── Main RedirectURLPanel ────────────────────────────────────────────────────
 export const RedirectURLPanel = () => {
   const { redirectURLs, updateRedirectURL, activeMode } = useAuthConfigStore();
@@ -253,6 +297,10 @@ export const RedirectURLPanel = () => {
                 onChange={(val) => updateRedirectURL(key, val)}
               />
             ))}
+            <ErrorCodeToggleField
+              enabled={!!redirectURLs.show_error_codes}
+              onToggle={() => updateRedirectURL('show_error_codes', !redirectURLs.show_error_codes)}
+            />
           </div>
         </div>
       )}
@@ -289,6 +337,10 @@ export const RedirectURLPanel = () => {
                 onChange={(val) => updateRedirectURL(key, val)}
               />
             ))}
+            <ErrorCodeToggleField
+              enabled={!!redirectURLs.show_error_codes}
+              onToggle={() => updateRedirectURL('show_error_codes', !redirectURLs.show_error_codes)}
+            />
           </div>
         </div>
       )}

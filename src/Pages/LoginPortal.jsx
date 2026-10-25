@@ -14,6 +14,85 @@ import { useToastStore } from '../Store/useToastStore';
 
 const backend_url = APP_CONFIG.BACKEND_URL;
 
+const getDisplayErrorMessage = (err, defaultMsg = 'An error occurred', showErrorCodes = false) => {
+  const detail = err?.response?.data?.detail;
+  const statusCode = err?.response?.status;
+  const rawMsg = typeof detail === 'string' ? detail : detail?.message || detail?.msg || defaultMsg;
+  const errorCode = (typeof detail === 'object' && detail?.status_code)
+    ? detail.status_code
+    : (statusCode && statusCode !== 400 && statusCode !== 500 ? statusCode : null);
+
+  if (showErrorCodes && errorCode) {
+    return `[${errorCode}] ${rawMsg}`;
+  }
+  return rawMsg;
+};
+
+const isLocalhostUrl = (url) => {
+  if (!url) return false;
+  try {
+    const raw = String(url).trim();
+    const withProto = raw.startsWith('http://') || raw.startsWith('https://') ? raw : `http://${raw}`;
+    const parsed = new URL(withProto);
+    const host = parsed.hostname.toLowerCase();
+    return host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0' || host === '::1' || host === '[::1]';
+  } catch (e) {
+    return false;
+  }
+};
+
+const verifyLocalhostEndpoint = async (verificationUrl, payload, clientId, showErrorCodes = false) => {
+  if (!isLocalhostUrl(verificationUrl)) {
+    return { shouldProceed: true };
+  }
+
+  const rawUrl = String(verificationUrl).trim();
+  const targetUrl = rawUrl.startsWith('http://') || rawUrl.startsWith('https://') ? rawUrl : `http://${rawUrl}`;
+
+  try {
+    const res = await axios.post(targetUrl, payload, {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-dauth-request-id': String(payload?.request_id || ''),
+        'x-client-id': String(clientId || ''),
+        'User-Agent': 'DAuth-Browser-Client/1.0'
+      },
+      timeout: 8000
+    });
+
+    const data = res.data || {};
+    const isSuccess = (res.status >= 200 && res.status < 300)
+      && data.success !== false
+      && data.status !== 'error'
+      && data.status !== 'failed'
+      && data.status !== 'failure';
+
+    if (!isSuccess) {
+      const code = data.status_code || res.status || 401;
+      const rawMsg = data.message || data.msg || data.detail || data.error || `Verification failed with status code ${res.status}`;
+      const msg = (showErrorCodes && code) ? `[${code}] ${rawMsg}` : rawMsg;
+      return { success: false, error: msg, status_code: code, data };
+    }
+
+    return { success: true, data };
+  } catch (err) {
+    const resp = err.response;
+    if (resp) {
+      const data = resp.data || {};
+      const code = resp.status || data.status_code || 401;
+      const rawMsg = (typeof data === 'string' ? data : (data.message || data.msg || data.detail || data.error)) || `Verification failed with status code ${code}`;
+      const msg = (showErrorCodes && code) ? `[${code}] ${rawMsg}` : rawMsg;
+      return { success: false, error: msg, status_code: code, data };
+    }
+    return {
+      success: false,
+      isNetworkError: true,
+      error: `Failed to reach local verification endpoint (${targetUrl}). Ensure your local service is running and accessible.`,
+      status_code: 502
+    };
+  }
+};
+
 const PROVIDER_META = {
   password:  { icon: <RiLockPasswordLine />, label: 'Password',  color: '#22d3ee'  },
   google:    { icon: <GoogleLogo size={18} />,    label: 'Google',    color: '#ea4335'  },
@@ -357,8 +436,9 @@ const SocialMethods = ({ methods, socialLayout, textColor, borderRadius, auth_to
 const OTPFlow = ({
   request_id, onComplete, onSuccess, onBack,
   primary, textColor, btnTextColor, linkColor, buttonStyle, inputStyle, inputBorderColor, borderRadius,
-  prefillEmail, lockedEmail, isCardLight,          // ← autofill props
+  prefillEmail, lockedEmail, isCardLight, showErrorCodes,          // ← autofill & error props
   mode = 'email',
+  verificationUrl, failureUrl, clientId, isSignup, signupFields,
 }) => {
   const [step, setStep] = useState(0);
   const [formData, setFormData] = useState({ email: prefillEmail || '', otp: '' });
@@ -386,13 +466,7 @@ const OTPFlow = ({
       if (res.data.success) setStep(1);
     } catch (err) {
       const detail = err.response?.data?.detail;
-      const statusCode = err.response?.status;
-      const rawMsg = typeof detail === 'string' ? detail : detail?.message || detail?.msg || 'Failed to send OTP';
-      const displayMsg = (typeof detail === 'object' && detail?.status_code)
-        ? `[${detail.status_code}] ${rawMsg}`
-        : (statusCode && statusCode !== 400 && statusCode !== 500)
-          ? `[${statusCode}] ${rawMsg}`
-          : rawMsg;
+      const displayMsg = getDisplayErrorMessage(err, 'Failed to send OTP', showErrorCodes);
 
       useToastStore.getState().addToast(displayMsg, 'error');
       setError(displayMsg);
@@ -412,7 +486,41 @@ const OTPFlow = ({
     setError('');
     setLoading(true);
     try {
-      const res = await axios.post(`${backend_url}/auth/login/verify`, { request_id, otp: formData.otp }, {
+      let clientVerified = false;
+      let verifyResult = null;
+
+      if (isLocalhostUrl(verificationUrl) && (!isSignup || !signupFields?.length)) {
+        const verifyPayload = {
+          request_id,
+          flow_type: isSignup ? 'signup' : 'signin',
+          auth_provider: 'otp',
+          email: formData.email || prefillEmail || '',
+          mobile_number: formData.mobile_number || '',
+          otp: formData.otp,
+          ip: '127.0.0.1',
+          user_agent: window.navigator.userAgent,
+          client_id: clientId
+        };
+
+        const localRes = await verifyLocalhostEndpoint(verificationUrl, verifyPayload, clientId, showErrorCodes);
+        if (!localRes.shouldProceed && !localRes.success) {
+          useToastStore.getState().addToast(localRes.error, 'error');
+          setError(localRes.error);
+          setLoading(false);
+          return;
+        }
+        if (localRes.success) {
+          clientVerified = true;
+          verifyResult = localRes.data;
+        }
+      }
+
+      const res = await axios.post(`${backend_url}/auth/login/verify`, {
+        request_id,
+        otp: formData.otp,
+        client_verified: clientVerified,
+        verify_result: verifyResult
+      }, {
         withCredentials: true,
         headers: getDeviceFingerprintHeaders()
       });
@@ -420,13 +528,7 @@ const OTPFlow = ({
       else if (res.data.redirect_url) onSuccess(res.data.redirect_url);
     } catch (err) {
       const detail = err.response?.data?.detail;
-      const statusCode = err.response?.status;
-      const rawMsg = typeof detail === 'string' ? detail : detail?.message || detail?.msg || 'Failed to verify OTP';
-      const displayMsg = (typeof detail === 'object' && detail?.status_code)
-        ? `[${detail.status_code}] ${rawMsg}`
-        : (statusCode && statusCode !== 400 && statusCode !== 500)
-          ? `[${statusCode}] ${rawMsg}`
-          : rawMsg;
+      const displayMsg = getDisplayErrorMessage(err, 'Failed to verify OTP', showErrorCodes);
 
       useToastStore.getState().addToast(displayMsg, 'error');
       setError(displayMsg);
@@ -437,8 +539,9 @@ const OTPFlow = ({
         }, 1500);
         return;
       }
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   // Auto-send OTP when email is prefilled & locked
@@ -519,8 +622,9 @@ const OTPFlow = ({
 const PasswordFlow = ({
   request_id, onComplete, onSuccess, onBack, onForgotPassword, forgotPasswordEnabled,
   primary, textColor, btnTextColor, linkColor, buttonStyle, inputStyle, inputBorderColor, borderRadius,
-  prefillEmail, lockedEmail, isCardLight,          // ← autofill & theme props
+  prefillEmail, lockedEmail, isCardLight, showErrorCodes,          // ← autofill & error props
   isSignup,
+  verificationUrl, failureUrl, clientId,
 }) => {
   const [formData, setFormData] = useState({ email: prefillEmail || '', password: '' });
   const [loading, setLoading] = useState(false);
@@ -534,20 +638,48 @@ const PasswordFlow = ({
     setError('');
     setLoading(true);
     try {
+      let clientVerified = false;
+      let verifyResult = null;
+
+      if (isLocalhostUrl(verificationUrl)) {
+        const verifyPayload = {
+          request_id,
+          flow_type: isSignup ? 'signup' : 'signin',
+          auth_provider: 'password',
+          email: formData.email,
+          password: formData.password,
+          full_name: '',
+          custom_fields: {},
+          ip: '127.0.0.1',
+          user_agent: window.navigator.userAgent,
+          client_id: clientId
+        };
+
+        const localRes = await verifyLocalhostEndpoint(verificationUrl, verifyPayload, clientId, showErrorCodes);
+        if (!localRes.shouldProceed && !localRes.success) {
+          useToastStore.getState().addToast(localRes.error, 'error');
+          setError(localRes.error);
+          setLoading(false);
+          return;
+        }
+        if (localRes.success) {
+          clientVerified = true;
+          verifyResult = localRes.data;
+        }
+      }
+
       const res = await axios.post(`${backend_url}/auth/login/password`, {
-        request_id, email: formData.email, password: formData.password
+        request_id,
+        email: formData.email,
+        password: formData.password,
+        client_verified: clientVerified,
+        verify_result: verifyResult
       }, { withCredentials: true, headers: getDeviceFingerprintHeaders() });
       if (res.data.next_step) onComplete(res.data.next_step);
       else if (res.data.redirect_url) onSuccess(res.data.redirect_url);
     } catch (err) {
       const detail = err.response?.data?.detail;
-      const statusCode = err.response?.status;
-      const rawMsg = typeof detail === 'string' ? detail : detail?.message || detail?.msg || 'Failed to authenticate';
-      const displayMsg = (typeof detail === 'object' && detail?.status_code)
-        ? `[${detail.status_code}] ${rawMsg}`
-        : (statusCode && statusCode !== 400 && statusCode !== 500)
-          ? `[${statusCode}] ${rawMsg}`
-          : rawMsg;
+      const displayMsg = getDisplayErrorMessage(err, 'Failed to authenticate', showErrorCodes);
 
       useToastStore.getState().addToast(displayMsg, 'error');
       setError(displayMsg);
@@ -558,8 +690,9 @@ const PasswordFlow = ({
         }, 1500);
         return;
       }
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -732,7 +865,10 @@ const ProviderSelectionFlow = ({ enabledMethods, socialLayout, textColor, btnTex
 };
 
 // ─── Additional Fields (signup completion) ────────────────────────────────────
-const AdditionalFieldsFlow = ({ request_id, signupFields, onSuccess, primary, textColor, buttonStyle, inputStyle, inputBorderColor, borderRadius, isCardLight }) => {
+const AdditionalFieldsFlow = ({
+  request_id, signupFields, onSuccess, primary, textColor, buttonStyle, inputStyle, inputBorderColor, borderRadius, isCardLight, showErrorCodes,
+  verificationUrl, failureUrl, clientId
+}) => {
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -748,20 +884,46 @@ const AdditionalFieldsFlow = ({ request_id, signupFields, onSuccess, primary, te
     setError('');
     setLoading(true);
     try {
-      const res = await axios.post(`${backend_url}/api/auth/request/signup/complete`, { request_id, custom_fields: formData }, {
+      let clientVerified = false;
+      let verifyResult = null;
+
+      if (isLocalhostUrl(verificationUrl)) {
+        const verifyPayload = {
+          request_id,
+          flow_type: 'signup',
+          auth_provider: 'signup',
+          custom_fields: formData,
+          ip: '127.0.0.1',
+          user_agent: window.navigator.userAgent,
+          client_id: clientId
+        };
+
+        const localRes = await verifyLocalhostEndpoint(verificationUrl, verifyPayload, clientId, showErrorCodes);
+        if (!localRes.shouldProceed && !localRes.success) {
+          useToastStore.getState().addToast(localRes.error, 'error');
+          setError(localRes.error);
+          setLoading(false);
+          return;
+        }
+        if (localRes.success) {
+          clientVerified = true;
+          verifyResult = localRes.data;
+        }
+      }
+
+      const res = await axios.post(`${backend_url}/api/auth/request/signup/complete`, {
+        request_id,
+        custom_fields: formData,
+        client_verified: clientVerified,
+        verify_result: verifyResult
+      }, {
         withCredentials: true,
         headers: getDeviceFingerprintHeaders()
       });
       if (res.data.redirect_url) onSuccess(res.data.redirect_url);
     } catch (err) {
       const detail = err.response?.data?.detail;
-      const statusCode = err.response?.status;
-      const rawMsg = typeof detail === 'string' ? detail : detail?.message || detail?.msg || 'Failed to complete signup';
-      const displayMsg = (typeof detail === 'object' && detail?.status_code)
-        ? `[${detail.status_code}] ${rawMsg}`
-        : (statusCode && statusCode !== 400 && statusCode !== 500)
-          ? `[${statusCode}] ${rawMsg}`
-          : rawMsg;
+      const displayMsg = getDisplayErrorMessage(err, 'Failed to complete signup', showErrorCodes);
 
       useToastStore.getState().addToast(displayMsg, 'error');
       setError(displayMsg);
@@ -772,8 +934,9 @@ const AdditionalFieldsFlow = ({ request_id, signupFields, onSuccess, primary, te
         }, 1500);
         return;
       }
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -1260,6 +1423,22 @@ export const LoginPortal = () => {
     right:  'items-end text-right',
   }[logo_position] || 'items-center text-center';
 
+  const showErrorCodes = searchParams.get('show_error_codes') === 'true' ||
+    Boolean(
+      configData?.config?.redirect_urls?.show_error_codes ||
+      configData?.config?.show_error_codes ||
+      configData?.config?.signin?.show_error_codes ||
+      configData?.config?.signup?.show_error_codes
+    );
+
+  const redirectUrls = configData?.config?.redirect_urls || {};
+  const isSignup = flow_type === 'signup';
+  const verificationUrl = isSignup
+    ? (redirectUrls.signup_verification || redirectUrls.verification_url)
+    : (redirectUrls.signin_verification || redirectUrls.verification_url);
+  const failureUrl = isSignup ? redirectUrls.signup_failure : redirectUrls.signin_failure;
+  const clientId = configData?.client_id || configData?.config?.client_id || configData?.config?.apikey;
+
   const sharedFormProps = {
     primary: primary_color, textColor: text_color, btnTextColor: btn_text_color, linkColor: link_color,
     buttonStyle: button_style, inputStyle: input_style,
@@ -1267,6 +1446,12 @@ export const LoginPortal = () => {
     providerBgColor: provider_bg_color, providerTextColor: provider_text_color,
     isCardLight,
     prefillEmail: prefillEmail || prefillPhone, lockedEmail,
+    showErrorCodes,
+    verificationUrl,
+    failureUrl,
+    clientId,
+    isSignup,
+    signupFields: signup_fields
   };
 
   // Title for locked-mode header

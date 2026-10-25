@@ -64,6 +64,7 @@ const DEFAULT_REDIRECT_URLS = {
   signup_success: '',
   signup_failure: '',
   signup_verification: '',
+  show_error_codes: false,
 };
 
 // Password is the first/default method

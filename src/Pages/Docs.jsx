@@ -991,7 +991,7 @@ export const AuthDocs = () => {
                         Decoded JWT token payload issued after standard authentication without passing custom app metadata.
                       </p>
                       <CodeEditor
-                        code={`{\n  "email": "alex.dev@gmail.com",\n  "mobile_number": null,\n  "name": "Alex Dev",\n  "profile_picture": "https://lh3.googleusercontent.com/a/...",\n  "auth_provider": "google",\n  "custom_fields": {},\n  "additional_infos": null,\n  "prefilled": false,\n  "lock_method": null,\n  "ip": "127.0.0.1",\n  "browser": "Mozilla/5.0...",\n  "exp": 1786218915\n}`}
+                        code={`{\n  "email": "alex.dev@gmail.com",\n  "mobile_number": null,\n  "name": "Alex Dev",\n  "profile_picture": "https://lh3.googleusercontent.com/a/...",\n  "flow_type": "signin",\n  "auth_provider": "google",\n  "custom_fields": {},\n  "additional_infos": null,\n  "prefilled": false,\n  "lock_method": null,\n  "ip": "127.0.0.1",\n  "browser": "Mozilla/5.0...",\n  "exp": 1786218915\n}`}
                         language="json"
                         filename="standard-jwt-decoded.json"
                       />
@@ -1007,7 +1007,7 @@ export const AuthDocs = () => {
                         Decoded JWT payload returning custom app metadata passed during <code className="text-cyan-900 font-bold bg-cyan-50 border border-cyan-200 px-1.5 py-0.5 rounded text-xs">/auth</code> along with user signup fields.
                       </p>
                       <CodeEditor
-                        code={`{\n  "email": "john.doe@acme.com",\n  "mobile_number": "+19876543210",\n  "name": "John Doe",\n  "profile_picture": "https://example.com/avatar.png",\n  "auth_provider": "password",\n  "custom_fields": {\n    "fullname": "John Doe",\n    "phone": "+19876543210"\n  },\n  "additional_infos": {\n    "role": "admin",\n    "tenant_id": "org_acme_corp",\n    "custom_user_id": "usr_abc123"\n  },\n  "location": {\n    "lat": 9.848474,\n    "lng": 78.094087\n  },\n  "prefilled": false,\n  "lock_method": null,\n  "ip": "127.0.0.1",\n  "browser": "Mozilla/5.0...",\n  "exp": 1786218915\n}`}
+                        code={`{\n  "email": "john.doe@acme.com",\n  "mobile_number": "+19876543210",\n  "name": "John Doe",\n  "profile_picture": "https://example.com/avatar.png",\n  "flow_type": "signin",\n  "auth_provider": "password",\n  "custom_fields": {\n    "fullname": "John Doe",\n    "phone": "+19876543210"\n  },\n  "additional_infos": {\n    "role": "admin",\n    "tenant_id": "org_acme_corp",\n    "custom_user_id": "usr_abc123"\n  },\n  "location": {\n    "lat": 9.848474,\n    "lng": 78.094087\n  },\n  "prefilled": false,\n  "lock_method": null,\n  "ip": "127.0.0.1",\n  "browser": "Mozilla/5.0...",\n  "exp": 1786218915\n}`}
                         language="json"
                         filename="extended-jwt-decoded.json"
                       />
@@ -1032,7 +1032,11 @@ export const AuthDocs = () => {
 
                   <div className="border-t border-slate-200 pt-6">
                     <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider mb-4">Claim Descriptions</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+                    <div className="grid grid-cols-1 md:grid-cols-5 gap-4 text-sm">
+                      <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 shadow-xs">
+                        <code className="text-cyan-900 font-bold font-mono text-xs bg-cyan-100/70 border border-cyan-200 px-2 py-0.5 rounded-md">flow_type</code>
+                        <p className="text-slate-600 text-xs mt-2 leading-relaxed font-medium">Flow identifier (<code className="text-slate-900 font-bold bg-white border border-slate-200 px-1 py-0.5 rounded">signin</code>, <code className="text-slate-900 font-bold bg-white border border-slate-200 px-1 py-0.5 rounded">signup</code>, <code className="text-slate-900 font-bold bg-white border border-slate-200 px-1 py-0.5 rounded">password_reset</code>, <code className="text-slate-900 font-bold bg-white border border-slate-200 px-1 py-0.5 rounded">two_factor</code>).</p>
+                      </div>
                       <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 shadow-xs">
                         <code className="text-cyan-900 font-bold font-mono text-xs bg-cyan-100/70 border border-cyan-200 px-2 py-0.5 rounded-md">additional_infos</code>
                         <p className="text-slate-600 text-xs mt-2 leading-relaxed font-medium">Custom key-value metadata provided by your application when requesting <code className="text-slate-900 font-bold bg-white border border-slate-200 px-1 py-0.5 rounded">POST /auth</code>.</p>
